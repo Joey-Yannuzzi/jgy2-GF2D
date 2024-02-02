@@ -3,6 +3,8 @@
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
+#include "drgn_entity.h"
+#include "drgn_player.h"
 
 int main(int argc, char * argv[])
 {
@@ -15,6 +17,7 @@ int main(int argc, char * argv[])
     float mf = 0;
     Sprite *mouse;
     Color mouseColor = gfc_color8(255,100,255,200);
+    DRGN_Entity* player;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -29,11 +32,17 @@ int main(int argc, char * argv[])
         0);
     gf2d_graphics_set_frame_delay(16);
     gf2d_sprite_init(1024);
+
+    drgn_entitySystemInit(1024);
+
     SDL_ShowCursor(SDL_DISABLE);
     
     /*demo setup*/
     sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
+
+    player = drgn_playerNew();
+
     /*main game loop*/
     while(!done)
     {
@@ -44,11 +53,16 @@ int main(int argc, char * argv[])
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
         
+        drgn_entitySystemThink();
+        drgn_entitySystemUpdate();
+
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
             gf2d_sprite_draw_image(sprite,vector2d(0,0));
-            
+
+            drgn_entitySystemDraw();
+
             //UI elements last
             gf2d_sprite_draw(
                 mouse,
@@ -65,6 +79,9 @@ int main(int argc, char * argv[])
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
+
+    drgn_entityFree(player);
+
     slog("---==== END ====---");
     return 0;
 }
