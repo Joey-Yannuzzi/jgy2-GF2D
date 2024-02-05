@@ -98,6 +98,7 @@ void drgn_entityFree(DRGN_Entity* self)
 	}
 
 	gf2d_sprite_free(self->sprite);
+	self->_inuse = 0;
 	//TODO: don't forget to free anything that gets allocated
 
 	if (self->free)
@@ -172,7 +173,7 @@ void drgn_entityDraw(DRGN_Entity* self)
 
 	if (self->sprite)
 	{
-		gf2d_sprite_render(self->sprite, self->pos, NULL, NULL, NULL, NULL, NULL, NULL, (Uint32)self->frame);
+		gf2d_sprite_render(self->sprite, self->pos, &self->scale, NULL, NULL, NULL, &self->color, NULL, (Uint32)self->frame);
 	}
 }
 
@@ -187,4 +188,37 @@ void drgn_entitySystemDraw()
 
 		drgn_entityDraw(&_entManager.entList[bogus]);
 	}
+}
+
+DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation)
+{
+	DRGN_Entity list[] = { 0 };
+	int units = 0;
+
+	if (!affiliation)
+	{
+		slog("No affiliation to assign to army");
+		return NULL;
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		if (_entManager.entList[bogus].affiliation == affiliation)
+		{
+			list[units++] = _entManager.entList[bogus];
+			slog("found unit");
+		}
+	}
+
+	if (units < 1)
+	{
+		return NULL;
+	}
+
+	return (&list);
 }

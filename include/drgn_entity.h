@@ -7,6 +7,14 @@
 * @purpose default entity skeleton; all entities should inherit from this
 */
 
+enum DRGN_Affiliation
+{
+	DRGN_DEFAULT,
+	DRGN_BLUE,
+	DRGN_RED,
+	DRGN_GREEN
+};
+
 typedef struct DRGN_Entity_S
 {
 	Uint8 _inuse; //used to check for memory usage
@@ -14,6 +22,9 @@ typedef struct DRGN_Entity_S
 	float frame; //current animation frame of the entity's sprite
 	Vector2D pos; //position of the entity in space
 	Vector2D velocity; //velocity vector for an entity
+	Vector2D scale; //scale entity should be scaled up to; NULL if no scaling is needed
+	Color color; //main color of the entity; NULL if not used
+	enum DRGN_Affiliation affiliation; //the units army affiliation; should never be set to DEFAULT and should be checked/caught
 	void* data; //for any additional data default entity may not have; NULL if no such data exists
 
 	void (*think) (struct DRGN_Entity_S* self); //call function to make decisions
@@ -61,5 +72,12 @@ void drgn_entitySystemUpdate();
 * @brief draw all active entities
 */
 void drgn_entitySystemDraw();
+
+/*
+* @brief writes all entities with certain affiliation to entity list pointer
+* @param list the entity pointer that is written to
+* @param affiliation the desired affiliation
+*/
+DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation);
 
 #endif
