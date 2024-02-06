@@ -82,6 +82,7 @@ DRGN_Entity* drgn_entityNew()
 		_entManager.entList[bogus]._inuse = 1;
 		//TODO: set default color/scale
 
+		//slog("creating entity %i", bogus);
 		return (&_entManager.entList[bogus]);
 	}
 
@@ -211,7 +212,7 @@ DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation)
 		if (_entManager.entList[bogus].affiliation == affiliation)
 		{
 			list[units++] = _entManager.entList[bogus];
-			slog("found unit");
+			slog("found unit %i", bogus);
 		}
 	}
 
@@ -221,4 +222,49 @@ DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation)
 	}
 
 	return (&list);
+}
+
+DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation, Vector2D pos, DRGN_Entity* self)
+{
+	slog("looking for %i affiliation", affiliation);
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		if (&_entManager.entList[bogus] == self)
+		{
+			slog("don't touch me");
+			continue;
+		}
+
+		slog("%i entity touched", bogus);
+
+		if (_entManager.entList[bogus].affiliation == affiliation && (_entManager.entList[bogus].pos.x == pos.x && _entManager.entList[bogus].pos.y == pos.y))
+		{
+			_entManager.entList[bogus].color = GFC_COLOR_GREEN;
+			return (&_entManager.entList[bogus]);
+		}
+
+		/*if (_entManager.entList[bogus].affiliation == affiliation)
+		{
+			slog("affiliation check complete on %i", bogus);
+
+			if (_entManager.entList[bogus].pos.x == pos.x)
+			{
+				slog("x pos check complete om %i", bogus);
+
+				if (_entManager.entList[bogus].pos.y == pos.y)
+				{
+					slog("y pos checkcomplete on %i", bogus);
+					return(&_entManager.entList[bogus]);
+				}
+			}
+		}*/
+	}
+
+	return NULL;
 }

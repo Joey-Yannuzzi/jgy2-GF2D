@@ -25,6 +25,8 @@ typedef struct DRGN_Entity_S
 	Vector2D scale; //scale entity should be scaled up to; NULL if no scaling is needed
 	Color color; //main color of the entity; NULL if not used
 	enum DRGN_Affiliation affiliation; //the units army affiliation; should never be set to DEFAULT and should be checked/caught
+	Uint8 selected; //used to check if this entity is selected
+	struct DRGN_Entity_S* curr; //currently selected entity
 	void* data; //for any additional data default entity may not have; NULL if no such data exists
 
 	void (*think) (struct DRGN_Entity_S* self); //call function to make decisions
@@ -79,5 +81,7 @@ void drgn_entitySystemDraw();
 * @param affiliation the desired affiliation
 */
 DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation);
+
+DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation, Vector2D pos, DRGN_Entity* self);
 
 #endif

@@ -19,6 +19,7 @@ DRGN_Entity* drgn_armyNew(enum DRGN_Affiliation affiliation, char* name)
 	if (!list)
 	{
 		slog("No units in your army");
+		drgn_entityFree(self);
 		return NULL;
 	}
 	
@@ -48,7 +49,7 @@ DRGN_Entity* drgn_armyNew(enum DRGN_Affiliation affiliation, char* name)
 		break;
 	}*/
 
-	slog("%s army created", *name);
+	slog("%s army created", name);
 	return (self);
 }
 

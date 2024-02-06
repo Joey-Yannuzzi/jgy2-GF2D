@@ -6,6 +6,7 @@
 #include "drgn_entity.h"
 #include "drgn_player.h"
 #include "drgn_army.h"
+#include "drgn_unit.h"
 
 int main(int argc, char * argv[])
 {
@@ -23,6 +24,8 @@ int main(int argc, char * argv[])
     DRGN_Entity* redArmy;
     DRGN_Entity* greenArmy;
     DRGN_Entity* noArmy;
+    DRGN_Entity* unit;
+    int stats[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -52,6 +55,9 @@ int main(int argc, char * argv[])
     * Then create armies and populate them with units
     * Finally, create the player, and populate with player's army
     */
+
+    unit = drgn_unitNew(stats, NULL, "Test", DRGN_BLUE);
+
     blueArmy = drgn_armyNew(DRGN_BLUE, "blue");
     redArmy = drgn_armyNew(DRGN_RED, "red");
     greenArmy = drgn_armyNew(DRGN_GREEN, "green");
@@ -91,6 +97,8 @@ int main(int argc, char * argv[])
                 (int)mf);
 
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
+        //slog("Player pos: %f, %f", player->pos.x, player->pos.y);
+        //slog("Unit pos: %f, %f", unit->pos.x, unit->pos.y);
         
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
