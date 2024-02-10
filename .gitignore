@@ -58,3 +58,5 @@ dragoon
 *.log
 
 makefile.dep
+
+*.xcf

@@ -3,6 +3,7 @@
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
+#include "drgn_camera.h"
 #include "drgn_entity.h"
 #include "drgn_player.h"
 #include "drgn_army.h"
@@ -33,7 +34,7 @@ int main(int argc, char * argv[])
     init_logger("gf2d.log",0);
     slog("---==== BEGIN ====---");
     gf2d_graphics_initialize(
-        "gf2d",
+        "Dragoon",
         1200,
         720,
         1200,
@@ -46,6 +47,8 @@ int main(int argc, char * argv[])
     drgn_entitySystemInit(1024);
 
     SDL_ShowCursor(SDL_DISABLE);
+
+    drgn_cameraSetSize(vector2d(1200, 720));
     
     /*demo setup*/
     //sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
@@ -54,6 +57,7 @@ int main(int argc, char * argv[])
     //slog("%i", (*(DRGN_Player*)player->data).test);
 
     world = drgn_worldNewTest();
+    drgn_worldCameraInit(world);
     /*
     * 
     * Create units first

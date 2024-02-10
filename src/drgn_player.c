@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 #include "drgn_player.h"
+#include "drgn_camera.h"
 
 DRGN_Entity* drgn_playerNew(DRGN_Entity* army)
 {
@@ -19,10 +20,10 @@ DRGN_Entity* drgn_playerNew(DRGN_Entity* army)
 		return NULL;
 	}
 
-	self->sprite = gf2d_sprite_load_all("images/cursor.png", 16, 16, 4, 0);
+	self->sprite = gf2d_sprite_load_all("images/newCursor.png", 64, 64, 4, 0);
 	self->frame = 0;
 	self->pos = vector2d(0, 0);
-	self->scale = vector2d(4, 4);
+	self->scale = vector2d(1, 1);
 	self->color = GFC_COLOR_LIGHTCYAN;
 	self->affiliation = DRGN_BLUE;
 	self->think = drgn_playerThink;
@@ -41,9 +42,11 @@ void drgn_playerThink(DRGN_Entity* self)
 	const Uint8* keys;
 	Vector2D dir = { 0 };
 	SDL_Event event;
+	Vector2D offset = { 0 };
 
 	SDL_PumpEvents();
 	keys = SDL_GetKeyboardState(NULL);
+	SDL_PollEvent(&event);
 
 	if (!self)
 	{
@@ -51,19 +54,19 @@ void drgn_playerThink(DRGN_Entity* self)
 		return;
 	}
 
-	if (keys[SDL_SCANCODE_W])
+	if (keys[SDL_SCANCODE_W] && event.type == SDL_KEYDOWN)
 	{
 		dir.y = -1;
 	}
-	else if (keys[SDL_SCANCODE_S])
+	else if (keys[SDL_SCANCODE_S] && event.type == SDL_KEYDOWN)
 	{
 		dir.y = 1;
 	}
-	else if (keys[SDL_SCANCODE_A])
+	else if (keys[SDL_SCANCODE_A] && event.type == SDL_KEYDOWN)
 	{
 		dir.x = -1;
 	}
-	else if (keys[SDL_SCANCODE_D])
+	else if (keys[SDL_SCANCODE_D] && event.type == SDL_KEYDOWN)
 	{
 		dir.x = 1;
 	}
@@ -76,16 +79,27 @@ void drgn_playerThink(DRGN_Entity* self)
 	{
 		self->selected = 0;
 	}*/
-	SDL_PollEvent(&event);
+
 	if (keys[SDL_SCANCODE_SPACE] && !self->selected && event.type == SDL_KEYDOWN)
 	{
 		self->selected = 1;
 		slog("begin selection");
 	}
 
-
 	vector2d_normalize(&dir);
-	vector2d_scale(self->velocity, dir, 3);
+
+	if (dir.x)
+	{
+		offset.x = self->scale.x * self->sprite->frame_w * dir.x;
+	}
+	if (dir.y)
+	{
+		offset.y = self->scale.y * self->sprite->frame_h * dir.y;
+	}
+
+	//vector2d_normalize(&offset);
+	vector2d_copy(self->velocity, offset);
+	//vector2d_scale(self->velocity, dir, 3);
 	/*Uint32 mx, my;
 	Vector2D dir = { 0 };
 
@@ -121,6 +135,7 @@ void drgn_playerThink(DRGN_Entity* self)
 void drgn_playerUpdate(DRGN_Entity* self)
 {
 	DRGN_Entity* unit;
+	Rect bounds;
 
 	if (!self)
 	{
@@ -137,6 +152,27 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	}
 
 	vector2d_add(self->pos, self->pos, self->velocity);
+	bounds = drgn_cameraGetBounds();
+	//drgn_playerCheckBounds(self, bounds);
+
+	if ((self->pos.x + (self->scale.x * self->sprite->frame_w)) > (bounds.w + bounds.x))
+	{
+		self->pos.x = (bounds.w + bounds.x) - (self->scale.x * self->sprite->frame_w);
+	}
+	if ((self->pos.y + (self->scale.y * self->sprite->frame_h)) > (bounds.h + bounds.y))
+	{
+		self->pos.y = (bounds.h + bounds.y) - (self->scale.y * self->sprite->frame_h);
+	}
+	if (self->pos.x < bounds.x)
+	{
+		self->pos.x = bounds.x;
+	}
+	if (self->pos.y < bounds.y)
+	{
+		self->pos.y = bounds.y;
+	}
+
+	drgn_cameraCenterOn(self->pos);
 
 	if (self->selected  && !self->curr)
 	{
@@ -214,4 +250,24 @@ DRGN_Entity* drgn_playerCheckSelectionByPosition(DRGN_Entity* selector, DRGN_Ent
 	}
 
 	return NULL;
+}
+
+void drgn_playerCheckBounds(DRGN_Entity* self, Rect bounds)
+{
+	if ((self->pos.x + (self->scale.x * self->sprite->frame_w)) > (bounds.w + bounds.x))
+	{
+		self->pos.x = (bounds.w + bounds.x) - (self->scale.x * self->sprite->frame_w);
+	}
+	if ((self->pos.y + (self->scale.y * self->sprite->frame_h)) > (bounds.h + bounds.y))
+	{
+		self->pos.y = (bounds.h + bounds.y) - (self->scale.y * self->sprite->frame_h);
+	}
+	if (self->pos.x < bounds.x)
+	{
+		self->pos.x = bounds.x;
+	}
+	if (self->pos.y < bounds.y)
+	{
+		self->pos.y = bounds.y;
+	}
 }

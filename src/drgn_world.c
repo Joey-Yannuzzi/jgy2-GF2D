@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 #include "gf2d_graphics.h"
+#include "drgn_camera.h"
 #include "drgn_world.h"
 
 DRGN_World* drgn_worldNew(int width, int height)
@@ -44,6 +45,7 @@ void drgn_worldDraw(DRGN_World* self)
 	Uint8 frame;
 	int index;
 	Vector2D pos;
+	Vector2D offset;
 
 	if (!self)
 	{
@@ -51,6 +53,7 @@ void drgn_worldDraw(DRGN_World* self)
 		return;
 	}
 
+	offset = drgn_cameraGetOffset();
 	gf2d_sprite_draw_image(self->background, vector2d(0, 0));
 
 	if (!self->tileSet)
@@ -59,13 +62,14 @@ void drgn_worldDraw(DRGN_World* self)
 		return;
 	}
 
-	gf2d_sprite_draw_image(self->tileLayer, vector2d(0, 0));
+	gf2d_sprite_draw_image(self->tileLayer, offset);
 }
 
 DRGN_World* drgn_worldNewTest()
 {
 	DRGN_World* self;
-	int width = 75, height = 45;
+	Vector2D size = drgn_cameraGetSize();
+	int width = size.x / 64 , height = size.y/64;
 	self = drgn_worldNew(width, height);
 
 	if (!self)
@@ -74,7 +78,7 @@ DRGN_World* drgn_worldNewTest()
 	}
 
 	self->background = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
-	self->tileSet = gf2d_sprite_load_all("images/tile.png", 16, 16, 1, 1);
+	self->tileSet = gf2d_sprite_load_all("images/newTile.png", 64, 64, 1, 1);
 
 	for (int bogus = 0; bogus < width; bogus++)
 	{
@@ -97,6 +101,7 @@ void drgn_worldTileLayerRender(DRGN_World* self)
 	Vector2D pos;
 	Uint32 frame;
 	int index;
+	Vector2D scale;
 
 	if (!self)
 	{
@@ -139,6 +144,7 @@ void drgn_worldTileLayerRender(DRGN_World* self)
 			pos.x = bogus2 * self->tileSet->frame_w;
 			pos.y = bogus * self->tileSet->frame_h;
 			frame = self->tileMap[index] - 1;
+			scale = vector2d(4, 4);
 			gf2d_sprite_draw_to_surface(self->tileSet, pos, NULL, NULL, frame, self->tileLayer->surface);
 		}
 	}
@@ -150,4 +156,22 @@ void drgn_worldTileLayerRender(DRGN_World* self)
 		slog("failed to create texture from surface");
 		return;
 	}
+}
+
+void drgn_worldCameraInit(DRGN_World* self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (!self->tileLayer || !self->tileLayer->surface)
+	{
+		slog("No tile layer for the world");
+		return;
+	}
+
+	drgn_cameraSetBounds(gfc_rect(0, 0, self->tileLayer->surface->w, self->tileLayer->surface->h));
+	drgn_cameraSetBind(1);
+	drgn_cameraApplyBounds();
 }
