@@ -7,13 +7,14 @@
 #include "drgn_player.h"
 #include "drgn_army.h"
 #include "drgn_unit.h"
+#include "drgn_world.h"
 
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
     int done = 0;
     const Uint8 * keys;
-    Sprite *sprite;
+    //Sprite *sprite;
     
     int mx,my;
     float mf = 0;
@@ -26,6 +27,7 @@ int main(int argc, char * argv[])
     DRGN_Entity* noArmy;
     DRGN_Entity* unit;
     int stats[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    DRGN_World* world;
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -46,11 +48,14 @@ int main(int argc, char * argv[])
     SDL_ShowCursor(SDL_DISABLE);
     
     /*demo setup*/
-    sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
+    //sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
 
     //slog("%i", (*(DRGN_Player*)player->data).test);
+
+    world = drgn_worldNewTest();
     /*
+    * 
     * Create units first
     * Then create armies and populate them with units
     * Finally, create the player, and populate with player's army
@@ -81,8 +86,9 @@ int main(int argc, char * argv[])
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
-            gf2d_sprite_draw_image(sprite,vector2d(0,0));
+            //gf2d_sprite_draw_image(sprite,vector2d(0,0));
 
+        drgn_worldDraw(world);
             drgn_entitySystemDraw();
 
             //UI elements last
@@ -106,6 +112,7 @@ int main(int argc, char * argv[])
 
     //drgn_entityFree(player);
     drgn_entityCleanAll(NULL);
+    drgn_worldFree(world);
 
     slog("---==== END ====---");
     return 0;
