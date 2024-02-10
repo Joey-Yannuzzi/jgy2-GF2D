@@ -13,10 +13,10 @@ DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, char* name, enum D
 		return NULL;
 	}
 
-	self->sprite = gf2d_sprite_load_all("images/unit.png", 16, 16, 4, 0);
+	self->sprite = gf2d_sprite_load_all("images/newUnit.png", 64, 64, 4, 0);
 	self->frame = 0;
 	self->pos = vector2d(0, 0);
-	self->scale = vector2d(4, 4);
+	self->scale = vector2d(1, 1);
 	
 	switch (affiliation)
 	{

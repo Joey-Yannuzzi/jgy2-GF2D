@@ -1,4 +1,5 @@
 #include "simple_logger.h"
+#include "drgn_camera.h"
 #include "drgn_entity.h"
 
 typedef struct
@@ -166,15 +167,20 @@ void drgn_entitySystemUpdate()
 
 void drgn_entityDraw(DRGN_Entity* self)
 {
+	Vector2D offset, pos;
+
 	if (!self)
 	{
 		slog("No entity to draw");
 		return;
 	}
 
+	offset = drgn_cameraGetOffset();
+	vector2d_add(pos, offset, self->pos);
+
 	if (self->sprite)
 	{
-		gf2d_sprite_render(self->sprite, self->pos, &self->scale, NULL, NULL, NULL, &self->color, NULL, (Uint32)self->frame);
+		gf2d_sprite_render(self->sprite, pos, &self->scale, NULL, NULL, NULL, &self->color, NULL, (Uint32)self->frame);
 	}
 }
 

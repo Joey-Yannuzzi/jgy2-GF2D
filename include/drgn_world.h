@@ -37,4 +37,6 @@ DRGN_World* drgn_worldNewTest();
 
 void drgn_worldTileLayerRender(DRGN_World* self);
 
+void drgn_worldCameraInit(DRGN_World* self);
+
 #endif
