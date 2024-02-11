@@ -39,4 +39,11 @@ void drgn_worldTileLayerRender(DRGN_World* self);
 
 void drgn_worldCameraInit(DRGN_World* self);
 
+/*
+* @brief loads world from json file format
+* @param file the name of the file to be loaded as a json object
+* @return the resulting world object's pointer; NULL on error
+*/
+DRGN_World* drgn_worldLoad(const char* file);
+
 #endif

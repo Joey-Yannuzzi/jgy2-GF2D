@@ -1,4 +1,5 @@
 #include "simple_logger.h"
+#include "simple_json.h"
 #include "gf2d_graphics.h"
 #include "drgn_camera.h"
 #include "drgn_world.h"
@@ -174,4 +175,139 @@ void drgn_worldCameraInit(DRGN_World* self)
 	drgn_cameraSetBounds(gfc_rect(0, 0, self->tileLayer->surface->w, self->tileLayer->surface->h));
 	drgn_cameraSetBind(1);
 	drgn_cameraApplyBounds();
+}
+
+DRGN_World* drgn_worldLoad(const char* file)
+{
+	DRGN_World* world;
+	SJson* json;
+	SJson* worldJson;
+	SJson* vertical;
+	SJson* horizontal;
+	SJson* item;
+	int width, height, tile;
+	int frameWidth, frameHeight, framesPerLine;
+	const char* tileSet;
+	const char* background;
+
+	if (!file)
+	{
+		slog("No file to load from");
+		return NULL;
+	}
+
+	json = sj_load(file);
+
+	if (!json)
+	{
+		slog("Error loading json file from name %s", file);
+		return NULL;
+	}
+
+	worldJson = sj_object_get_value(json, "world");
+
+	if (!worldJson)
+	{
+		slog("No world object in json file");
+		sj_free(json);
+		return NULL;
+	}
+
+	vertical = sj_object_get_value(worldJson, "tileMap");
+
+	if (!vertical)
+	{
+		slog("Error obtaining vertical array in json object");
+		sj_free(json);
+		return NULL;
+	}
+
+	height = sj_array_get_count(vertical);
+	horizontal = sj_array_get_nth(vertical, 0);
+
+	if (!horizontal)
+	{
+		slog("Error obtaining horizontal array in json object");
+		sj_free(json);
+		return NULL;
+	}
+
+	width = sj_array_get_count(horizontal);
+	world = drgn_worldNew(width, height);
+
+	if (!world)
+	{
+		slog("World could not be created");
+		sj_free(json);
+		return NULL;
+	}
+
+	for (int bogus = 0; bogus < height; bogus++)
+	{
+		horizontal = sj_array_get_nth(vertical, bogus);
+
+		if (!horizontal)
+		{
+			continue;
+		}
+
+		for (int bogus2 = 0; bogus2 < width; bogus2++)
+		{
+			item = sj_array_get_nth(horizontal, bogus2);
+
+			if (!item)
+			{
+				continue;
+			}
+
+			tile = 0;
+			sj_get_integer_value(item, &tile);
+			world->tileMap[bogus2 + (bogus * width)] = tile;
+		}
+	}
+
+	tileSet = sj_object_get_value_as_string(worldJson, "tileSet");
+
+	if (!tileSet)
+	{
+		slog("No tile set image provided");
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
+	background = sj_object_get_value_as_string(worldJson, "background");
+
+	if (!background)
+	{
+		slog("No background image loaded, I hope you know what you're doing");
+	}
+
+	sj_object_get_value_as_int(worldJson, "frameWidth", &frameWidth);
+	sj_object_get_value_as_int(worldJson, "frameHeight", &frameHeight);
+
+	if (!frameWidth || !frameHeight)
+	{
+		slog("invalid frame height or width (%i, %i)", frameWidth, frameHeight);
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
+	sj_object_get_value_as_int(worldJson, "framesPerLine", &framesPerLine);
+
+	if (!framesPerLine)
+	{
+		slog("invalid frames per line %i", framesPerLine);
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
+	world->tileSet = gf2d_sprite_load_all(tileSet, frameWidth, frameHeight, framesPerLine, 1);
+	world->background = gf2d_sprite_load_image(background);
+	drgn_worldTileLayerRender(world);
+	sj_free(json);
+	slog("World created from file %s", file);
+	return (world);
 }
