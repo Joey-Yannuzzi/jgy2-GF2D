@@ -1,30 +1,20 @@
-# gameframework2d (GF2D)
-a collection of utlitity functions designed to facilitate creating 2D games with SDL2
-This project is specifically intended to function as an educational tool for my students taking 2D Game Programming.
+# Project Dragoon
+**A turn based strategy RPG in the making**
 
-FOR FULL FEATURES CHECKOUT THE MASTER BRANCH
-Students: Don't do that.  You are not ready.... yet.
+## About
+Project Dragoon is a turn based strategy RPG inspired by games such as Fire Emblem, Final Fantasy Tactics, and Advanced Wars.  The game will have a large emphasis on building an army up from nothing by recruiting soldiers and training them into hardened warriors.  Play as the captain of a small merenary company hired to help fight in a deadly war.  Fight, survive and recruit enemies and allies to join your company to build up your strength and increase your odds of surviving this war.
 
-The main branch is kept deliberately minimal to allow students to build out systems as they are learning.
-Other branches have more complete system: Collisions, Windows, Armatures, Entities, Particles...
+## How to Play
+### Controls
+Use W,S, A, and D to move the cursor.  To select a unit, press the spacebar when hovering over a unit.  Press the spcebar again to move the unit to the selected position.
 
-# Build Process
+###Gameplay
+Your goal: survive
+Move your units into strategic positions and attack enemies that stand in your way.  Different maps have different objectives, so pay attention closely to the objective to be completed.  Have your units swing swords, cast spells, or heal themselfs to increase their chances of victory in battles.  Talk to enemies and recruit them to your cause to bolster your forces.  Protect other allies and villages from raiders and get rewards for your efforts.
 
-Before you can build the example code we are providing for you, you will need to obtain the libraries required
-by the source code
- - SDL2
- - SDL2_image
- - SDL2_mixer
- - SDL2_ttf
-There are additional sub modules that are needed for this project to work as well, but they can be pulled right from within the project.
-Performable from the following steps from the root of the cloned git repository within a terminal. 
-
-Make sure you fetch submodules: `git submodule update --init --recursive`
-Go into each submodule's src directory and type:
-`make`
-`make static`
-
-Once each submodule has been made you can go into the base project src folder anre simply type:
-`make`
-
-You should now have a `gf2d` binary within the root of your git repository. Executing this will start your game.
+## Features
+- Read maps from files and draw them acording to the files
+- An entity management system that tracks player, enemy, and ally units separately
+## Coming Soon
+- A UI to see units stats, inventory and other useful information
+- Save games and loading saved games
