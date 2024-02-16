@@ -56,7 +56,7 @@ int main(int argc, char * argv[])
 
     //slog("%i", (*(DRGN_Player*)player->data).test);
 
-    world = drgn_worldLoad("maps/drgn_test.json");
+    world = drgn_worldLoad("defs/maps/drgn_test.json");
     drgn_worldCameraInit(world);
     /*
     * 

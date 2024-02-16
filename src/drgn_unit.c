@@ -49,7 +49,7 @@ DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, char* name, enum D
 
 	temp.lvl = stats[0];
 	temp.hp = stats[1];
-	temp.pow = stats[2];
+	temp.str = stats[2];
 	temp.skl = stats[3];
 	temp.spd = stats[4];
 	temp.lck = stats[5];

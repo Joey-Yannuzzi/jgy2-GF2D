@@ -1,0 +1,154 @@
+{
+  "items" : [
+    {
+      "name": "smallPotion",
+      "displayName": "Small Potion",
+      "cost": 500,
+      "type": "consumable",
+      "heal": 10,
+      "uses": 5,
+      "description" : "A small potion that heals 10 HP."
+    },
+
+    {
+      "name": "mediumPotion",
+      "displayName": "Medium Potion",
+      "cost": 950,
+      "type": "consumable",
+      "heal": 20,
+      "uses": 5,
+      "description": "A medium potion that heals 20 HP."
+    },
+
+    {
+      "name": "largePotion",
+      "displayName": "Large Potion",
+      "cost": 1800,
+      "type": "consumable",
+      "heal": -1,
+      "uses": 5,
+      "description": "A large potion that heals all HP."
+    },
+
+    {
+      "name": "lvlIncrease",
+      "displayName": "Memory Mint",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 0,
+      "increase": 1,
+      "uses": 1,
+      "decription": "A psychodelic mint that makes the consumer halucinate memories from battles past.  Increases level by 1."
+    },
+
+    {
+      "name": "hpIncrease",
+      "displayName": "Hearty Haggis",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 1,
+      "increase": 10,
+      "uses": 1,
+      "decription": "The dish of choice in some of eastern regions.  Increases HP by 10."
+    },
+
+    {
+      "name": "strIncrease",
+      "displayName": "Mighty Mango",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 2,
+      "increase": 2,
+      "uses": 1,
+      "decription": "A mango fabled to gift one the strength of The Old Gods when eaten in every day.  Increases strength by 2."
+    },
+
+    {
+      "name": "mgcIncrease",
+      "displayName": "Mystical Mercury",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 3,
+      "increase": 2,
+      "uses": 1,
+      "decription": "While its not a potion for immortallity, it will help one's magical abilities.'.  Increases magic by 2."
+    },
+
+    {
+      "name": "sklIncrease",
+      "displayName": "Accuracy Apple",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 4,
+      "increase": 2,
+      "uses": 1,
+      "decription": "They say an apple a day keeps the enemies away.  Increases skill by 2."
+    },
+
+    {
+      "name": "spdIncrease",
+      "displayName": "Speed Sap",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 5,
+      "increase": 2,
+      "uses": 1,
+      "decription": "A special sap taken from trees in Calencia.  Increases speed by 2."
+    },
+
+    {
+      "name": "lckIncrease",
+      "displayName": "Lucky Lemon",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 6,
+      "increase": 4,
+      "uses": 1,
+      "decription": "When life gives you lemons, go and gamble that life away.  Increases luck by 4."
+    },
+
+    {
+      "name": "defIncrease",
+      "displayName": "Sturdy Sturgeon",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 7,
+      "increase": 2,
+      "uses": 1,
+      "decription": "The signature dish of the Narinian Archapeligo.  Increases defense by 2."
+    },
+
+    {
+      "name": "resIncrease",
+      "displayName": "Warding Watermelon",
+      "cost": 50000,
+      "type": "consumable",
+      "stat": 8,
+      "increase": 2,
+      "uses": 1,
+      "decription": "A watermelon blessed with by the High Priests.  Increases resitance by 2."
+    },
+
+    {
+      "name": "movIncrease",
+      "displayName": "Boots",
+      "cost": 100000,
+      "type": "consumable",
+      "stat": 9,
+      "increase": 4,
+      "uses": 1,
+      "decription": "Luxorious boots fashioned to be worn during long battles.  Increases movement by 4."
+    },
+
+    {
+      "name": "buildIncrease",
+      "displayName": "Muscle Belt",
+      "cost": 100000,
+      "type": "consumable",
+      "stat": 0,
+      "increase": 4,
+      "uses": 1,
+      "decription": "A belt worn by body builders to help with extreme exercises.  Increases build by 4."
+    }
+  ]
+}

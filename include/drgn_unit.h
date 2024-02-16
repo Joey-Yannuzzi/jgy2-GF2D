@@ -5,7 +5,7 @@
 
 typedef struct
 {
-	int lvl, hp, pow, skl, spd, lck, def, res, mov, morale; //unit stats
+	int lvl, hp, str, mgc, skl, spd, lck, def, res, mov, morale; //unit stats
 	DRGN_Entity* inventory; //list of unit's inventory items
 	Sprite* moveTile; //pointer to movement tile sprite
 	Sprite* attackTitle; //pointer to attack tile sprite; NULL if cannot attack
