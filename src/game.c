@@ -9,6 +9,7 @@
 #include "drgn_army.h"
 #include "drgn_unit.h"
 #include "drgn_world.h"
+#include "drgn_inventory.h"
 
 int main(int argc, char * argv[])
 {
@@ -45,6 +46,7 @@ int main(int argc, char * argv[])
     gf2d_sprite_init(1024);
 
     drgn_entitySystemInit(1024);
+    drgn_inventoryFileInit("defs/inventory/drgn_items.json");
 
     SDL_ShowCursor(SDL_DISABLE);
 
@@ -68,15 +70,17 @@ int main(int argc, char * argv[])
     unit = drgn_unitNew(stats, NULL, "Test", DRGN_BLUE);
 
     blueArmy = drgn_armyNew(DRGN_BLUE, "blue");
-    redArmy = drgn_armyNew(DRGN_RED, "red");
+    /*redArmy = drgn_armyNew(DRGN_RED, "red");
     greenArmy = drgn_armyNew(DRGN_GREEN, "green");
-    noArmy = drgn_armyNew(DRGN_DEFAULT, "none");
+    noArmy = drgn_armyNew(DRGN_DEFAULT, "none");*/
 
     player = drgn_playerNew(blueArmy);
 
     /*main game loop*/
     while(!done)
     {
+        //slog("here");
+        //slog("Unit named %s on field", ((DRGN_Unit*)unit->data)->name);
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         /*update things here*/
@@ -115,8 +119,13 @@ int main(int argc, char * argv[])
     }
 
     //drgn_entityFree(player);
+    slog("begin cleaning");
     drgn_entityCleanAll(NULL);
+    slog("cleaned entities successfully");
     drgn_worldFree(world);
+    slog("cleaned world successfully");
+    drgn_inventoryClose();
+    slog("cleaned inventory successfully");
 
     slog("---==== END ====---");
     return 0;

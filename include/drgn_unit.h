@@ -2,16 +2,17 @@
 #define __DRGN_UNIT_H__
 
 #include "drgn_entity.h"
+#include "drgn_inventory.h"
 
 typedef struct
 {
 	int lvl, hp, str, mgc, skl, spd, lck, def, res, mov, morale; //unit stats
-	DRGN_Entity* inventory; //list of unit's inventory items
+	DRGN_Inventory* inventory; //list of unit's inventory items
 	Sprite* moveTile; //pointer to movement tile sprite
 	Sprite* attackTitle; //pointer to attack tile sprite; NULL if cannot attack
 	Sprite* animationSprite; //pointer to closeup animation spritesheet;
 	Uint8 animate; //true if animations are on for this unit, false if not; defaults to true
-	char* name; //the units name or rank if generic
+	const char* name; //the units name or rank if generic
 	void* data; //used for class specific attributes
 }
 DRGN_Unit;
@@ -30,6 +31,6 @@ void drgn_unitFree(DRGN_Entity* self);
 * @param affiliation the affiliation for the unit
 * @return pointer to an entity; NULL if it could not be created
 */
-DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, char* name, enum DRGN_Affiliation affiliation);
+DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, const char* name, enum DRGN_Affiliation affiliation);
 
 #endif
