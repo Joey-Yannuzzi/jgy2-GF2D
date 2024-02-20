@@ -1,11 +1,11 @@
 #include "simple_logger.h"
 #include "drgn_unit.h"
 
-DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, const char* name, enum DRGN_Affiliation affiliation)
+DRGN_Entity* drgn_unitNew(int* stats, size_t statSize, const char* inventory[], const char* name, enum DRGN_Affiliation affiliation)
 {
 	DRGN_Entity* self;
 	DRGN_Unit* temp;
-	const char* names[] = { "smallPotion", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion"};
+	//const char* names[] = { "smallPotion", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion"};
 	self = drgn_entityNew();
 
 	if (!self)
@@ -48,25 +48,6 @@ DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, const char* name, 
 		return NULL;
 	}
 
-	/*temp = calloc(0, sizeof(DRGN_Unit*));
-	temp->lvl = stats[0];
-	temp->hp = stats[1];
-	temp->str = stats[2];
-	temp->skl = stats[3];
-	temp->spd = stats[4];
-	temp->lck = stats[5];
-	temp->def = stats[6];
-	temp->res = stats[7];
-	temp->mov = stats[8];
-	temp->morale = stats[9];
-	temp->inventory = inventory;
-	temp->moveTile = NULL; //same regardless of unit
-	temp->attackTitle = NULL; //same as above
-	temp->animate = 1;
-	temp->name = name;
-	self->data = temp;
-	slog("%s spawned", name);*/
-
 	temp = gfc_allocate_array(sizeof(DRGN_Unit), 1);
 
 	if (!temp)
@@ -76,22 +57,18 @@ DRGN_Entity* drgn_unitNew(int* stats, DRGN_Entity* inventory, const char* name, 
 	}
 
 	self->data = temp;
-	temp->lvl = stats[0];
-	temp->hp = stats[1];
-	temp->str = stats[2];
-	temp->skl = stats[3];
-	temp->spd = stats[4];
-	temp->lck = stats[5];
-	temp->def = stats[6];
-	temp->res = stats[7];
-	temp->mov = stats[8];
-	temp->morale = stats[9];
-	//temp->inventory = inventory;
+
+	for (int bogus = 0; bogus < statSize; bogus++)
+	{
+		temp->stats[bogus] = stats[bogus];
+	}
+
+	slog("stats allocated");
 	temp->moveTile = NULL; //same regardless of unit
 	temp->attackTitle = NULL; //same as above
 	temp->animate = 1;
 	temp->name = name;
-	temp->inventory = drgn_inventoryNew(names, 5);
+	temp->inventory = drgn_inventoryNew(inventory, 5);
 
 	if (!temp->inventory)
 	{

@@ -28,8 +28,10 @@ int main(int argc, char * argv[])
     DRGN_Entity* greenArmy;
     DRGN_Entity* noArmy;
     DRGN_Entity* unit;
-    int stats[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int stats[] = { 1, 18, 5, 0, 5, 7, 0, 5, 0, 5, 7 };
     DRGN_World* world;
+    DRGN_Unit* me;
+    const char* names[] = { "smallPotion", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -67,7 +69,13 @@ int main(int argc, char * argv[])
     * Finally, create the player, and populate with player's army
     */
 
-    unit = drgn_unitNew(stats, NULL, "Test", DRGN_BLUE);
+    unit = drgn_unitNew(stats, sizeof(stats)/sizeof(stats[0]), names, "Test", DRGN_BLUE);
+    me = (DRGN_Unit*)unit->data;
+
+    for (int bogus = 0; bogus < sizeof(me->stats) / sizeof(*me->stats); bogus++)
+    {
+        slog("Stat: %i\nValue: %i", bogus, me->stats[bogus]);
+    }
 
     blueArmy = drgn_armyNew(DRGN_BLUE, "blue");
     /*redArmy = drgn_armyNew(DRGN_RED, "red");

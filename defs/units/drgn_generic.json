@@ -1,0 +1,10 @@
+{
+  "generic": [
+    {
+      "name": "soldier",
+      "displayName": "Soldier",
+      "stats": [ 1, 18, 5, 0, 5, 7, 0, 5, 0, 5, 7 ],
+      "weaponTypes": [0, 1, 0, 0, 0, 0, 0, 0, 0]
+    }
+  ]
+}

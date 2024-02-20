@@ -145,7 +145,7 @@
       "displayName": "Muscle Belt",
       "cost": 100000,
       "type": 2,
-      "stat": 0,
+      "stat": 10,
       "increase": 4,
       "uses": 1,
       "description": "A belt worn by body builders to help with extreme exercises.  Increases build by 4."
