@@ -66,6 +66,7 @@ void drgn_entityCleanAll(DRGN_Entity* ignore)
 			continue;
 		}
 
+		slog("Freeing entity number %i", bogus);
 		drgn_entityFree(&_entManager.entList[bogus]);
 	}
 }
@@ -99,14 +100,19 @@ void drgn_entityFree(DRGN_Entity* self)
 		return;
 	}
 
-	gf2d_sprite_free(self->sprite);
+	if (self->sprite)
+	{
+		gf2d_sprite_free(self->sprite);
+	}
 	self->_inuse = 0;
 	//TODO: don't forget to free anything that gets allocated
 
 	if (self->free)
 	{
-		self->free(self->data);
+		self->free(self);
 	}
+
+	slog("successfully freed entity");
 }
 
 void drgn_entityThink(DRGN_Entity* self)
