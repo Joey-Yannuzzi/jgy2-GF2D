@@ -3,6 +3,7 @@
 #include "gf2d_graphics.h"
 #include "drgn_camera.h"
 #include "drgn_world.h"
+#include "drgn_unit.h"
 
 DRGN_World* drgn_worldNew(int width, int height)
 {
@@ -186,9 +187,13 @@ DRGN_World* drgn_worldLoad(const char* file)
 	SJson* horizontal;
 	SJson* item;
 	int width, height, tile;
-	int frameWidth, frameHeight, framesPerLine;
+	int frameWidth, frameHeight, framesPerLine, affiliation;
 	const char* tileSet;
 	const char* background;
+	SJson* unit;
+	SJson* unitName;
+	SJson* unitAffiliation;
+	const char* names[] = { "smallPotion", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
 
 	if (!file)
 	{
@@ -263,6 +268,58 @@ DRGN_World* drgn_worldLoad(const char* file)
 			tile = 0;
 			sj_get_integer_value(item, &tile);
 			world->tileMap[bogus2 + (bogus * width)] = tile;
+		}
+	}
+
+	vertical = sj_object_get_value(worldJson, "unitMap");
+
+	if (!vertical)
+	{
+		slog("Error obtaining vertical array in json object for unit map");
+		sj_free(json);
+		return NULL;
+	}
+
+	height = sj_array_get_count(vertical);
+	horizontal = sj_array_get_nth(vertical, 0);
+
+	if (!horizontal)
+	{
+		slog("Error obtaining horizontal array in json object for unit map");
+		sj_free(json);
+		return NULL;
+	}
+
+	width = sj_array_get_count(horizontal);
+
+	for (int bogus = 0; bogus < height; bogus++)
+	{
+		horizontal = sj_array_get_nth(vertical, bogus);
+
+		if (!horizontal)
+		{
+			continue;
+		}
+
+		for (int bogus2 = 0; bogus2 < width; bogus2++)
+		{
+			unit = sj_array_get_nth(horizontal, bogus2);
+
+			if (!unit)
+			{
+				continue;
+			}
+
+			unitName = sj_array_get_nth(unit, 0);
+			unitAffiliation = sj_array_get_nth(unit, 1);
+			sj_get_integer_value(unitAffiliation, &affiliation);
+
+			if (!unitName || !affiliation)
+			{
+				continue;
+			}
+
+			drgn_unitNew(sj_get_string_value(unitName), names, affiliation, vector2d(bogus * 64, bogus2 * 64));
 		}
 	}
 

@@ -14,7 +14,7 @@ enum DRGN_InventoryItemType
 	DRGN_AXE,
 	DRGN_BOW,
 	DRGN_RAPIER,
-	DRGN_DAGGER,
+	DRGN_DAGGER
 };
 
 typedef struct
