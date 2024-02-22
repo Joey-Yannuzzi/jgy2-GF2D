@@ -4,28 +4,36 @@
 #include "drgn_entity.h"
 #include "drgn_inventory.h"
 
+#define _drgn_weapons 9 //0 sword, 1 lance, 2, axe, 3 bow, 4 rapier, 5 dagger, 6 arcane, 7 divine, 8 natural
+#define _drgn_stats 11 //0 lvl, 1 hp, 2, str, 3 mag, 4 skl, 5 spd, 6 lck, 7 def, 8 res, 9 mov, 10 bld
+
+static SJson* _unitJson = NULL;
+static SJson* _unitIds = NULL;
+
 enum DRGN_UnitWeaponLvl
 {
-	DRGN_NOT_WIELDABLE,
-	DRGN_E,
-	DRGN_D,
-	DRGN_C,
-	DRGN_B,
-	DRGN_A,
-	DRGN_S
+	DRGN_WEAPON_NONE,
+	DRGN_WEAPON_E,
+	DRGN_WEAPON_D,
+	DRGN_WEAPON_C,
+	DRGN_WEAPON_B,
+	DRGN_WEAPON_A,
+	DRGN_WEAPON_S
 };
 
 typedef struct
 {
-	int stats[11]; //unit stats; 0 lvl, 1 hp, 2, str, 3 mag, 4 skl, 5 spd, 6 lck, 7 def, 8 res, 9 mov, 10 bld
+	int stats[_drgn_stats]; //unit stats
 	DRGN_Inventory* inventory; //list of unit's inventory items
 	Sprite* moveTile; //pointer to movement tile sprite
 	Sprite* attackTitle; //pointer to attack tile sprite; NULL if cannot attack
 	Sprite* animationSprite; //pointer to closeup animation spritesheet;
 	Uint8 animate; //true if animations are on for this unit, false if not; defaults to true
 	const char* name; //the units name or rank if generic
-	enum DRGN_UnitWeaponLvl weaponLvls[9]; //Counters for weapon levels; 0 or NULL if unit cannot wield that weapon; 0 sword, 1 lance, 2, axe, 3 bow, 4 rapier, 5 dagger, 6 arcane, 7 divine, 8 natural
-	void* data; //used for class specific attributes
+	enum DRGN_UnitWeaponLvl weaponLvls[_drgn_weapons]; //Counters for weapon levels; 0 or NULL if unit cannot wield that weapon
+	int exp; //unit experience; goes from 0 to 99 at 100 unit levels up; defaults as 0
+	int weaponExp[_drgn_weapons]; //experience for a units weapons; goes from 0 to 99 at 100 weapon level goes up one rank; defaults as 0
+	int growths[_drgn_stats]; //unit growths
 }
 DRGN_Unit;
 
@@ -43,6 +51,22 @@ void drgn_unitFree(DRGN_Entity* self);
 * @param affiliation the affiliation for the unit
 * @return pointer to an entity; NULL if it could not be created
 */
-DRGN_Entity* drgn_unitNew(int* stats, size_t statSize, const char* inventory[], const char* name, enum DRGN_Affiliation affiliation);
+//DRGN_Entity* drgn_unitNew(int* stats, size_t statSize, const char* inventory[], const char* name, enum DRGN_Affiliation affiliation);
+DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_Affiliation affiliation, Vector2D pos);
+
+/*
+* @brief initializes def file that holds units
+* @param name the name of the file
+*/
+void drgn_unitFileInit(const char* name);
+
+void drgn_unitFileFree();
+
+/*
+* @brief gets the definition of a unit
+* @param name the name of the unit
+* @return the pointer to the json object of the unit
+*/
+SJson* drgn_unitGetDefByName(const char* name);
 
 #endif

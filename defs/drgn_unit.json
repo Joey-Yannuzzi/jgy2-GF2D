@@ -1,0 +1,16 @@
+{
+  "units": [
+    {
+      "name": "soldier",
+      "class" : "Soldier",
+      "stats": [ 1, 18, 5, 0, 5, 7, 0, 5, 0, 5, 7 ],
+      "growths" : [0, 80, 45, 0, 50, 40, 45, 30, 35, 0, 0],
+      "weaponTypes": [ 0, 1, 0, 0, 0, 0, 0, 0, 0 ],
+      "sprite": "images/newUnit.png",
+      "frame": 0,
+      "width": 64,
+      "height": 64,
+      "framesPerLine" : 4
+    }
+  ]
+}

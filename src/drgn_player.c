@@ -2,21 +2,14 @@
 #include "drgn_player.h"
 #include "drgn_camera.h"
 
-DRGN_Entity* drgn_playerNew(DRGN_Entity* army)
+DRGN_Entity* drgn_playerNew()
 {
 	DRGN_Entity* self;
-	DRGN_Player temp;
 	self = drgn_entityNew();
 
 	if (!self)
 	{
 		slog("No free space for player entity exists");
-		return NULL;
-	}
-
-	if (!army)
-	{
-		slog("No army to assign the player");
 		return NULL;
 	}
 
@@ -29,9 +22,6 @@ DRGN_Entity* drgn_playerNew(DRGN_Entity* army)
 	self->think = drgn_playerThink;
 	self->update = drgn_playerUpdate;
 	self->free = drgn_playerFree;
-	temp.army = army;
-	//temp.test = 5;
-	self->data = &temp;
 	slog("Player entity spawned");
 	//slog("%i", (*(DRGN_Player*)self->data).test);
 	return (self);
