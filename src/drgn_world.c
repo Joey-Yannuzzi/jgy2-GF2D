@@ -319,7 +319,7 @@ DRGN_World* drgn_worldLoad(const char* file)
 				continue;
 			}
 
-			drgn_unitNew(sj_get_string_value(unitName), names, affiliation, vector2d(bogus * 64, bogus2 * 64));
+			drgn_unitNew(sj_get_string_value(unitName), names, affiliation, vector2d(bogus2 * 64, bogus * 64));
 		}
 	}
 
