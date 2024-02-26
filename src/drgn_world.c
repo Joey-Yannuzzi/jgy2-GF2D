@@ -4,6 +4,7 @@
 #include "drgn_camera.h"
 #include "drgn_world.h"
 #include "drgn_unit.h"
+#include "drgn_terrain.h"
 
 DRGN_World* drgn_worldNew(int width, int height)
 {
@@ -271,6 +272,46 @@ DRGN_World* drgn_worldLoad(const char* file)
 		}
 	}
 
+	tileSet = sj_object_get_value_as_string(worldJson, "tileSet");
+
+	if (!tileSet)
+	{
+		slog("No tile set image provided");
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
+	background = sj_object_get_value_as_string(worldJson, "background");
+
+	if (!background)
+	{
+		slog("No background image loaded, I hope you know what you're doing");
+	}
+
+	sj_object_get_value_as_int(worldJson, "frameWidth", &frameWidth);
+	sj_object_get_value_as_int(worldJson, "frameHeight", &frameHeight);
+
+	if (!frameWidth || !frameHeight)
+	{
+		slog("invalid frame height or width (%i, %i)", frameWidth, frameHeight);
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
+	sj_object_get_value_as_int(worldJson, "framesPerLine", &framesPerLine);
+
+	if (!framesPerLine)
+	{
+		slog("invalid frames per line %i", framesPerLine);
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
+	world->tileSet = gf2d_sprite_load_all(tileSet, frameWidth, frameHeight, framesPerLine, 1);
+	world->background = gf2d_sprite_load_image(background);
 	vertical = sj_object_get_value(worldJson, "unitMap");
 
 	if (!vertical)
@@ -319,50 +360,56 @@ DRGN_World* drgn_worldLoad(const char* file)
 				continue;
 			}
 
-			drgn_unitNew(sj_get_string_value(unitName), names, affiliation, vector2d(bogus2 * 64, bogus * 64));
+			drgn_unitNew(sj_get_string_value(unitName), names, affiliation, vector2d(bogus2 * frameWidth, bogus * frameHeight));
 		}
 	}
 
-	tileSet = sj_object_get_value_as_string(worldJson, "tileSet");
+	vertical = sj_object_get_value(worldJson, "terrainMap");
 
-	if (!tileSet)
+	if (!vertical)
 	{
-		slog("No tile set image provided");
+		slog("Error obtaining vertical array in json object");
 		sj_free(json);
-		drgn_worldFree(world);
 		return NULL;
 	}
 
-	background = sj_object_get_value_as_string(worldJson, "background");
+	height = sj_array_get_count(vertical);
+	horizontal = sj_array_get_nth(vertical, 0);
 
-	if (!background)
+	if (!horizontal)
 	{
-		slog("No background image loaded, I hope you know what you're doing");
-	}
-
-	sj_object_get_value_as_int(worldJson, "frameWidth", &frameWidth);
-	sj_object_get_value_as_int(worldJson, "frameHeight", &frameHeight);
-
-	if (!frameWidth || !frameHeight)
-	{
-		slog("invalid frame height or width (%i, %i)", frameWidth, frameHeight);
+		slog("Error obtaining horizontal array in json object");
 		sj_free(json);
-		drgn_worldFree(world);
 		return NULL;
 	}
 
-	sj_object_get_value_as_int(worldJson, "framesPerLine", &framesPerLine);
+	width = sj_array_get_count(horizontal);
 
-	if (!framesPerLine)
+	for (int bogus = 0; bogus < height; bogus++)
 	{
-		slog("invalid frames per line %i", framesPerLine);
-		sj_free(json);
-		drgn_worldFree(world);
-		return NULL;
+		horizontal = sj_array_get_nth(vertical, bogus);
+
+		if (!horizontal)
+		{
+			continue;
+		}
+
+		for (int bogus2 = 0; bogus2 < width; bogus2++)
+		{
+			item = sj_array_get_nth(horizontal, bogus2);
+
+			if (!item)
+			{
+				continue;
+			}
+
+			tile = 0;
+			sj_get_integer_value(item, &tile);
+			drgn_terrainNew(tile, vector2d(bogus2* frameWidth, bogus* frameHeight));
+			
+		}
 	}
 
-	world->tileSet = gf2d_sprite_load_all(tileSet, frameWidth, frameHeight, framesPerLine, 1);
-	world->background = gf2d_sprite_load_image(background);
 	drgn_worldTileLayerRender(world);
 	sj_free(json);
 	slog("World created from file %s", file);

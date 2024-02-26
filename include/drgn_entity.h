@@ -9,7 +9,7 @@
 
 enum DRGN_Affiliation
 {
-	DRGN_DEFAULT,
+	DRGN_DEFAULT, //only terrain will use this value
 	DRGN_BLUE,
 	DRGN_RED,
 	DRGN_GREEN

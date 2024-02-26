@@ -1,0 +1,45 @@
+{
+  "terrain": [
+    {
+      "name": "grass",
+      "displayName" : "Grass",
+      "tile": 1,
+      "moveValue": 1
+    },
+
+    {
+      "name": "forest",
+      "displayName" : "Forest",
+      "tile": 2,
+      "moveValue": 2,
+      "avoidBonus" : 10
+    },
+
+    {
+      "name": "road",
+      "displayName" : "Road",
+      "tile": 3,
+      "moveValue": 0.5
+    },
+
+    {
+      "name": "hill",
+      "displayName" : "Hill",
+      "tile": 4,
+      "moveValue": 3,
+      "ignoreClass": [ "cavalier", "paladin" ],
+      "avoidBonus": 20,
+      "defBonus" : 1
+    },
+
+    {
+      "name": "mountain",
+      "displayName" : "Mountain",
+      "tile": 5,
+      "moveValue": 4,
+      "ignoreClass": [ "soldier" ], //should ignore all except brigands
+      "avoidBonus": 50,
+      "defBonus" : 2
+    }
+  ]
+}

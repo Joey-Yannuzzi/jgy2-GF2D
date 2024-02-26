@@ -260,22 +260,6 @@ DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation
 			_entManager.entList[bogus].color = GFC_COLOR_GREEN;
 			return (&_entManager.entList[bogus]);
 		}
-
-		/*if (_entManager.entList[bogus].affiliation == affiliation)
-		{
-			slog("affiliation check complete on %i", bogus);
-
-			if (_entManager.entList[bogus].pos.x == pos.x)
-			{
-				slog("x pos check complete om %i", bogus);
-
-				if (_entManager.entList[bogus].pos.y == pos.y)
-				{
-					slog("y pos checkcomplete on %i", bogus);
-					return(&_entManager.entList[bogus]);
-				}
-			}
-		}*/
 	}
 
 	return NULL;
