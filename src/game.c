@@ -10,6 +10,7 @@
 #include "drgn_unit.h"
 #include "drgn_world.h"
 #include "drgn_inventory.h"
+#include "drgn_terrain.h"
 
 int main(int argc, char * argv[])
 {
@@ -42,6 +43,7 @@ int main(int argc, char * argv[])
     drgn_entitySystemInit(1024);
     drgn_inventoryFileInit("defs/inventory/drgn_items.json");
     drgn_unitFileInit("defs/drgn_unit.json");
+    drgn_terrainFileInit("defs/drgn_terrain.json");
 
     SDL_ShowCursor(SDL_DISABLE);
 

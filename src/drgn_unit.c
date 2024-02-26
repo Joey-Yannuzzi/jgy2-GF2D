@@ -267,7 +267,7 @@ void drgn_unitFileInit(const char* name)
 
 	if (!_unitIds)
 	{
-		slog("no generic units specified in file with name %s", name);
+		slog("no units specified in file with name %s", name);
 		sj_free(_unitJson);
 		_unitJson = NULL;
 		return;

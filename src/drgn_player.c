@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 #include "drgn_player.h"
 #include "drgn_camera.h"
+#include "drgn_terrain.h"
 
 DRGN_Entity* drgn_playerNew()
 {
@@ -61,15 +62,6 @@ void drgn_playerThink(DRGN_Entity* self)
 		dir.x = 1;
 	}
 
-	/*if (keys[SDL_SCANCODE_SPACE] && !self->selected && drgn_entityGetSelectionByPosition(self->affiliation, &self->pos, self))
-	{
-		self->selected = 1;
-	}
-	else if (keys[SDL_SCANCODE_SPACE] && self->selected && !drgn_entityGetSelectionByPosition(self->affiliation, &self->pos, self))
-	{
-		self->selected = 0;
-	}*/
-
 	if (keys[SDL_SCANCODE_SPACE] && !self->selected && event.type == SDL_KEYDOWN)
 	{
 		self->selected = 1;
@@ -87,44 +79,14 @@ void drgn_playerThink(DRGN_Entity* self)
 		offset.y = self->scale.y * self->sprite->frame_h * dir.y;
 	}
 
-	//vector2d_normalize(&offset);
 	vector2d_copy(self->velocity, offset);
-	//vector2d_scale(self->velocity, dir, 3);
-	/*Uint32 mx, my;
-	Vector2D dir = { 0 };
-
-	if (!self)
-	{
-		slog("No player to update");
-		return;
-	}
-
-	SDL_GetMouseState(&mx, &my);
-
-	if (self->pos.x < mx)
-	{
-		dir.x = 1;
-	}
-	if (self->pos.x > mx)
-	{
-		dir.x = -1;
-	}
-	if (self->pos.y < my)
-	{
-		dir.y = 1;
-	}
-	if (self->pos.y > my)
-	{
-		dir.y = -1;
-	}
-
-	vector2d_normalize(&dir);
-	vector2d_scale(self->velocity, dir, 3);*/
 }
 
 void drgn_playerUpdate(DRGN_Entity* self)
 {
 	DRGN_Entity* unit;
+	DRGN_Entity* terrain;
+	DRGN_Terrain* terrainData;
 	Rect bounds;
 
 	if (!self)
@@ -133,7 +95,6 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		return;
 	}
 
-	//slog("Player is updating");
 	self->frame += 0.05;
 
 	if (self->frame > 4)
@@ -143,7 +104,6 @@ void drgn_playerUpdate(DRGN_Entity* self)
 
 	vector2d_add(self->pos, self->pos, self->velocity);
 	bounds = drgn_cameraGetBounds();
-	//drgn_playerCheckBounds(self, bounds);
 
 	if ((self->pos.x + (self->scale.x * self->sprite->frame_w)) > (bounds.w + bounds.x))
 	{
@@ -178,17 +138,6 @@ void drgn_playerUpdate(DRGN_Entity* self)
 
 		self->curr = unit;
 		slog("Unit selected");
-		//unit = drgn_playerCheckSelectionByPosition(self, (*(DRGN_Player*)self->data).army);
-		//unit = drgn_entityGetSelectionByPosition(self->affiliation, &self->pos);
-
-		/*if (unit)
-		{
-			slog("Selected a unit");
-		}
-		else
-		{
-			self->selected = 0;
-		}*/
 	}
 	else if (self->selected && self->curr && (self->pos.x != self->curr->pos.x || self->pos.y != self->curr->pos.y))
 	{
@@ -202,6 +151,24 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	{
 		self->selected = 0;
 	}
+
+	terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
+
+	if (!terrain)
+	{
+		slog("Player not on any known terrain");
+		return;
+	}
+
+	terrainData = (DRGN_Terrain*)terrain->data;
+
+	if (!terrainData)
+	{
+		slog("No data on terrain");
+		return;
+	}
+
+	slog("Player is on terrain %s", terrainData->name);
 }
 
 void drgn_playerFree(DRGN_Entity* self)
