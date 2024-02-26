@@ -19,7 +19,7 @@ DRGN_Entity* drgn_playerNew()
 	self->pos = vector2d(0, 0);
 	self->scale = vector2d(1, 1);
 	self->color = GFC_COLOR_LIGHTCYAN;
-	self->affiliation = DRGN_BLUE;
+	self->affiliation = DRGN_CURSOR;
 	self->think = drgn_playerThink;
 	self->update = drgn_playerUpdate;
 	self->free = drgn_playerFree;
@@ -65,7 +65,7 @@ void drgn_playerThink(DRGN_Entity* self)
 	if (keys[SDL_SCANCODE_SPACE] && !self->selected && event.type == SDL_KEYDOWN)
 	{
 		self->selected = 1;
-		slog("begin selection");
+		//slog("begin selection");
 	}
 
 	vector2d_normalize(&dir);
@@ -127,23 +127,26 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	if (self->selected  && !self->curr)
 	{
 		//slog("unit selected");
-		unit = drgn_entityGetSelectionByPosition(self->affiliation, self->pos, self);
+		unit = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
 		self->selected = 0;
 
 		if (!unit)
 		{
-			slog("No unit to select");
+			//slog("No unit to select");
 			return;
 		}
 
 		self->curr = unit;
-		slog("Unit selected");
+		unit->selected = 1;
+		unit->color = GFC_COLOR_GREEN;
+		//slog("Unit selected");
 	}
 	else if (self->selected && self->curr && (self->pos.x != self->curr->pos.x || self->pos.y != self->curr->pos.y))
 	{
-		slog("unit unselected");
+		//slog("unit unselected");
 		self->curr->pos = self->pos;
 		self->curr->color = GFC_COLOR_BLUE;
+		self->curr->selected = 0;
 		self->curr = NULL;
 		self->selected = 0;
 	}
@@ -152,11 +155,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		self->selected = 0;
 	}
 
-	terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
+	/*terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
 
 	if (!terrain)
 	{
-		slog("Player not on any known terrain");
+		//slog("Player not on any known terrain");
 		return;
 	}
 
@@ -164,11 +167,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 
 	if (!terrainData)
 	{
-		slog("No data on terrain");
+		//slog("No data on terrain");
 		return;
 	}
 
-	slog("Player is on terrain %s", terrainData->name);
+	slog("Player is on terrain %s", terrainData->name);*/
 }
 
 void drgn_playerFree(DRGN_Entity* self)

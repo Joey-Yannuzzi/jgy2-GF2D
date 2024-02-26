@@ -3,6 +3,7 @@
 
 #include "drgn_entity.h"
 #include "drgn_inventory.h"
+#include "drgn_move.h"
 
 #define _drgn_weapons 9 //0 sword, 1 lance, 2, axe, 3 bow, 4 rapier, 5 dagger, 6 arcane, 7 divine, 8 natural
 #define _drgn_stats 11 //0 lvl, 1 hp, 2, str, 3 mag, 4 skl, 5 spd, 6 lck, 7 def, 8 res, 9 mov, 10 bld
@@ -34,6 +35,7 @@ typedef struct
 	int exp; //unit experience; goes from 0 to 99 at 100 unit levels up; defaults as 0
 	int weaponExp[_drgn_weapons]; //experience for a units weapons; goes from 0 to 99 at 100 weapon level goes up one rank; defaults as 0
 	int growths[_drgn_stats]; //unit growths
+	int moveDrawn; //1 if movement is drawn, 0 if not
 }
 DRGN_Unit;
 
@@ -68,5 +70,9 @@ void drgn_unitFileFree();
 * @return the pointer to the json object of the unit
 */
 SJson* drgn_unitGetDefByName(const char* name);
+
+DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos);
+
+DRGN_Entity* drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos);
 
 #endif

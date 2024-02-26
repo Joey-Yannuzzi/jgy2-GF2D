@@ -171,13 +171,18 @@ void drgn_entitySystemUpdate()
 	}
 }
 
-void drgn_entityDraw(DRGN_Entity* self)
+void drgn_entityDraw(DRGN_Entity* self, enum DRGN_Affiliation affiliation)
 {
 	Vector2D offset, pos;
 
 	if (!self)
 	{
 		slog("No entity to draw");
+		return;
+	}
+
+	if (self->affiliation != affiliation)
+	{
 		return;
 	}
 
@@ -199,7 +204,57 @@ void drgn_entitySystemDraw()
 			continue;
 		}
 
-		drgn_entityDraw(&_entManager.entList[bogus]);
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_TILE);
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_DEFAULT);
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_BLUE);
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_RED);
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_GREEN);
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_CURSOR);
 	}
 }
 
@@ -237,8 +292,7 @@ DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation)
 }
 
 DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation, Vector2D pos, DRGN_Entity* self)
-{
-	slog("looking for %i affiliation", affiliation);
+{;
 
 	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
 	{
@@ -249,15 +303,11 @@ DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation
 
 		if (&_entManager.entList[bogus] == self)
 		{
-			slog("don't touch me");
 			continue;
 		}
 
-		slog("%i entity touched", bogus);
-
 		if (_entManager.entList[bogus].affiliation == affiliation && (_entManager.entList[bogus].pos.x == pos.x && _entManager.entList[bogus].pos.y == pos.y))
 		{
-			_entManager.entList[bogus].color = GFC_COLOR_GREEN;
 			return (&_entManager.entList[bogus]);
 		}
 	}

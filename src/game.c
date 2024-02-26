@@ -25,6 +25,8 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     DRGN_Entity* player;
     DRGN_World* world;
+    //Color color = gfc_color8(255, 0, 0, 100);
+    //Vector2D vect = vector2d(1, 1);
     
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -65,6 +67,7 @@ int main(int argc, char * argv[])
     */
 
     player = drgn_playerNew();
+    //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
 
     /*main game loop*/
     while(!done)
@@ -84,9 +87,9 @@ int main(int argc, char * argv[])
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
-            //gf2d_sprite_draw_image(sprite,vector2d(0,0));
 
         drgn_worldDraw(world);
+        //gf2d_sprite_render(sprite, vector2d(0, 0), &vect, NULL, NULL, NULL, &color, NULL, 0);
             drgn_entitySystemDraw();
 
             //UI elements last
