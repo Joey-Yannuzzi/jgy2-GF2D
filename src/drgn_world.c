@@ -41,6 +41,7 @@ void drgn_worldFree(DRGN_World* self)
 	gf2d_sprite_free(self->tileLayer);
 	free(self->tileMap);
 	free(self);
+	_currentWorld = NULL;
 }
 
 void drgn_worldDraw(DRGN_World* self)
@@ -195,6 +196,12 @@ DRGN_World* drgn_worldLoad(const char* file)
 	SJson* unitName;
 	SJson* unitAffiliation;
 	const char* names[] = { "smallPotion", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
+
+	if (_currentWorld)
+	{
+		slog("world has already been created");
+		return NULL;
+	}
 
 	if (!file)
 	{
@@ -413,5 +420,21 @@ DRGN_World* drgn_worldLoad(const char* file)
 	drgn_worldTileLayerRender(world);
 	sj_free(json);
 	slog("World created from file %s", file);
+	_currentWorld = world;
 	return (world);
+}
+
+Uint32 drgn_worldGetHeight()
+{
+	return (_currentWorld->height);
+}
+
+Uint32 drgn_worldGetWidth()
+{
+	return (_currentWorld->width);
+}
+
+Uint8* drgn_worldGetTileMap()
+{
+	return (_currentWorld->tileMap);
 }

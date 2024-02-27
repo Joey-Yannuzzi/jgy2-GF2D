@@ -5,8 +5,8 @@
 
 typedef struct
 {
-	DRGN_Entity* army; //pointer to the army the player will be controlling
 	//int test;
+	int pressed; //to check if spacebar is pressed this frame
 }
 DRGN_Player;
 

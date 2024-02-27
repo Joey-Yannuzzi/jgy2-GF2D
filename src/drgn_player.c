@@ -2,10 +2,12 @@
 #include "drgn_player.h"
 #include "drgn_camera.h"
 #include "drgn_terrain.h"
+#include "drgn_unit.h"
 
 DRGN_Entity* drgn_playerNew()
 {
 	DRGN_Entity* self;
+	DRGN_Player* player;
 	self = drgn_entityNew();
 
 	if (!self)
@@ -19,12 +21,14 @@ DRGN_Entity* drgn_playerNew()
 	self->pos = vector2d(0, 0);
 	self->scale = vector2d(1, 1);
 	self->color = GFC_COLOR_LIGHTCYAN;
-	self->affiliation = DRGN_BLUE;
+	self->affiliation = DRGN_CURSOR;
 	self->think = drgn_playerThink;
 	self->update = drgn_playerUpdate;
 	self->free = drgn_playerFree;
 	slog("Player entity spawned");
 	//slog("%i", (*(DRGN_Player*)self->data).test);
+	player = gfc_allocate_array(sizeof(DRGN_Player), 1);
+	self->data = player;
 	return (self);
 }
 
@@ -34,16 +38,19 @@ void drgn_playerThink(DRGN_Entity* self)
 	Vector2D dir = { 0 };
 	SDL_Event event;
 	Vector2D offset = { 0 };
+	DRGN_Player* player;
 
 	SDL_PumpEvents();
 	keys = SDL_GetKeyboardState(NULL);
 	SDL_PollEvent(&event);
 
-	if (!self)
+	if (!self || !self->data)
 	{
 		slog("No player to update");
 		return;
 	}
+
+	player = (DRGN_Player*)self->data;
 
 	if (keys[SDL_SCANCODE_W] && event.type == SDL_KEYDOWN)
 	{
@@ -62,10 +69,11 @@ void drgn_playerThink(DRGN_Entity* self)
 		dir.x = 1;
 	}
 
-	if (keys[SDL_SCANCODE_SPACE] && !self->selected && event.type == SDL_KEYDOWN)
+	if (keys[SDL_SCANCODE_SPACE] && !player->pressed && event.type == SDL_KEYDOWN)
 	{
-		self->selected = 1;
-		slog("begin selection");
+		player->pressed = 1;
+		//self->selected = 1;
+		//slog("begin selection");
 	}
 
 	vector2d_normalize(&dir);
@@ -87,14 +95,17 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	DRGN_Entity* unit;
 	DRGN_Entity* terrain;
 	DRGN_Terrain* terrainData;
+	DRGN_Player* player;
 	Rect bounds;
+	DRGN_Unit* curr;
 
-	if (!self)
+	if (!self || !self->data)
 	{
 		slog("No player to have thoughts");
 		return;
 	}
 
+	player = (DRGN_Player*)self->data;
 	self->frame += 0.05;
 
 	if (self->frame > 4)
@@ -124,39 +135,83 @@ void drgn_playerUpdate(DRGN_Entity* self)
 
 	drgn_cameraCenterOn(self->pos);
 
-	if (self->selected  && !self->curr)
+	if (player->pressed  && !self->curr)
 	{
 		//slog("unit selected");
-		unit = drgn_entityGetSelectionByPosition(self->affiliation, self->pos, self);
-		self->selected = 0;
+		unit = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
+		player->pressed = 0;
 
 		if (!unit)
 		{
-			slog("No unit to select");
 			return;
 		}
 
+		curr = (DRGN_Unit*)unit->data;
+
+		if (!curr->active)
+		{
+			return;
+		}
+
+		self->selected = 1;
 		self->curr = unit;
-		slog("Unit selected");
+		unit->selected = 1;
+		unit->color = GFC_COLOR_GREEN;
 	}
-	else if (self->selected && self->curr && (self->pos.x != self->curr->pos.x || self->pos.y != self->curr->pos.y))
+	else if (player->pressed && self->curr && self->selected && drgn_entityGetSelectionByPosition(DRGN_TILE, self->pos, self))
 	{
-		slog("unit unselected");
+		//slog("unit unselected");
 		self->curr->pos = self->pos;
-		self->curr->color = GFC_COLOR_BLUE;
+		self->curr->color = GFC_COLOR_GREY;
+		curr = (DRGN_Unit*)self->curr->data;
+		curr->active = 0;
+		self->curr->selected = 0;
+		drgn_unitMoveFree(self->curr);
 		self->curr = NULL;
 		self->selected = 0;
+		player->pressed = 0;
+	}
+	else if (player->pressed && self->curr && self->selected && drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr))
+	{
+		curr = (DRGN_Unit*)drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr)->data;
+
+		if (!curr->active)
+		{
+			self->curr->color = GFC_COLOR_BLUE;
+			self->curr->selected = 0;
+			drgn_unitMoveFree(self->curr);
+			self->curr = NULL;
+			self->selected = 0;
+			player->pressed = 0;
+			return;
+		}
+		self->curr->color = GFC_COLOR_BLUE;
+		self->curr->selected = 0;
+		drgn_unitMoveFree(self->curr);
+		self->curr = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr);
+		self->curr->selected = 1;
+		self->curr->color = GFC_COLOR_GREEN;
+		player->pressed = 0;
+	}
+	else if (player->pressed && self->curr && self->selected)
+	{
+		self->curr->color = GFC_COLOR_BLUE;
+		self->curr->selected = 0;
+		drgn_unitMoveFree(self->curr);
+		self->curr = NULL;
+		self->selected = 0;
+		player->pressed = 0;
 	}
 	else
 	{
-		self->selected = 0;
+		player->pressed = 0;
 	}
 
-	terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
+	/*terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
 
 	if (!terrain)
 	{
-		slog("Player not on any known terrain");
+		//slog("Player not on any known terrain");
 		return;
 	}
 
@@ -164,11 +219,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 
 	if (!terrainData)
 	{
-		slog("No data on terrain");
+		//slog("No data on terrain");
 		return;
 	}
 
-	slog("Player is on terrain %s", terrainData->name);
+	slog("Player is on terrain %s", terrainData->name);*/
 }
 
 void drgn_playerFree(DRGN_Entity* self)

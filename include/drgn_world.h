@@ -14,6 +14,7 @@ typedef struct
 }
 DRGN_World;
 
+static DRGN_World* _currentWorld = NULL;
 /*
 * @brief creates new world
 * @param width the tile's width
@@ -45,5 +46,9 @@ void drgn_worldCameraInit(DRGN_World* self);
 * @return the resulting world object's pointer; NULL on error
 */
 DRGN_World* drgn_worldLoad(const char* file);
+
+Uint32 drgn_worldGetWidth();
+Uint32 drgn_worldGetHeight();
+Uint8* drgn_worldGetTileMap();
 
 #endif

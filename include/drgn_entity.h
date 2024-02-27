@@ -12,7 +12,9 @@ enum DRGN_Affiliation
 	DRGN_DEFAULT, //only terrain will use this value
 	DRGN_BLUE,
 	DRGN_RED,
-	DRGN_GREEN
+	DRGN_GREEN,
+	DRGN_CURSOR,
+	DRGN_TILE
 };
 
 typedef struct DRGN_Entity_S
