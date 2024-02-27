@@ -197,6 +197,10 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 		return NULL;
 	}
 
+	unit->moveTotal = ((unit->stats[9] * 2) + 1) * ((unit->stats[9] * 2) + 1);
+	unit->moveMap = gfc_allocate_array(sizeof(Uint8), unit->moveTotal);
+	unit->active = 1;
+
 	self->data = unit;
 	return (self);
 }
@@ -224,37 +228,40 @@ void drgn_unitThink(DRGN_Entity* self)
 			//slog("Unit is on terrain %s", terrainData->name);
 		}
 	}
+}
 
-	if (!self->selected)
-	{
-		return;
-	}
-
-	if (!self->data)
+void drgn_unitUpdate(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+	if (!self || !self->data)
 	{
 		return;
 	}
 
 	unit = (DRGN_Unit*)self->data;
 
-	if (unit->moveDrawn)
+	if (!unit->active)
 	{
+		self->frame = 0;
 		return;
 	}
 
-	check = drgn_unitCalcMove(self, unit->stats[9], self->pos);
-	self->selected = 0;
-	unit->moveDrawn = 1;
-	self->curr = check;
-}
-
-void drgn_unitUpdate(DRGN_Entity* self)
-{
 	self->frame += 0.05;
 
 	if (self->frame > 4)
 	{
 		self->frame = 0;
+	}
+
+	if (self->selected)
+	{
+		slog("Array size %i", unit->moveTotal);
+		unit->moveTiles = gfc_allocate_array(sizeof(DRGN_Entity), unit->moveTotal);
+		drgn_unitCalcMove(self, unit->stats[9], self->pos, (unit->moveTotal - 1) / 2);
+		self->selected = 0;
+		free(unit->moveMap);
+		unit->moveMap = NULL;
+		unit->moveMap = gfc_allocate_array(sizeof(Uint8), unit->moveTotal);
 	}
 }
 
@@ -291,16 +298,22 @@ void drgn_unitFree(DRGN_Entity* self)
 	free(unit);
 }
 
-DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos)
+DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos, int index)
 {
 	DRGN_Entity* move;
 	DRGN_Unit* unit;
 
-	if (!self)
+	if (!self || !self->data)
 	{
 		return NULL;
 	}
 
+	unit = (DRGN_Unit*)self->data;
+
+	if (unit->moveTiles[index])
+	{
+		return NULL;
+	}
 	Color color = gfc_color8(0, 0, 255, 100);
 	move = drgn_moveNew(color, pos, "images/tiles/move.png", self->sprite->frame_w, self->sprite->frame_h);
 
@@ -309,15 +322,17 @@ DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos)
 		return NULL;
 	}
 
+	unit->moveTiles[index] = move;
+
 	return (move);
 }
 
-DRGN_Entity* drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos)
+void drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos, int index)
 {
-	DRGN_Entity* moveEnt = NULL;
-	DRGN_Entity* nextMove = NULL;
+	DRGN_Unit* unit;
 	int x = pos.x;
 	int y = pos.y;
+	int offset;
 
 	//Base Cases:
 	//Out of movement: true
@@ -327,80 +342,85 @@ DRGN_Entity* drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos)
 	//Recusive Cases
 	//Blank square is found
 
-	if (!self)
+	if (!self || !self->data)
 	{
-		return NULL;
+		return;
 	}
 
-	if (move < 0)
-	{
-		slog("out of movement");
-		return (self);
-	}
+	unit = (DRGN_Unit*)self->data;
+
 	if (drgn_entityGetSelectionByPosition(DRGN_RED, pos, self))
 	{
-		slog("hit an enemy");
-		return (self);
+		return;
 	}
 	if (x < 0 || y < 0 || x >(drgn_worldGetWidth() * 64) || y >(drgn_worldGetHeight() * 64))
 	{
-		slog("hit a wall");
-		slog("%i of %i", x, drgn_worldGetWidth() * 64);
-		slog("%i of %i", y, drgn_worldGetHeight() * 64);
-		return self;
+		return;
 	}
-
-	if (drgn_entityGetSelectionByPosition(DRGN_TILE, pos, self))
+	if (drgn_entityGetSelectionByPosition(DRGN_DEFAULT, pos, self))
 	{
-		slog("already colored this tile");
-
-		if (drgn_entityGetSelectionByPosition(DRGN_TILE, vector2d(x + 64, y), self) && drgn_entityGetSelectionByPosition(DRGN_TILE, vector2d(x - 64, y), self) && drgn_entityGetSelectionByPosition(DRGN_TILE, vector2d(x , y + 64), self) && drgn_entityGetSelectionByPosition(DRGN_TILE, vector2d(x, y - 64), self))
-		{
-			return (self);
-		}
-		else
-		{
-			moveEnt = self;
-		}
+		move--;
 	}
-	else
+	if (move < 0)
 	{
-		moveEnt = drgn_unitMoveNew(self, pos);
+		return;
 	}
 
-	slog("%i, %i", x, y);
+	if (index < 0 || index > unit->moveTotal)
+	{
+		slog("Error index out of bounds at index %i", index);
+		return;
+	}
+	unit->moveMap[index]++;
+
+	if (unit->moveMap[index] == 1 && !drgn_entityGetSelectionByPosition(DRGN_BLUE, pos, self))
+	{
+		drgn_unitMoveNew(self, pos, index);
+	}
+
+	offset = (unit->stats[9] * 2) + 1;
 
 	if ((x-64) >= 0)
 	{
-		slog("x - 1");
-		slog("movement left: %i", move);
-		nextMove = drgn_unitCalcMove(moveEnt, move - 1, vector2d(x - 64, pos.y));
+		drgn_unitCalcMove(self, move - 1, vector2d(x - 64, pos.y), index - 1);
 	}
 	if ((x + 64) <= (drgn_worldGetWidth() * 64))
 	{
-		slog("x + 1");
-		slog("movement left: %i", move);
-		nextMove = drgn_unitCalcMove(moveEnt, move - 1, vector2d(x + 64, pos.y));
+		drgn_unitCalcMove(self, move - 1, vector2d(x + 64, pos.y), index + 1);
 	}
 	if ((y - 64) >= 0)
 	{
-		slog("y - 1");
-		slog("movement left: %i", move);
-		nextMove = drgn_unitCalcMove(moveEnt, move - 1, vector2d(pos.x, y - 64));
+		drgn_unitCalcMove(self, move - 1, vector2d(pos.x, y - 64), index - offset);
 	}
 	if ((y + 64) <= (drgn_worldGetHeight() * 64))
 	{
-		slog("y + 1");
-		slog("movement left: %i", move);
-		nextMove = drgn_unitCalcMove(moveEnt, move - 1, vector2d(pos.x, y + 64));
+		drgn_unitCalcMove(self, move - 1, vector2d(pos.x, y + 64), index + offset);
+	}
+}
+
+void drgn_unitMoveFree(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+	if (!self || !self->data)
+	{
+		return;
 	}
 
-	if (!nextMove)
+	unit = (DRGN_Unit*)self->data;
+
+	for (int bogus = 0; bogus < unit->moveTotal; bogus++)
 	{
-		return (moveEnt);
+		if (!unit->moveTiles)
+		{
+			continue;
+		}
+
+		drgn_entityFree(unit->moveTiles[bogus]);
 	}
-	
-	return (nextMove);
+
+	free(unit->moveTiles);
+	unit->moveTiles = NULL;
+	unit->moveTiles = gfc_allocate_array(sizeof(DRGN_Entity), unit->moveTotal);
 }
 
 void drgn_unitFileInit(const char* name)

@@ -13,11 +13,6 @@ DRGN_Entity* drgn_moveNew(Color color, Vector2D pos, const char* sprite, int wid
 		return NULL;
 	}
 
-	if (drgn_entityGetSelectionByPosition(DRGN_TILE, pos, self))
-	{
-		return NULL;
-	}
-
 	self->think = drgn_moveThink;
 	self->update = drgn_moveUpdate;
 	self->free = drgn_moveFree;

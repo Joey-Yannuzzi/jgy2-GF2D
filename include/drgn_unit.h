@@ -36,6 +36,10 @@ typedef struct
 	int weaponExp[_drgn_weapons]; //experience for a units weapons; goes from 0 to 99 at 100 weapon level goes up one rank; defaults as 0
 	int growths[_drgn_stats]; //unit growths
 	int moveDrawn; //1 if movement is drawn, 0 if not
+	Uint8* moveMap; //the units move map
+	DRGN_Entity** moveTiles; //list of all units move tiles
+	int moveTotal; //size of array to be created for move purposes
+	int active; //check for if unit already acted this turn
 }
 DRGN_Unit;
 
@@ -71,8 +75,10 @@ void drgn_unitFileFree();
 */
 SJson* drgn_unitGetDefByName(const char* name);
 
-DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos);
+DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos, int index);
 
-DRGN_Entity* drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos);
+void drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos, int index);
+
+void drgn_unitMoveFree(DRGN_Entity* self);
 
 #endif
