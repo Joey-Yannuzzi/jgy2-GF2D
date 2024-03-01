@@ -255,6 +255,17 @@ DRGN_World* drgn_worldLoad(const char* file)
 		return NULL;
 	}
 
+	sj_object_get_value_as_int(worldJson, "frameWidth", &frameWidth);
+	sj_object_get_value_as_int(worldJson, "frameHeight", &frameHeight);
+
+	if (!frameWidth || !frameHeight)
+	{
+		slog("invalid frame height or width (%i, %i)", frameWidth, frameHeight);
+		sj_free(json);
+		drgn_worldFree(world);
+		return NULL;
+	}
+
 	for (int bogus = 0; bogus < height; bogus++)
 	{
 		horizontal = sj_array_get_nth(vertical, bogus);
@@ -276,6 +287,11 @@ DRGN_World* drgn_worldLoad(const char* file)
 			tile = 0;
 			sj_get_integer_value(item, &tile);
 			world->tileMap[bogus2 + (bogus * width)] = tile;
+
+			if (tile > 1)
+			{
+				drgn_terrainNew(tile, vector2d(bogus2 * frameWidth, bogus * frameHeight));
+			}
 		}
 	}
 
@@ -294,17 +310,6 @@ DRGN_World* drgn_worldLoad(const char* file)
 	if (!background)
 	{
 		slog("No background image loaded, I hope you know what you're doing");
-	}
-
-	sj_object_get_value_as_int(worldJson, "frameWidth", &frameWidth);
-	sj_object_get_value_as_int(worldJson, "frameHeight", &frameHeight);
-
-	if (!frameWidth || !frameHeight)
-	{
-		slog("invalid frame height or width (%i, %i)", frameWidth, frameHeight);
-		sj_free(json);
-		drgn_worldFree(world);
-		return NULL;
 	}
 
 	sj_object_get_value_as_int(worldJson, "framesPerLine", &framesPerLine);
@@ -371,7 +376,7 @@ DRGN_World* drgn_worldLoad(const char* file)
 		}
 	}
 
-	vertical = sj_object_get_value(worldJson, "terrainMap");
+	/*vertical = sj_object_get_value(worldJson, "terrainMap");
 
 	if (!vertical)
 	{
@@ -415,7 +420,7 @@ DRGN_World* drgn_worldLoad(const char* file)
 			drgn_terrainNew(tile, vector2d(bogus2* frameWidth, bogus* frameHeight));
 			
 		}
-	}
+	}*/
 
 	drgn_worldTileLayerRender(world);
 	sj_free(json);

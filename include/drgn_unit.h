@@ -40,6 +40,7 @@ typedef struct
 	DRGN_Entity** moveTiles; //list of all units move tiles
 	int moveTotal; //size of array to be created for move purposes
 	int active; //check for if unit already acted this turn
+	const char* class; //name of the class of unit
 }
 DRGN_Unit;
 
@@ -77,7 +78,7 @@ SJson* drgn_unitGetDefByName(const char* name);
 
 DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos, int index);
 
-void drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos, int index);
+void drgn_unitCalcMove(DRGN_Entity* self, float move, Vector2D pos, int index);
 
 void drgn_unitMoveFree(DRGN_Entity* self);
 
