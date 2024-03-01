@@ -94,6 +94,8 @@ DRGN_Entity* drgn_terrainNew(int tile, Vector2D pos)
 
 			terrain->ignoreClass[bogus] = sj_get_string_value(temp);
 		}
+
+		terrain->ignoreCount = count;
 	}
 
 	self->data = terrain;

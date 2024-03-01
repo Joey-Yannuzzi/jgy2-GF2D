@@ -15,6 +15,7 @@ typedef struct
 	int avoidBonus; //extra avoid given by being in this terrain; optional
 	int defBonus; //extra defense given by being in this terrain; optional
 	const char** ignoreClass; //list of names of classes to not let pass through this terrain; optional; needs to be freed if it exists
+	int ignoreCount; //number of units to be ignored
 }
 DRGN_Terrain;
 

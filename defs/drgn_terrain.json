@@ -27,7 +27,7 @@
       "displayName" : "Hill",
       "tile": 4,
       "moveValue": 3,
-      "ignoreClass": [ "cavalier", "paladin" ],
+      "ignoreClass": ["cavalier", "paladin" ],
       "avoidBonus": 20,
       "defBonus" : 1
     },
@@ -37,7 +37,7 @@
       "displayName" : "Mountain",
       "tile": 5,
       "moveValue": 4,
-      "ignoreClass": [ "soldier" ], //should ignore all except brigands
+      "ignoreClass": [ "Soldier" ], //should ignore all except brigands
       "avoidBonus": 50,
       "defBonus" : 2
     }

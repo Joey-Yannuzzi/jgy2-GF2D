@@ -13,6 +13,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	int frame, width, height, framesPerLine, count;
 	const char* displayName;
 	const char* sprite;
+	const char* class;
 
 	self = drgn_entityNew();
 
@@ -188,6 +189,16 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 		unit->name = displayName;
 	}
 
+	class = sj_object_get_value_as_string(unitDef, "class");
+
+	if (!class)
+	{
+		slog("No class assigned to unit");
+		return NULL;
+	}
+
+	unit->class = class;
+
 	unit->inventory = drgn_inventoryNew(inventory, 5);
 
 	if (!unit->inventory)
@@ -257,7 +268,7 @@ void drgn_unitUpdate(DRGN_Entity* self)
 	{
 		slog("Array size %i", unit->moveTotal);
 		unit->moveTiles = gfc_allocate_array(sizeof(DRGN_Entity), unit->moveTotal);
-		drgn_unitCalcMove(self, unit->stats[9], self->pos, (unit->moveTotal - 1) / 2);
+		drgn_unitCalcMove(self, unit->stats[9] + 1, self->pos, (unit->moveTotal - 1) / 2);
 		self->selected = 0;
 		free(unit->moveMap);
 		unit->moveMap = NULL;
@@ -327,12 +338,15 @@ DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos, int index)
 	return (move);
 }
 
-void drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos, int index)
+void drgn_unitCalcMove(DRGN_Entity* self, float move, Vector2D pos, int index)
 {
 	DRGN_Unit* unit;
+	DRGN_Entity* terrainSuper;
+	DRGN_Terrain* terrain;
 	int x = pos.x;
 	int y = pos.y;
 	int offset;
+	float moveValue = 1;
 
 	//Base Cases:
 	//Out of movement: true
@@ -357,10 +371,27 @@ void drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos, int index)
 	{
 		return;
 	}
-	if (drgn_entityGetSelectionByPosition(DRGN_DEFAULT, pos, self))
+
+	terrainSuper = drgn_entityGetSelectionByPosition(DRGN_DEFAULT, pos, self);
+	if (terrainSuper && terrainSuper->data)
 	{
-		move--;
+		terrain = (DRGN_Terrain*)terrainSuper->data;
+		moveValue = terrain->moveValue;
+
+		if (terrain->ignoreClass)
+		{
+			for (int bogus = 0; bogus < terrain->ignoreCount; bogus++)
+			{
+				if (gfc_strlcmp(terrain->ignoreClass[bogus], unit->class) == 0)
+				{
+					return;
+				}
+			}
+		}
 	}
+
+	move -= moveValue;
+
 	if (move < 0)
 	{
 		return;
@@ -382,19 +413,19 @@ void drgn_unitCalcMove(DRGN_Entity* self, int move, Vector2D pos, int index)
 
 	if ((x-64) >= 0)
 	{
-		drgn_unitCalcMove(self, move - 1, vector2d(x - 64, pos.y), index - 1);
+		drgn_unitCalcMove(self, move, vector2d(x - 64, pos.y), index - 1);
 	}
 	if ((x + 64) <= (drgn_worldGetWidth() * 64))
 	{
-		drgn_unitCalcMove(self, move - 1, vector2d(x + 64, pos.y), index + 1);
+		drgn_unitCalcMove(self, move, vector2d(x + 64, pos.y), index + 1);
 	}
 	if ((y - 64) >= 0)
 	{
-		drgn_unitCalcMove(self, move - 1, vector2d(pos.x, y - 64), index - offset);
+		drgn_unitCalcMove(self, move, vector2d(pos.x, y - 64), index - offset);
 	}
 	if ((y + 64) <= (drgn_worldGetHeight() * 64))
 	{
-		drgn_unitCalcMove(self, move - 1, vector2d(pos.x, y + 64), index + offset);
+		drgn_unitCalcMove(self, move, vector2d(pos.x, y + 64), index + offset);
 	}
 }
 
