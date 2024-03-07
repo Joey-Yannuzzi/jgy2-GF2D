@@ -23,4 +23,6 @@ void drgn_playerFree(DRGN_Entity* self);
 */
 DRGN_Entity* drgn_playerNew();
 
+void drgn_playerCreateUnitWindow(DRGN_Entity* unit);
+
 #endif

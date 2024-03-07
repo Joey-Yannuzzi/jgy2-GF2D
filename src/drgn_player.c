@@ -1,7 +1,9 @@
 #include "simple_logger.h"
+#include "gfc_list.h"
 #include "drgn_player.h"
 #include "drgn_camera.h"
 #include "drgn_terrain.h"
+#include "drgn_window.h"
 #include "drgn_unit.h"
 
 DRGN_Entity* drgn_playerNew()
@@ -167,6 +169,8 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		curr->active = 0;
 		self->curr->selected = 0;
 		drgn_unitMoveFree(self->curr);
+		//drgn_windowFree(self->curr->window);
+		//self->curr->window = NULL;
 		self->curr = NULL;
 		self->selected = 0;
 		player->pressed = 0;
@@ -180,6 +184,8 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			self->curr->color = GFC_COLOR_BLUE;
 			self->curr->selected = 0;
 			drgn_unitMoveFree(self->curr);
+			//drgn_windowFree(self->curr->window);
+			//self->curr->window = NULL;
 			self->curr = NULL;
 			self->selected = 0;
 			player->pressed = 0;
@@ -188,6 +194,8 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		self->curr->color = GFC_COLOR_BLUE;
 		self->curr->selected = 0;
 		drgn_unitMoveFree(self->curr);
+		drgn_windowFree(self->curr->window);
+		self->curr->window = NULL;
 		self->curr = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr);
 		self->curr->selected = 1;
 		self->curr->color = GFC_COLOR_GREEN;
@@ -198,6 +206,8 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		self->curr->color = GFC_COLOR_BLUE;
 		self->curr->selected = 0;
 		drgn_unitMoveFree(self->curr);
+		//drgn_windowFree(self->curr->window);
+		//self->curr->window = NULL;
 		self->curr = NULL;
 		self->selected = 0;
 		player->pressed = 0;
@@ -207,23 +217,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->pressed = 0;
 	}
 
-	/*terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
-
-	if (!terrain)
+	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self)->window)
 	{
-		//slog("Player not on any known terrain");
-		return;
+		slog("displaying UI");
+		drgn_playerCreateUnitWindow(drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self));
 	}
-
-	terrainData = (DRGN_Terrain*)terrain->data;
-
-	if (!terrainData)
-	{
-		//slog("No data on terrain");
-		return;
-	}
-
-	slog("Player is on terrain %s", terrainData->name);*/
 }
 
 void drgn_playerFree(DRGN_Entity* self)
@@ -282,4 +280,25 @@ void drgn_playerCheckBounds(DRGN_Entity* self, Rect bounds)
 	{
 		self->pos.y = bounds.y;
 	}
+}
+
+void drgn_playerCreateUnitWindow(DRGN_Entity* unit)
+{
+	DRGN_Unit* data;
+	List* list;
+	const char* hp;
+
+	if (!unit || !unit->data)
+	{
+		slog("No unit or data to display");
+		return;
+	}
+
+	data = (DRGN_Unit*)unit->data;
+
+	list = gfc_list_new();
+	gfc_list_append(list, data->name);
+	hp = data->stats[1] + '/' + data->stats[1];
+	gfc_list_append(list, hp);
+	unit->window = drgn_windowNew(list, vector2d(500, 0));
 }
