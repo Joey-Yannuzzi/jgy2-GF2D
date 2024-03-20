@@ -22,7 +22,7 @@ enum DRGN_UnitWeaponLvl
 	DRGN_WEAPON_S
 };
 
-typedef enum
+typedef enum DRGN_Action
 {
 	DRGN_NO_ACTION,
 	DRGN_MOVE,
@@ -63,7 +63,9 @@ typedef struct
 	const char* class; //name of the class of unit
 	DRGN_Action currentAction; //current action the unit is taking
 	DRGN_Entity** menuWindow; //menu window pointer
+	int menuMax; //number of generated menu elements
 	DRGN_Entity* rescuedUnit; //points to the unit currently being rescued; NULL if no rescue in progress
+	DRGN_Entity* menuCursor; //the cursor when selecting a command
 }
 DRGN_Unit;
 
@@ -126,5 +128,9 @@ void drgn_unitRescue(DRGN_Entity* self, DRGN_Entity* other);
 void drgn_unitDrop(DRGN_Entity* self);
 
 void drgn_unitSeize(DRGN_Entity* self);
+
+void drgn_unitSelectedMenuItem(DRGN_Entity* self);
+
+void drgn_unitMenuFree(DRGN_Unit* self);
 
 #endif

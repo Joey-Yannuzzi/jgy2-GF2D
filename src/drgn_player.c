@@ -31,7 +31,7 @@ DRGN_Entity* drgn_playerNew()
 	//slog("%i", (*(DRGN_Player*)self->data).test);
 	player = gfc_allocate_array(sizeof(DRGN_Player), 1);
 	self->data = player;
-	player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576));
+	player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576), NULL);
 	player->unitWindow = NULL;
 	return (self);
 }
@@ -185,9 +185,10 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		curr = (DRGN_Unit*)self->curr->data;
 		curr->currentAction = DRGN_MOVE;
 		drgn_unitMenu(self->curr);
+		self->curr->curr = self;
 		self->inactive = 1;
 		self->curr = NULL;
-		//self->selected = 0;
+		self->selected = 0;
 		player->pressed = 0;
 	}
 	else if (player->pressed && self->curr && self->selected && drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr))
@@ -254,7 +255,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			y = self->pos.y - 64;
 		}
 
-		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y));
+		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
 		player->unitWindow->offset = 1;
 		//window->texts = curr->name;
 		slog("created unit window");
@@ -287,7 +288,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			y = self->pos.y - 64;
 		}
 
-		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y));
+		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
 		player->unitWindow->offset = 1;
 		//window->texts = curr->name;
 		slog("created unit window");
@@ -320,7 +321,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			y = self->pos.y - 64;
 		}
 
-		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y));
+		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
 		player->unitWindow->offset = 1;
 		//window->texts = curr->name;
 		slog("created unit window");
