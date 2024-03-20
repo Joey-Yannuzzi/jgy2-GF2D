@@ -54,6 +54,11 @@ void drgn_playerThink(DRGN_Entity* self)
 		return;
 	}
 
+	if (self->inactive)
+	{
+		return;
+	}
+
 	player = (DRGN_Player*)self->data;
 
 	if (keys[SDL_SCANCODE_W] && event.type == SDL_KEYDOWN)
@@ -115,6 +120,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		return;
 	}
 
+	if (self->inactive)
+	{
+		return;
+	}
+
 	player = (DRGN_Player*)self->data;
 	self->frame += 0.05;
 
@@ -170,15 +180,14 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	}
 	else if (player->pressed && self->curr && self->selected && drgn_entityGetSelectionByPosition(DRGN_TILE, self->pos, self))
 	{
-		//slog("unit unselected");
+
 		self->curr->pos = self->pos;
-		self->curr->color = GFC_COLOR_GREY;
 		curr = (DRGN_Unit*)self->curr->data;
-		curr->active = 0;
-		self->curr->selected = 0;
-		drgn_unitMoveFree(self->curr);
+		curr->currentAction = DRGN_MOVE;
+		drgn_unitMenu(self->curr);
+		self->inactive = 1;
 		self->curr = NULL;
-		self->selected = 0;
+		//self->selected = 0;
 		player->pressed = 0;
 	}
 	else if (player->pressed && self->curr && self->selected && drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr))
@@ -217,7 +226,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->pressed = 0;
 	}
 
-	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow && !player->unitWindowSource)
+	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow && !player->unitWindowSource && !self->selected)
 	{
 		//slog("begining to draw");
 		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
@@ -250,7 +259,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		//window->texts = curr->name;
 		slog("created unit window");
 	}
-	else if (drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !player->unitWindow && !player->unitWindowSource)
+	else if (drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !player->unitWindow && !player->unitWindowSource && !self->selected)
 	{
 		slog("begining to draw");
 		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self);
@@ -283,7 +292,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		//window->texts = curr->name;
 		slog("created unit window");
 	}
-	else if (drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && !player->unitWindow && !player->unitWindowSource)
+	else if (drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && !player->unitWindow && !player->unitWindowSource && !self->selected)
 	{
 		//slog("begining to draw");
 		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self);
@@ -316,9 +325,13 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		//window->texts = curr->name;
 		slog("created unit window");
 	}
-	else if (player->unitWindow && player->unitWindowSource && !vector2d_compare(self->pos, player->unitWindowSource->pos))
+	else if ((player->unitWindow && player->unitWindowSource && !vector2d_compare(self->pos, player->unitWindowSource->pos)) || self->selected)
 	{
-		drgn_entityFree(player->unitWindow);
+		if (player->unitWindow)
+		{
+			drgn_entityFree(player->unitWindow);
+		}
+
 		player->unitWindow = NULL;
 		player->unitWindowSource = NULL;
 		//slog("deleted unit window");

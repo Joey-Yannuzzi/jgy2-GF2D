@@ -2,6 +2,7 @@
 #include "drgn_unit.h"
 #include "drgn_terrain.h"
 #include "drgn_world.h"
+#include "drgn_window.h"
 
 DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_Affiliation affiliation, Vector2D pos)
 {
@@ -89,7 +90,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 		self->color = GFC_COLOR_RED;
 		break;
 	case DRGN_GREEN:
-		self->color = GFC_COLOR_RED;
+		self->color = GFC_COLOR_GREEN;
 		break;
 	default:
 		slog("no affiliation for unit with name %s", name);
@@ -212,6 +213,9 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	unit->moveTotal = ((unit->stats[9] * 2) + 1) * ((unit->stats[9] * 2) + 1);
 	unit->moveMap = gfc_allocate_array(sizeof(Uint8), unit->moveTotal);
 	unit->active = 1;
+	unit->menuWindow = gfc_allocate_array(sizeof(DRGN_Entity*), 8);
+	unit->currentHP = unit->stats[1];
+	unit->currentHP--;
 
 	self->data = unit;
 	return (self);
@@ -539,4 +543,300 @@ SJson* drgn_unitGetDefByName(const char* name)
 
 	slog("Could not find unit with name %s", name);
 	return NULL;
+}
+
+void drgn_unitMenu(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+	int bogus = 0;
+	DRGN_Entity* left;
+	DRGN_Entity* right;
+	DRGN_Entity* up;
+	DRGN_Entity* down;
+	DRGN_Unit* unitLeft;
+	DRGN_Unit* unitRight;
+	DRGN_Unit* unitUp;
+	DRGN_Unit* unitDown;
+	DRGN_Entity* temp;
+	DRGN_Terrain* terrain;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+
+	switch (unit->currentAction)
+	{
+	case DRGN_MOVE:
+
+		temp = drgn_entityGetSelectionByPosition(DRGN_DEFAULT, self->pos, self);
+
+		if (temp && temp->data)
+		{
+			terrain = (DRGN_Terrain*)temp->data;
+
+			if (gfc_strlcmp(terrain->name, "Flag") == 0)
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("Seize", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				unit->menuWindow[bogus]->offset = 1;
+				bogus++;
+			}
+		}
+
+		right = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x + 64, self->pos.y), self);
+		left = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x - 64, self->pos.y), self);
+		down = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self);
+		up = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self);
+
+		if (right || left || down || up)
+		{
+			unit->menuWindow[bogus] = drgn_windowNew("Talk", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+			unit->menuWindow[bogus]->offset = 1;
+			bogus++;
+		}
+
+		if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_ARCANE))
+		{
+			right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 128, self->pos.y), self);
+			left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 128, self->pos.y), self);
+			down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 128), self);
+			up = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y - 128), self);
+		}
+		else
+		{
+			right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 64, self->pos.y), self);
+			left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 64, self->pos.y), self);
+			down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 64), self);
+			up = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y - 64), self);
+		}
+		unitRight = NULL;
+		unitLeft = NULL;
+		unitUp = NULL;
+		unitDown = NULL;
+
+		if (right || left || up || down)
+		{
+			if (right)
+			{
+				unitRight = (DRGN_Unit*)right->data;
+			}
+			if (left)
+			{
+				unitLeft = (DRGN_Unit*)left->data;
+			}
+			if (up)
+			{
+				unitUp = (DRGN_Unit*)up->data;
+			}
+			if (down)
+			{
+				unitDown = (DRGN_Unit*)down->data;
+			}
+
+			if (unitRight || unitLeft || unitUp || unitDown)
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("Attack", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				unit->menuWindow[bogus]->offset = 1;
+				bogus++;
+			}
+		}
+
+		right = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self);
+		left = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self);
+		down = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self);
+		up = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self);
+		unitRight = NULL;
+		unitLeft = NULL;
+		unitUp = NULL;
+		unitDown = NULL;
+
+		if (right || left || down || up)
+		{
+			if (right)
+			{
+				unitRight = (DRGN_Unit*)right->data;
+			}
+			if (left)
+			{
+				unitLeft = (DRGN_Unit*)left->data;
+			}
+			if (up)
+			{
+				unitUp = (DRGN_Unit*)up->data;
+			}
+			if (down)
+			{
+				unitDown = (DRGN_Unit*)down->data;
+			}
+
+			if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_DIVINE) &&((unitRight && unitRight->currentHP < unitRight->stats[1]) || (unitLeft && unitLeft->currentHP < unitLeft->stats[1]) || (unitUp && unitUp->currentHP < unitUp->stats[1]) || (unitDown && unitDown->currentHP < unitDown->stats[1])))
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("Heal", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				unit->menuWindow[bogus]->offset = 1;
+				bogus++;
+			}
+		}
+		if (unit->inventory->curr > 0)
+		{
+			unit->menuWindow[bogus] = drgn_windowNew("Item", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+			unit->menuWindow[bogus]->offset = 1;
+			bogus++;
+		}
+
+		right = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self);
+		left = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self);
+		down = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self);
+		up = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self);
+		unitRight = NULL;
+		unitLeft = NULL;
+		unitUp = NULL;
+		unitDown = NULL;
+
+		if  (right || left || down || up)
+		{
+			if (right)
+			{
+				unitRight = (DRGN_Unit*)right->data;
+			}
+			if (left)
+			{
+				unitLeft = (DRGN_Unit*)left->data;
+			}
+			if (up)
+			{
+				unitUp = (DRGN_Unit*)up->data;
+			}
+			if (down)
+			{
+				unitDown = (DRGN_Unit*)down->data;
+			}
+
+			if (unit->inventory->curr > 0 || ((unitRight && unitRight->inventory->curr > 0) || (unitLeft && unitLeft->inventory->curr > 0) || (unitUp && unitUp->inventory->curr > 0) || (unitDown && unitDown->inventory->curr > 0)))
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("Trade", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				unit->menuWindow[bogus]->offset = 1;
+				bogus++;
+			}
+		}
+
+		right = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self);
+		left = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self);
+		down = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self);
+		up = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self);
+		unitRight = NULL;
+		unitLeft = NULL;
+		unitUp = NULL;
+		unitDown = NULL;
+
+		if (right || left || down || up)
+		{
+			if (right)
+			{
+				unitRight = (DRGN_Unit*)right->data;
+			}
+			if (left)
+			{
+				unitLeft = (DRGN_Unit*)left->data;
+			}
+			if (up)
+			{
+				unitUp = (DRGN_Unit*)up->data;
+			}
+			if (down)
+			{
+				unitDown = (DRGN_Unit*)down->data;
+			}
+
+			if (!unit->rescuedUnit && ((unitRight && unit->stats[10] > unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] > unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] > unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] > unitDown->stats[10] && !unitDown->rescuedUnit)))
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("Rescue", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				unit->menuWindow[bogus]->offset = 1;
+				bogus++;
+			}
+		}
+
+		right = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self);
+		left = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self);
+		down = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self);
+		up = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self);
+		unitRight = NULL;
+		unitLeft = NULL;
+		unitUp = NULL;
+		unitDown = NULL;
+
+		if (right || left || down || up)
+		{
+			if (right)
+			{
+				unitRight = (DRGN_Unit*)right->data;
+			}
+			if (left)
+			{
+				unitLeft = (DRGN_Unit*)left->data;
+			}
+			if (up)
+			{
+				unitUp = (DRGN_Unit*)up->data;
+			}
+			if (down)
+			{
+				unitDown = (DRGN_Unit*)down->data;
+			}
+
+			if (unit->rescuedUnit && ((unitRight && unit->stats[10] <= unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] <= unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] <= unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] <= unitDown->stats[10] && !unitDown->rescuedUnit)))
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("Transfer", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				unit->menuWindow[bogus]->offset = 1;
+				bogus++;
+			}
+		}
+		if (unit->rescuedUnit && (
+			!drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 64, self->pos.y), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 64, self->pos.y), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 64), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y - 64), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x + 64, self->pos.y), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x - 64, self->pos.y), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self) ||
+			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self)))
+		{
+			unit->menuWindow[bogus] = drgn_windowNew("Drop", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+			unit->menuWindow[bogus]->offset = 1;
+			bogus++;
+		}
+
+		unit->menuWindow[bogus] = drgn_windowNew("Wait", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+		unit->menuWindow[bogus]->offset = 1;
+		bogus++;
+		break;
+
+	default:
+		self->color = GFC_COLOR_GREY;
+		unit->active = 0;
+		self->selected = 0;
+		drgn_unitMoveFree(self);
+
+
+	}
+}
+
+void drgn_unitItem(DRGN_Entity* self, DRGN_InventoryItem* item)
+{
+	DRGN_InventoryItemPotion* potion;
+	DRGN_InventoryItemStatBooster* booster;
+
+	if (item->type == DRGN_POTION)
+	{
+
+	}
+	if (item->type == DRGN_STAT_BOOSTER)
+	{
+
+	}
 }

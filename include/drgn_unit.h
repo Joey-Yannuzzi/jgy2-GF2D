@@ -22,9 +22,29 @@ enum DRGN_UnitWeaponLvl
 	DRGN_WEAPON_S
 };
 
+typedef enum
+{
+	DRGN_NO_ACTION,
+	DRGN_MOVE,
+	DRGN_ITEM,
+	DRGN_TRADE,
+	DRGN_WAIT,
+	DRGN_TALK,
+	DRGN_HEAL,
+	DRGN_MELEE_ATTACK,
+	DRGN_RANGED_ATTACK,
+	DRGN_MAGIC_ATTACK,
+	DRGN_RESCUE,
+	DRGN_DROP,
+	DRGN_TRANSFER,
+	DRGN_SEIZE
+}
+DRGN_Action;
+
 typedef struct
 {
 	int stats[_drgn_stats]; //unit stats
+	int currentHP; //current health of unit
 	DRGN_Inventory* inventory; //list of unit's inventory items
 	Sprite* moveTile; //pointer to movement tile sprite
 	Sprite* attackTitle; //pointer to attack tile sprite; NULL if cannot attack
@@ -41,6 +61,9 @@ typedef struct
 	int moveTotal; //size of array to be created for move purposes
 	int active; //check for if unit already acted this turn
 	const char* class; //name of the class of unit
+	DRGN_Action currentAction; //current action the unit is taking
+	DRGN_Entity** menuWindow; //menu window pointer
+	DRGN_Entity* rescuedUnit; //points to the unit currently being rescued; NULL if no rescue in progress
 }
 DRGN_Unit;
 
@@ -81,5 +104,27 @@ DRGN_Entity* drgn_unitMoveNew(DRGN_Entity* self, Vector2D pos, int index);
 void drgn_unitCalcMove(DRGN_Entity* self, float move, Vector2D pos, int index);
 
 void drgn_unitMoveFree(DRGN_Entity* self);
+
+void drgn_unitMenu(DRGN_Entity* self);
+
+void drgn_unitItem(DRGN_Entity* self, DRGN_InventoryItem* item);
+
+void drgn_unitTrade(DRGN_Entity* self, DRGN_Entity* other);
+
+void drgn_unitWait(DRGN_Entity* self);
+
+void drgn_unitTalk(DRGN_Entity* self, DRGN_Entity* other);
+
+void drgn_unitHeal(DRGN_Entity* self, DRGN_Entity* target);
+
+void drgn_unitMeleeAttack(DRGN_Entity* self, DRGN_Inventory* selfItem, int selfAvoBonus, int selfDefBonus, Uint8 selfIsMagic, DRGN_Entity* target, DRGN_Inventory* targetItem, int targetAvoBonus, int targetDefBonus, Uint8 targetIsMagic);
+
+void drgn_unitRangedAttack(DRGN_Entity* self, DRGN_Inventory* selfItem, int selfAvoBonus, int selfDefBonus, Uint8 selfIsMagic, DRGN_Entity* target, DRGN_Inventory* targetItem, int targetAvoBonus, int targetDefBonus, Uint8 targetIsMagic);
+
+void drgn_unitRescue(DRGN_Entity* self, DRGN_Entity* other);
+
+void drgn_unitDrop(DRGN_Entity* self);
+
+void drgn_unitSeize(DRGN_Entity* self);
 
 #endif
