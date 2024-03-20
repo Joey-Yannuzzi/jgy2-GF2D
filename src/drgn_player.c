@@ -217,11 +217,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->pressed = 0;
 	}
 
-	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow)
+	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow && !player->unitWindowSource)
 	{
 		//slog("begining to draw");
-		unit = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
-		curr = (DRGN_Unit*)unit->data;
+		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
+		curr = (DRGN_Unit*)player->unitWindowSource->data;
 
 		if (self->pos.x - 64 < 0)
 		{
@@ -250,11 +250,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		//window->texts = curr->name;
 		slog("created unit window");
 	}
-	else if (drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !player->unitWindow)
+	else if (drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !player->unitWindow && !player->unitWindowSource)
 	{
-		//slog("begining to draw");
-		unit = drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self);
-		curr = (DRGN_Unit*)unit->data;
+		slog("begining to draw");
+		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self);
+		curr = (DRGN_Unit*)player->unitWindowSource->data;
 
 		if (self->pos.x - 64 < 0)
 		{
@@ -283,11 +283,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		//window->texts = curr->name;
 		slog("created unit window");
 	}
-	else if (drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && !player->unitWindow)
+	else if (drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && !player->unitWindow && !player->unitWindowSource)
 	{
 		//slog("begining to draw");
-		unit = drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self);
-		curr = (DRGN_Unit*)unit->data;
+		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self);
+		curr = (DRGN_Unit*)player->unitWindowSource->data;
 
 		if (self->pos.x - 64 < 0)
 		{
@@ -316,10 +316,11 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		//window->texts = curr->name;
 		slog("created unit window");
 	}
-	else if (!drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && player->unitWindow)
+	else if (player->unitWindow && player->unitWindowSource && !vector2d_compare(self->pos, player->unitWindowSource->pos))
 	{
 		drgn_entityFree(player->unitWindow);
 		player->unitWindow = NULL;
+		player->unitWindowSource = NULL;
 		//slog("deleted unit window");
 	}
 
