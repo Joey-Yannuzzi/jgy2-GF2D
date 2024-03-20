@@ -1,0 +1,100 @@
+#include "simple_logger.h"
+#include "drgn_window.h"
+#include "drgn_font.h"
+
+DRGN_Entity* drgn_windowNew(char* texts, const char* sprite, Uint32 width, Uint32 height, Vector2D pos)
+{
+	DRGN_Entity* self;
+	DRGN_Window* window;
+	size_t textLen;
+
+	self = drgn_entityNew();
+
+	if (!self)
+	{
+		slog("failed to create entity");
+		return NULL;
+	}
+
+	self->think = drgn_windowThink;
+	self->update = drgn_windowUpdate;
+	self->free = drgn_windowFree;
+	self->draw = drgn_windowDraw;
+	self->offsetVal = vector2d(0, 0);
+
+	if (!texts)
+	{
+		slog("No texts for this window");
+		drgn_entityFree(self);
+		return NULL;
+	}
+
+	self->sprite = gf2d_sprite_load_all(sprite, width, height, 1, 0);
+
+	if (!self->sprite)
+	{
+		slog("No sprite was loaded with filename %s", sprite);
+		drgn_entityFree(self);
+		return NULL;
+	}
+
+	vector2d_copy(self->pos, pos);
+	self->scale = vector2d(1, 1);
+	self->affiliation = DRGN_UI;
+	window = gfc_allocate_array(sizeof(DRGN_Window), 1);
+
+	if (!window)
+	{
+		slog("window could not be created");
+		drgn_entityFree(self);
+		return NULL;
+	}
+
+	textLen = strlen(texts) + 1;
+	window->texts = gfc_allocate_array(sizeof(char), textLen);
+	strncpy(window->texts, texts, textLen);
+	self->data = window;
+
+	//slog("Drew window");
+	return (self);
+}
+
+void drgn_windowFree(DRGN_Entity* self)
+{
+	DRGN_Window* window;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	window = (DRGN_Window*)self->data;
+
+	//free(window->texts);
+	free(window);
+}
+
+void drgn_windowThink(DRGN_Entity* self)
+{
+
+}
+
+void drgn_windowUpdate(DRGN_Entity* self)
+{
+
+}
+
+void drgn_windowDraw(DRGN_Entity* self)
+{
+	DRGN_Window* window;
+	Vector2D pos;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	vector2d_add(pos, self->pos, self->offsetVal);
+	window = (DRGN_Window*)self->data;
+	drgn_fontDraw(window->texts, DRGN_SMALL_FONT, GFC_COLOR_BLACK, pos, vector2d(self->sprite->frame_w, self->sprite->frame_h));
+}

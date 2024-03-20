@@ -86,7 +86,7 @@ void drgn_fontInit()
 	atexit(drgn_fontFree);
 }
 
-void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2D pos)
+void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2D pos, Vector2D vertical)
 {
 	TTF_Font* font;
 	SDL_Surface* result;
@@ -105,11 +105,11 @@ void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2
 		destination.h = cache->size.y;
 		SDL_RenderCopy(gf2d_graphics_get_renderer(), cache->texture, NULL, &destination);
 		cache->timestamp = SDL_GetTicks();
-		slog("drawing text '%s' from cache", text);
+		//slog("drawing text '%s' from cache", text);
 		return;
 	}
 
-	slog("drawing text '%s' fresh", text);
+	//slog("drawing text '%s' fresh", text);
 
 	font = (TTF_Font*)gfc_list_get_nth(_fontManager.fonts, style);
 
@@ -148,8 +148,8 @@ void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2
 
 	destination.x = pos.x;
 	destination.y = pos.y;
-	destination.w = result->w;
-	destination.h = result->h;
+	destination.w = vertical.x; //result->w;
+	destination.h = vertical.y; //result->h;
 	SDL_RenderCopy(gf2d_graphics_get_renderer(), texture, NULL, &destination);
 	SDL_FreeSurface(result);
 	drgn_fontAddCached(text, style, color, texture, vector2d(destination.w, destination.h));
