@@ -14,7 +14,8 @@ enum DRGN_Affiliation
 	DRGN_RED,
 	DRGN_GREEN,
 	DRGN_CURSOR,
-	DRGN_TILE
+	DRGN_TILE,
+	DRGN_UI
 };
 
 typedef struct DRGN_Entity_S
@@ -29,11 +30,15 @@ typedef struct DRGN_Entity_S
 	enum DRGN_Affiliation affiliation; //the units army affiliation; should never be set to DEFAULT and should be checked/caught
 	Uint8 selected; //used to check if this entity is selected
 	struct DRGN_Entity_S* curr; //currently selected entity
+	Uint8 colorSet; //value to check if a color is set
+	Uint8 offset; //value to check if offset should be used when drawing; only used for UI
+	Vector2D offsetVal; //value of the offset; only used for UI
 	void* data; //for any additional data default entity may not have; NULL if no such data exists
 
 	void (*think) (struct DRGN_Entity_S* self); //call function to make decisions
 	void (*update) (struct DRGN_Entity_S* self); //call function to execute decisions from think function
 	void (*free) (struct DRGN_Entity_S* self); //call function to clean up custom allocated data
+	void (*draw) (struct DRGN_Entity_S* self); //call function to draw custom assets for an entity
 }
 DRGN_Entity;
 

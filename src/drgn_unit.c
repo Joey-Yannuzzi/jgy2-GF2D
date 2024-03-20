@@ -98,6 +98,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	}
 
 	self->affiliation = affiliation;
+	self->colorSet = 1;
 
 	unit = gfc_allocate_array(sizeof(DRGN_Unit), 1);
 

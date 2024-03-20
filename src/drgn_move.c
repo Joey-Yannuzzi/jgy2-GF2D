@@ -17,6 +17,7 @@ DRGN_Entity* drgn_moveNew(Color color, Vector2D pos, const char* sprite, int wid
 	self->update = drgn_moveUpdate;
 	self->free = drgn_moveFree;
 	self->color = color;
+	self->colorSet = 1;
 	vector2d_copy(self->pos, pos);
 	self->sprite = gf2d_sprite_load_all(sprite, width, height, 1, 0);
 	self->scale = vector2d(1, 1);

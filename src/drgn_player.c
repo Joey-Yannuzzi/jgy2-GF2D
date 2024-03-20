@@ -3,6 +3,7 @@
 #include "drgn_camera.h"
 #include "drgn_terrain.h"
 #include "drgn_unit.h"
+#include "drgn_window.h"
 
 DRGN_Entity* drgn_playerNew()
 {
@@ -21,6 +22,7 @@ DRGN_Entity* drgn_playerNew()
 	self->pos = vector2d(0, 0);
 	self->scale = vector2d(1, 1);
 	self->color = GFC_COLOR_LIGHTCYAN;
+	self->colorSet = 1;
 	self->affiliation = DRGN_CURSOR;
 	self->think = drgn_playerThink;
 	self->update = drgn_playerUpdate;
@@ -29,6 +31,8 @@ DRGN_Entity* drgn_playerNew()
 	//slog("%i", (*(DRGN_Player*)self->data).test);
 	player = gfc_allocate_array(sizeof(DRGN_Player), 1);
 	self->data = player;
+	player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576));
+	player->unitWindow = NULL;
 	return (self);
 }
 
@@ -93,11 +97,17 @@ void drgn_playerThink(DRGN_Entity* self)
 void drgn_playerUpdate(DRGN_Entity* self)
 {
 	DRGN_Entity* unit;
+	DRGN_Entity* red;
+	DRGN_Entity* green;
 	DRGN_Entity* terrain;
 	DRGN_Terrain* terrainData;
 	DRGN_Player* player;
 	Rect bounds;
 	DRGN_Unit* curr;
+	DRGN_Window* window;
+	size_t size;
+	char* terrainText;
+	int x, y;
 
 	if (!self || !self->data)
 	{
@@ -207,11 +217,137 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->pressed = 0;
 	}
 
-	/*terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
+	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow)
+	{
+		//slog("begining to draw");
+		unit = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
+		curr = (DRGN_Unit*)unit->data;
 
+		if (self->pos.x - 64 < 0)
+		{
+			x = self->pos.x;
+		}
+		else if ((self->pos.x + (self->scale.x * self->sprite->frame_w)) + 64 > (bounds.w + bounds.x))
+		{
+			x = self->pos.x - 128;
+		}
+		else
+		{
+			x = self->pos.x - 64;
+		}
+
+		if (self->pos.y - 64 < 0)
+		{
+			y = self->pos.y + 64;
+		}
+		else
+		{
+			y = self->pos.y - 64;
+		}
+
+		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y));
+		player->unitWindow->offset = 1;
+		//window->texts = curr->name;
+		slog("created unit window");
+	}
+	else if (drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !player->unitWindow)
+	{
+		//slog("begining to draw");
+		unit = drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self);
+		curr = (DRGN_Unit*)unit->data;
+
+		if (self->pos.x - 64 < 0)
+		{
+			x = self->pos.x;
+		}
+		else if ((self->pos.x + (self->scale.x * self->sprite->frame_w)) + 64 > (bounds.w + bounds.x))
+		{
+			x = self->pos.x - 128;
+		}
+		else
+		{
+			x = self->pos.x - 64;
+		}
+
+		if (self->pos.y - 64 < 0)
+		{
+			y = self->pos.y + 64;
+		}
+		else
+		{
+			y = self->pos.y - 64;
+		}
+
+		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y));
+		player->unitWindow->offset = 1;
+		//window->texts = curr->name;
+		slog("created unit window");
+	}
+	else if (drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && !player->unitWindow)
+	{
+		//slog("begining to draw");
+		unit = drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self);
+		curr = (DRGN_Unit*)unit->data;
+
+		if (self->pos.x - 64 < 0)
+		{
+			x = self->pos.x;
+		}
+		else if ((self->pos.x + (self->scale.x * self->sprite->frame_w)) + 64 > (bounds.w + bounds.x))
+		{
+			x = self->pos.x - 128;
+		}
+		else
+		{
+			x = self->pos.x - 64;
+		}
+
+		if (self->pos.y - 64 < 0)
+		{
+			y = self->pos.y + 64;
+		}
+		else
+		{
+			y = self->pos.y - 64;
+		}
+
+		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y));
+		player->unitWindow->offset = 1;
+		//window->texts = curr->name;
+		slog("created unit window");
+	}
+	else if (!drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !drgn_entityGetSelectionByPosition(DRGN_RED, self->pos, self) && !drgn_entityGetSelectionByPosition(DRGN_GREEN, self->pos, self) && player->unitWindow)
+	{
+		drgn_entityFree(player->unitWindow);
+		player->unitWindow = NULL;
+		//slog("deleted unit window");
+	}
+
+	if (self->pos.x > player->terrainWindow->pos.x)
+	{
+		player->terrainWindow->pos.x = 80;
+	}
+	if (self->pos.x < player->terrainWindow->pos.x + player->terrainWindow->sprite->frame_w)
+	{
+		player->terrainWindow->pos.x = 1024;
+	}
+
+	if (self->pos.y > player->terrainWindow->pos.y)
+	{
+		player->terrainWindow->pos.y = 36;
+	}
+	if (self->pos.y < player->terrainWindow->pos.y + player->terrainWindow->sprite->frame_h)
+	{
+		player->terrainWindow->pos.y = 576;
+	}
+
+	terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
+	window = (DRGN_Window*)player->terrainWindow->data;
+	
 	if (!terrain)
 	{
 		//slog("Player not on any known terrain");
+		window->texts = "Grass\nAvoid: 0\nDefense: 0";
 		return;
 	}
 
@@ -223,15 +359,27 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		return;
 	}
 
-	slog("Player is on terrain %s", terrainData->name);*/
+	size = strlen(terrainData->name) + strlen("\nAvoid: ")  + sizeof(terrainData->avoidBonus) + sizeof(terrainData->defBonus) + 1;
+	window->texts = gfc_allocate_array(sizeof(char), size);
+	sprintf(window->texts, "%s\nAvoid: %i\nDefense: %i", terrainData->name, terrainData->avoidBonus, terrainData->defBonus);
 }
 
 void drgn_playerFree(DRGN_Entity* self)
 {
-	if (!self)
+	DRGN_Player* player;
+	DRGN_Window* window;
+
+	if (!self || !self->data)
 	{
 		slog("No player to be freed");
 		return;
+	}
+
+	player = (DRGN_Player*)self->data;
+
+	if (player->terrainWindow)
+	{
+		drgn_entityFree(player->terrainWindow);
 	}
 }
 

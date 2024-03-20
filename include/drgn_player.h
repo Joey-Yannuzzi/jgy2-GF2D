@@ -7,6 +7,8 @@ typedef struct
 {
 	//int test;
 	int pressed; //to check if spacebar is pressed this frame
+	DRGN_Entity* terrainWindow; //terrain window to display terrain being hovered over
+	DRGN_Entity* unitWindow; //window that display's unit's name/class
 }
 DRGN_Player;
 

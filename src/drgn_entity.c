@@ -192,6 +192,21 @@ void drgn_entityDraw(DRGN_Entity* self, enum DRGN_Affiliation affiliation)
 	if (self->sprite)
 	{
 		gf2d_sprite_render(self->sprite, pos, &self->scale, NULL, NULL, NULL, &self->color, NULL, (Uint32)self->frame);
+
+		if (self->affiliation == DRGN_UI && !self->offset)
+		{
+			gf2d_sprite_render(self->sprite, self->pos, &self->scale, NULL, NULL, NULL, NULL, NULL, (Uint32)self->frame);
+		}
+		else if (self->affiliation == DRGN_UI && self->offset)
+		{
+			vector2d_copy(self->offsetVal, offset);
+			gf2d_sprite_render(self->sprite, pos, &self->scale, NULL, NULL, NULL, NULL, NULL, (Uint32)self->frame);
+		}
+	}
+
+	if (self->draw)
+	{
+		self->draw(self);
 	}
 }
 
@@ -255,6 +270,16 @@ void drgn_entitySystemDraw()
 		}
 
 		drgn_entityDraw(&_entManager.entList[bogus], DRGN_CURSOR);
+	}
+
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_entityDraw(&_entManager.entList[bogus], DRGN_UI);
 	}
 }
 

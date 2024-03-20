@@ -3,6 +3,7 @@
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
+#include "drgn_font.h"
 #include "drgn_camera.h"
 #include "drgn_entity.h"
 #include "drgn_player.h"
@@ -11,6 +12,7 @@
 #include "drgn_world.h"
 #include "drgn_inventory.h"
 #include "drgn_terrain.h"
+#include "drgn_window.h"
 
 int main(int argc, char * argv[])
 {
@@ -25,6 +27,7 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     DRGN_Entity* player;
     DRGN_World* world;
+    //DRGN_Entity* window;
     //Color color = gfc_color8(255, 0, 0, 100);
     //Vector2D vect = vector2d(1, 1);
     
@@ -46,6 +49,7 @@ int main(int argc, char * argv[])
     drgn_inventoryFileInit("defs/inventory/drgn_items.json");
     drgn_unitFileInit("defs/drgn_unit.json");
     drgn_terrainFileInit("defs/drgn_terrain.json");
+    drgn_fontInit();
 
     SDL_ShowCursor(SDL_DISABLE);
 
@@ -66,12 +70,14 @@ int main(int argc, char * argv[])
     * Finally, create the player, and populate with player's army
     */
 
+    //window = drgn_windowNew("hello world", "images/windows/testWindow.png", 128, 64, vector2d(64, 64));
     player = drgn_playerNew();
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
 
     /*main game loop*/
     while(!done)
     {
+        drgn_fontCacheListFree();
         //slog("here");
         //slog("Unit named %s on field", ((DRGN_Unit*)unit->data)->name);
         SDL_PumpEvents();   // update SDL's internal event structures
@@ -92,6 +98,7 @@ int main(int argc, char * argv[])
         //gf2d_sprite_render(sprite, vector2d(0, 0), &vect, NULL, NULL, NULL, &color, NULL, 0);
             drgn_entitySystemDraw();
 
+            //drgn_fontDraw("Hello\nWorld", DRGN_LARGE_FONT, GFC_COLOR_BLACK, player->pos);
             //UI elements last
             gf2d_sprite_draw(
                 mouse,
