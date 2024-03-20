@@ -3,7 +3,6 @@
 
 #include "gfc_types.h"
 #include "gf2d_sprite.h"
-#include "drgn_window.h"
 /*
 * @purpose default entity skeleton; all entities should inherit from this
 */
@@ -30,8 +29,6 @@ typedef struct DRGN_Entity_S
 	enum DRGN_Affiliation affiliation; //the units army affiliation; should never be set to DEFAULT and should be checked/caught
 	Uint8 selected; //used to check if this entity is selected
 	struct DRGN_Entity_S* curr; //currently selected entity
-	Uint8 display; //1 if currently displaying the unit's stat screen
-	DRGN_Window* window; //a window element associated with an entity
 	void* data; //for any additional data default entity may not have; NULL if no such data exists
 
 	void (*think) (struct DRGN_Entity_S* self); //call function to make decisions

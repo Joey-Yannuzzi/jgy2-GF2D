@@ -3,7 +3,6 @@
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
-#include "drgn_window.h"
 #include "drgn_font.h"
 #include "drgn_camera.h"
 #include "drgn_entity.h"
@@ -48,7 +47,6 @@ int main(int argc, char * argv[])
     drgn_inventoryFileInit("defs/inventory/drgn_items.json");
     drgn_unitFileInit("defs/drgn_unit.json");
     drgn_terrainFileInit("defs/drgn_terrain.json");
-    drgn_windowManagerNew(1024);
     drgn_fontInit();
 
     SDL_ShowCursor(SDL_DISABLE);
@@ -97,8 +95,7 @@ int main(int argc, char * argv[])
         //gf2d_sprite_render(sprite, vector2d(0, 0), &vect, NULL, NULL, NULL, &color, NULL, 0);
             drgn_entitySystemDraw();
 
-            //drgn_fontDraw("Hello\nWorld", DRGN_LARGE_FONT, GFC_COLOR_BLACK, player->pos);
-            drgn_windowManagerDraw();
+            drgn_fontDraw("Hello\nWorld", DRGN_LARGE_FONT, GFC_COLOR_BLACK, player->pos);
             //UI elements last
             gf2d_sprite_draw(
                 mouse,
