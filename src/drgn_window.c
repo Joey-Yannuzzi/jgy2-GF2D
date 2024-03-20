@@ -81,7 +81,19 @@ void drgn_windowThink(DRGN_Entity* self)
 
 void drgn_windowUpdate(DRGN_Entity* self)
 {
+	DRGN_Window* window;
 
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	window = (DRGN_Window*)self->data;
+
+	if (self->selected)
+	{
+		slog("Selected %s", window->texts);
+	}
 }
 
 void drgn_windowDraw(DRGN_Entity* self)

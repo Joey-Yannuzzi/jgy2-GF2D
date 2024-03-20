@@ -3,6 +3,7 @@
 #include "drgn_terrain.h"
 #include "drgn_world.h"
 #include "drgn_window.h"
+#include "drgn_cursor.h"
 
 DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_Affiliation affiliation, Vector2D pos)
 {
@@ -813,7 +814,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 		unit->menuWindow[bogus] = drgn_windowNew("Wait", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 		unit->menuWindow[bogus]->offset = 1;
-		bogus++;
+		drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos);
 		break;
 
 	default:
