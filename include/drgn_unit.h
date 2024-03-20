@@ -111,19 +111,21 @@ void drgn_unitMenu(DRGN_Entity* self);
 
 void drgn_unitItem(DRGN_Entity* self, DRGN_InventoryItem* item);
 
-void drgn_unitTrade(DRGN_Entity* self, DRGN_Entity* other);
+void drgn_unitTrade(DRGN_Entity* self);
 
 void drgn_unitWait(DRGN_Entity* self);
 
-void drgn_unitTalk(DRGN_Entity* self, DRGN_Entity* other);
+void drgn_unitTalk(DRGN_Entity* self);
 
-void drgn_unitHeal(DRGN_Entity* self, DRGN_Entity* target);
+void drgn_unitHeal(DRGN_Entity* self);
 
-void drgn_unitMeleeAttack(DRGN_Entity* self, DRGN_Inventory* selfItem, int selfAvoBonus, int selfDefBonus, Uint8 selfIsMagic, DRGN_Entity* target, DRGN_Inventory* targetItem, int targetAvoBonus, int targetDefBonus, Uint8 targetIsMagic);
+void drgn_unitMeleeAttack(DRGN_Entity* self);
 
-void drgn_unitRangedAttack(DRGN_Entity* self, DRGN_Inventory* selfItem, int selfAvoBonus, int selfDefBonus, Uint8 selfIsMagic, DRGN_Entity* target, DRGN_Inventory* targetItem, int targetAvoBonus, int targetDefBonus, Uint8 targetIsMagic);
+void drgn_unitRangedAttack(DRGN_Entity* self);
 
-void drgn_unitRescue(DRGN_Entity* self, DRGN_Entity* other);
+void drgn_unitRescue(DRGN_Entity* self);
+
+void drgn_unitTransfer(DRGN_Entity* self);
 
 void drgn_unitDrop(DRGN_Entity* self);
 
@@ -132,5 +134,9 @@ void drgn_unitSeize(DRGN_Entity* self);
 void drgn_unitSelectedMenuItem(DRGN_Entity* self);
 
 void drgn_unitMenuFree(DRGN_Unit* self);
+
+void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other);
+
+void drgn_unitActionTalk(DRGN_Entity* self, DRGN_Entity* other);
 
 #endif

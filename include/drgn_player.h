@@ -10,6 +10,10 @@ typedef struct
 	DRGN_Entity* terrainWindow; //terrain window to display terrain being hovered over
 	DRGN_Entity* unitWindow; //window that display's unit's name/class
 	DRGN_Entity* unitWindowSource; //entity where the unitWindow is getting information from
+	DRGN_Entity** targets; //pointers to all the targets a unit can interact with; max 12
+	Uint8 targeting; //used to determine if the player is moving normally or is targetting
+	int totalTargets; //number of total targets currently
+	int currentTarget; //index of the current target
 }
 DRGN_Player;
 

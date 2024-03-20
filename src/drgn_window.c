@@ -123,17 +123,60 @@ void drgn_windowDraw(DRGN_Entity* self)
 DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
 {
 	DRGN_Window* window;
+	DRGN_Unit* unit;
 
-	if (!self || !self->data)
+	if (!self || !self->data || !self->curr || !self->curr->data)
 	{
 		return (DRGN_NO_ACTION);
 	}
 
 	window = (DRGN_Window*)self->data;
+	unit = (DRGN_Unit*)self->curr->data;
 
 	if (gfc_strlcmp(window->texts, "Wait") == 0)
 	{
 		return(DRGN_WAIT);
+	}
+	if (gfc_strlcmp(window->texts, "Seize") == 0)
+	{
+		return (DRGN_SEIZE);
+	}
+	if (gfc_strlcmp(window->texts, "Talk") == 0)
+	{
+		return (DRGN_TALK);
+	}
+	if (gfc_strlcmp(window->texts, "Attack") == 0)
+	{
+		if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_ARCANE))
+		{
+			return (DRGN_MAGIC_ATTACK);
+		}
+
+		return (DRGN_MELEE_ATTACK);
+	}
+	if (gfc_strlcmp(window->texts, "Heal") == 0)
+	{
+		return (DRGN_HEAL);
+	}
+	if (gfc_strlcmp(window->texts, "Item") == 0)
+	{
+		return (DRGN_ITEM);
+	}
+	if (gfc_strlcmp(window->texts, "Trade") == 0)
+	{
+		return (DRGN_TRADE);
+	}
+	if (gfc_strlcmp(window->texts, "Rescue") == 0)
+	{
+		return (DRGN_RESCUE);
+	}
+	if (gfc_strlcmp(window->texts, "Transfer") == 0)
+	{
+		return (DRGN_TRANSFER);
+	}
+	if (gfc_strlcmp(window->texts, "Drop") == 0)
+	{
+		return (DRGN_DROP);
 	}
 
 	return (DRGN_NO_ACTION);

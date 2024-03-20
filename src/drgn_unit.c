@@ -4,6 +4,7 @@
 #include "drgn_world.h"
 #include "drgn_window.h"
 #include "drgn_cursor.h"
+#include "drgn_player.h"
 
 DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_Affiliation affiliation, Vector2D pos)
 {
@@ -280,12 +281,6 @@ void drgn_unitUpdate(DRGN_Entity* self)
 		unit->moveMap = NULL;
 		unit->moveMap = gfc_allocate_array(sizeof(Uint8), unit->moveTotal);
 	}
-
-	if (gfc_strlcmp(unit->name, "Auburn") == 0)
-	{
-		slog("Action %i", unit->currentAction);
-	}
-	//drgn_unitSelectedMenuItem(self);
 }
 
 void drgn_unitFree(DRGN_Entity* self)
@@ -829,6 +824,61 @@ void drgn_unitMenu(DRGN_Entity* self)
 		drgn_unitWait(self);
 		break;
 
+	case DRGN_SEIZE:
+		drgn_unitSeize(self);
+		break;
+
+	case DRGN_TALK:
+		/*right = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x + 64, self->pos.y), self);
+		left = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x - 64, self->pos.y), self);
+		down = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self);
+		up = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self);
+		self->curr->inactive = 0;
+		
+		if (right)
+		{
+			self->curr->pos = right->pos;
+		}
+		else if (left)
+		{
+			self->curr->pos = left->pos;
+		}
+		else if ()*/
+		drgn_unitTalk(self);
+		break;
+	
+	case DRGN_MELEE_ATTACK:
+		//drgn_unitMeleeAttack(self);
+		break;
+
+	case DRGN_MAGIC_ATTACK:
+		//drgn_unitRangedAttack(self);
+		break;
+
+	case DRGN_HEAL:
+		//drgn_unitHeal(self);
+		break;
+
+	case DRGN_ITEM:
+		//drgn_unitItem(self, unit->inventory->equipped);
+		break;
+
+	case DRGN_TRADE:
+		//drgn_unitTrade(self);
+		break;
+
+	case DRGN_RESCUE:
+		//drgn_unitRescue(self);
+		break;
+
+	case DRGN_TRANSFER:
+		//drgn_unitTransfer(self);
+		break;
+
+	case DRGN_DROP:
+		//drgn_unitDrop(self);
+		break;
+
 	default:
 		break;
 	}
@@ -852,8 +902,9 @@ void drgn_unitItem(DRGN_Entity* self, DRGN_InventoryItem* item)
 void drgn_unitWait(DRGN_Entity* self)
 {
 	DRGN_Unit* unit;
+	DRGN_Player* player;
 
-	if (!self || !self->data)
+	if (!self || !self->data || !self->curr || !self->curr->data)
 	{
 		return;
 	}
@@ -865,7 +916,77 @@ void drgn_unitWait(DRGN_Entity* self)
 	drgn_unitMoveFree(self);
 	drgn_unitMenuFree(unit);
 	drgn_entityFree(unit->menuCursor);
+	unit->menuCursor = NULL;
 	self->curr->inactive = 0;
+	player = (DRGN_Player*)self->curr->data;
+	player->targeting = 0;
+	player->currentTarget = 0;
+	player->totalTargets = 0;
+	self->curr->curr = NULL;
+	self->curr = NULL;
+}
+
+void drgn_unitSeize(DRGN_Entity* self)
+{
+	drgn_unitWait(self);
+	//Win the game as well
+}
+
+void drgn_unitTalk(DRGN_Entity* self)
+{
+	DRGN_Entity* right;
+	DRGN_Entity* left;
+	DRGN_Entity* up;
+	DRGN_Entity* down;
+	DRGN_Unit* unit;
+	DRGN_Player* player;
+
+	if (!self || !self->data || !self->curr || !self->curr->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+	drgn_unitMoveFree(self);
+	drgn_entityFree(unit->menuCursor);
+	unit->menuCursor = NULL;
+	drgn_unitMenuFree(unit);
+
+	right = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x + 64, self->pos.y), self);
+	left = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x - 64, self->pos.y), self);
+	down = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self);
+	up = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self);
+	player = (DRGN_Player*)self->curr->data;
+
+	if (right)
+	{
+		self->curr->pos = right->pos;
+		player->targets[player->totalTargets] = right;
+		player->totalTargets++;
+	}
+	if (left)
+	{
+		self->curr->pos = left->pos;
+		player->targets[player->totalTargets] = left;
+		player->totalTargets++;
+	}
+	if (up)
+	{
+		self->curr->pos = up->pos;
+		player->targets[player->totalTargets] = up;
+		player->totalTargets++;
+	}
+	if (down)
+	{
+		self->curr->pos = down->pos;
+		player->targets[player->totalTargets] = down;
+		player->totalTargets++;
+	}
+
+	player->targeting = 1;
+	self->curr->inactive = 0;
+	player->pressed = 0;
+	self->curr->curr = self;
 }
 
 void drgn_unitMenuFree(DRGN_Unit* self)
@@ -915,4 +1036,42 @@ void drgn_unitSelectedMenuItem(DRGN_Entity* self)
 			return;
 		}
 	}
+}
+
+void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data)
+	{
+		slog("no unit");
+		return;
+	}
+
+	slog("pressed");
+	unit = (DRGN_Unit*)self->data;
+
+	switch (unit->currentAction)
+	{
+	case DRGN_TALK:
+
+		if (!other)
+		{
+			slog("Other unit does not exist");
+			return;
+		}
+
+		drgn_unitActionTalk(self, other);
+		break;
+
+	default:
+		break;
+	}
+}
+
+void drgn_unitActionTalk(DRGN_Entity* self, DRGN_Entity* other)
+{
+	other->affiliation = DRGN_BLUE;
+	other->color = GFC_COLOR_BLUE;
+	drgn_unitWait(self);
 }

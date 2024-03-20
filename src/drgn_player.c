@@ -33,6 +33,7 @@ DRGN_Entity* drgn_playerNew()
 	self->data = player;
 	player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576), NULL);
 	player->unitWindow = NULL;
+	player->targets = gfc_allocate_array(sizeof(DRGN_Entity*), 12);
 	return (self);
 }
 
@@ -54,12 +55,31 @@ void drgn_playerThink(DRGN_Entity* self)
 		return;
 	}
 
+	player = (DRGN_Player*)self->data;
+
+	if (player->targeting)
+	{
+		if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_D]) && event.type == SDL_KEYDOWN)
+		{
+			player->currentTarget++;
+		}
+		else if ((keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_A]) && event.type == SDL_KEYDOWN)
+		{
+			player->currentTarget--;
+		}
+
+		if (keys[SDL_SCANCODE_SPACE] && !player->pressed && event.type == SDL_KEYDOWN)
+		{
+			player->pressed = 1;
+		}
+
+		return;
+	}
+
 	if (self->inactive)
 	{
 		return;
 	}
-
-	player = (DRGN_Player*)self->data;
 
 	if (keys[SDL_SCANCODE_W] && event.type == SDL_KEYDOWN)
 	{
@@ -120,17 +140,47 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		return;
 	}
 
-	if (self->inactive)
-	{
-		return;
-	}
-
-	player = (DRGN_Player*)self->data;
 	self->frame += 0.05;
 
 	if (self->frame > 4)
 	{
 		self->frame = 0;
+	}
+
+	player = (DRGN_Player*)self->data;
+
+	if (player->targeting)
+	{
+		if (player->currentTarget >= player->totalTargets)
+		{
+			player->currentTarget = 0;
+		}
+		else if (player->currentTarget < 0)
+		{
+			player->currentTarget = player->totalTargets - 1;
+		}
+
+		vector2d_copy(self->pos, player->targets[player->currentTarget]->pos);
+
+
+		if (player->pressed)
+		{
+			drgn_unitInteractionByEnum(self->curr, player->targets[player->currentTarget]);
+			player->pressed = 0;
+		}
+		return;
+	}
+
+	if (self->inactive)
+	{
+		if (player->unitWindow)
+		{
+			drgn_entityFree(player->unitWindow);
+		}
+
+		player->unitWindow = NULL;
+		player->unitWindowSource = NULL;
+		return;
 	}
 
 	vector2d_add(self->pos, self->pos, self->velocity);
@@ -176,7 +226,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		self->selected = 1;
 		self->curr = unit;
 		unit->selected = 1;
-		unit->color = GFC_COLOR_GREEN;
+		unit->color = GFC_COLOR_CYAN;
 	}
 	else if (player->pressed && self->curr && self->selected && drgn_entityGetSelectionByPosition(DRGN_TILE, self->pos, self))
 	{
@@ -210,7 +260,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		drgn_unitMoveFree(self->curr);
 		self->curr = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self->curr);
 		self->curr->selected = 1;
-		self->curr->color = GFC_COLOR_GREEN;
+		self->curr->color = GFC_COLOR_CYAN;
 		player->pressed = 0;
 	}
 	else if (player->pressed && self->curr && self->selected)
@@ -395,6 +445,11 @@ void drgn_playerFree(DRGN_Entity* self)
 	if (player->terrainWindow)
 	{
 		drgn_entityFree(player->terrainWindow);
+	}
+
+	if (player->targets)
+	{
+		free(player->targets);
 	}
 }
 
