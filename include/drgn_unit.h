@@ -5,7 +5,7 @@
 #include "drgn_inventory.h"
 #include "drgn_move.h"
 
-#define _drgn_weapons 9 //0 sword, 1 lance, 2, axe, 3 bow, 4 rapier, 5 dagger, 6 arcane, 7 divine, 8 natural
+#define _drgn_weapons 9 //0 sword, 1 lance, 2 axe, 3 bow, 4 rapier, 5 dagger, 6 arcane, 7 divine, 8 natural
 #define _drgn_stats 11 //0 lvl, 1 hp, 2, str, 3 mag, 4 skl, 5 spd, 6 lck, 7 def, 8 res, 9 mov, 10 bld
 
 static SJson* _unitJson = NULL;
