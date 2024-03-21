@@ -162,6 +162,11 @@ void drgn_inventoryFree(DRGN_Inventory* self)
 
 	for (int bogus = 0; bogus < self->curr; bogus++)
 	{
+		if (!&self->itemList[bogus])
+		{
+			continue;
+		}
+
 		drgn_inventoryItemFree(&self->itemList[bogus]);
 	}
 
