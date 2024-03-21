@@ -204,7 +204,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 
 	unit->class = class;
 
-	if (self->affiliation == DRGN_GREEN)
+	if (gfc_strlcmp(unit->class, "arcanist") == 0)
 	{
 		unit->inventory = drgn_inventoryNew(names, 5);
 		slog("arcanist inventory filled");
@@ -227,6 +227,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	unit->menuWindow = gfc_allocate_array(sizeof(DRGN_Entity*), 8);
 	unit->currentHP = unit->stats[1];
 	unit->currentHP--;
+	unit->inventory->equipped = 0;
 
 	self->data = unit;
 	return (self);
@@ -856,7 +857,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		break;
 
 	case DRGN_ITEM:
-		//drgn_unitItem(self, unit->inventory->equipped);
+		drgn_unitItem(self, &unit->inventory->itemList[unit->inventory->equipped]);
 		break;
 
 	case DRGN_TRADE:
@@ -884,15 +885,44 @@ void drgn_unitItem(DRGN_Entity* self, DRGN_InventoryItem* item)
 {
 	DRGN_InventoryItemPotion* potion;
 	DRGN_InventoryItemStatBooster* booster;
+	DRGN_Unit* unit;
+	int healing;
+
+	if (!self || !item || !item->data || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
 
 	if (item->type == DRGN_POTION)
 	{
+		potion = (DRGN_InventoryItemPotion*)item->data;
+		healing = potion->heal;
+
+		if (unit->currentHP >= unit->stats[1])
+		{
+			return;
+		}
+
+		unit->currentHP += healing;
+
+		if (unit->currentHP > unit->stats[1])
+		{
+			unit->currentHP = unit->stats[1];
+		}
+
+		slog("healed for %i health", healing);
 
 	}
-	if (item->type == DRGN_STAT_BOOSTER)
+	else if (item->type == DRGN_STAT_BOOSTER)
 	{
-
+		booster = (DRGN_InventoryItemStatBooster*)item->data;
+		unit->stats[booster->stat] += booster->increase;
+		slog("increased sta %i by %i points", booster->stat, booster->increase);
 	}
+
+	drgn_unitWait(self);
 }
 
 void drgn_unitWait(DRGN_Entity* self)

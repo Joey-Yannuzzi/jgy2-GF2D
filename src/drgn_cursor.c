@@ -101,6 +101,8 @@ void drgn_cursorUpdate(DRGN_Entity* self)
 		{
 			temp->selected = 1;
 		}
+
+		cursor->pressed = 0;
 	}
 
 	cursor->frameskip++;

@@ -101,6 +101,11 @@ void drgn_windowUpdate(DRGN_Entity* self)
 		{
 			drgn_unitMenu(self->curr);
 		}
+		else
+		{
+			slog("do not consume item");
+			self->selected = 0;
+		}
 		//slog("Selected %s", window->texts);
 	}
 }
@@ -158,8 +163,9 @@ DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
 	{
 		return (DRGN_HEAL);
 	}
-	if (gfc_strlcmp(window->texts, "Item") == 0)
+	if (gfc_strlcmp(window->texts, "Item") == 0 && (unit->inventory->itemList[unit->inventory->equipped].type == DRGN_POTION || unit->inventory->itemList[unit->inventory->equipped].type == DRGN_STAT_BOOSTER))
 	{
+		slog("consuming item");
 		return (DRGN_ITEM);
 	}
 	if (gfc_strlcmp(window->texts, "Trade") == 0)
