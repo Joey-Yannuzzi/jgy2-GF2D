@@ -33,6 +33,7 @@ typedef struct DRGN_Entity_S
 	Uint8 colorSet; //value to check if a color is set
 	Uint8 offset; //value to check if offset should be used when drawing; only used for UI
 	Vector2D offsetVal; //value of the offset; only used for UI
+	Uint8 inactive; //set this off when entity is no longer active, but does not want to be destroyed yet
 	void* data; //for any additional data default entity may not have; NULL if no such data exists
 
 	void (*think) (struct DRGN_Entity_S* self); //call function to make decisions

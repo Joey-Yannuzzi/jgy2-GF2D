@@ -181,6 +181,11 @@ void drgn_entityDraw(DRGN_Entity* self, enum DRGN_Affiliation affiliation)
 		return;
 	}
 
+	if (self->inactive)
+	{
+		return;
+	}
+
 	if (self->affiliation != affiliation)
 	{
 		return;

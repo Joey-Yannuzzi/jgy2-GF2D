@@ -120,17 +120,6 @@ DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int max)
 	self->curr = 0;
 	slog("Successfully created inventory");
 
-	/*for (int bogus = 0; bogus < max; bogus++)
-	{
-		if (!itemNames[bogus])
-		{
-			continue;
-		}
-
-		self->curr++;
-		self->itemList[bogus] = *drgn_inventoryItemNew(itemNames[bogus]);
-	}*/
-
 	if (itemNames)
 	{
 		for (int bogus = 0; bogus < max; bogus++)
@@ -151,16 +140,6 @@ DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int max)
 
 			self->itemList[bogus] = *item;
 		}
-		/*self->curr++;
-		item = drgn_inventoryItemNew(itemNames);
-
-		if (!item)
-		{
-			slog("failed to get item from name");
-			return NULL;
-		}
-
-		self->itemList[0] = *item;*/
 	}
 
 	slog("Gave inventory %i items", self->curr);
@@ -183,6 +162,11 @@ void drgn_inventoryFree(DRGN_Inventory* self)
 
 	for (int bogus = 0; bogus < self->curr; bogus++)
 	{
+		if (!&self->itemList[bogus])
+		{
+			continue;
+		}
+
 		drgn_inventoryItemFree(&self->itemList[bogus]);
 	}
 
@@ -258,6 +242,8 @@ DRGN_InventoryItem* drgn_inventoryItemNew(const char* name)
 		item->data = statBooster;
 		slog("Stat booster successfully created");
 		break;
+	case DRGN_ARCANE:
+		slog("Spell book created");
 	default:
 		break;
 	}
@@ -345,12 +331,15 @@ DRGN_InventoryItem* drgn_inventoryCheckItemTypeInInventory(DRGN_Inventory* self,
 
 	for (int bogus = 0; bogus < self->curr; bogus++)
 	{
+		slog("Item: %s", self->itemList[bogus].name);
+
 		if (self->itemList[bogus].type == type)
 		{
 			return (&self->itemList[bogus]);
 		}
 	}
 
+	slog("failed to find item");
 	return NULL;
 }
 

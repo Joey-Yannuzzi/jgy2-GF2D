@@ -2,7 +2,7 @@
 #include "drgn_window.h"
 #include "drgn_font.h"
 
-DRGN_Entity* drgn_windowNew(char* texts, const char* sprite, Uint32 width, Uint32 height, Vector2D pos)
+DRGN_Entity* drgn_windowNew(char* texts, const char* sprite, Uint32 width, Uint32 height, Vector2D pos, DRGN_Entity* curr)
 {
 	DRGN_Entity* self;
 	DRGN_Window* window;
@@ -54,6 +54,7 @@ DRGN_Entity* drgn_windowNew(char* texts, const char* sprite, Uint32 width, Uint3
 	window->texts = gfc_allocate_array(sizeof(char), textLen);
 	strncpy(window->texts, texts, textLen);
 	self->data = window;
+	self->curr = curr;
 
 	//slog("Drew window");
 	return (self);
@@ -81,7 +82,32 @@ void drgn_windowThink(DRGN_Entity* self)
 
 void drgn_windowUpdate(DRGN_Entity* self)
 {
+	DRGN_Window* window;
+	DRGN_Unit* unit;
 
+	if (!self || !self->data || !self->curr || !self->curr->data)
+	{
+		return;
+	}
+
+	window = (DRGN_Window*)self->data;
+	unit = (DRGN_Unit*)self->curr->data;
+
+	if (self->selected)
+	{
+		unit->currentAction = drgn_windowMenuItemFromText(self);
+
+		if (unit->currentAction)
+		{
+			drgn_unitMenu(self->curr);
+		}
+		else
+		{
+			slog("do not consume item");
+			self->selected = 0;
+		}
+		//slog("Selected %s", window->texts);
+	}
 }
 
 void drgn_windowDraw(DRGN_Entity* self)
@@ -97,4 +123,67 @@ void drgn_windowDraw(DRGN_Entity* self)
 	vector2d_add(pos, self->pos, self->offsetVal);
 	window = (DRGN_Window*)self->data;
 	drgn_fontDraw(window->texts, DRGN_SMALL_FONT, GFC_COLOR_BLACK, pos, vector2d(self->sprite->frame_w, self->sprite->frame_h));
+}
+
+DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
+{
+	DRGN_Window* window;
+	DRGN_Unit* unit;
+
+	if (!self || !self->data || !self->curr || !self->curr->data)
+	{
+		return (DRGN_NO_ACTION);
+	}
+
+	window = (DRGN_Window*)self->data;
+	unit = (DRGN_Unit*)self->curr->data;
+
+	if (gfc_strlcmp(window->texts, "Wait") == 0)
+	{
+		return(DRGN_WAIT);
+	}
+	if (gfc_strlcmp(window->texts, "Seize") == 0)
+	{
+		return (DRGN_SEIZE);
+	}
+	if (gfc_strlcmp(window->texts, "Talk") == 0)
+	{
+		return (DRGN_TALK);
+	}
+	if (gfc_strlcmp(window->texts, "Attack") == 0)
+	{
+		if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_ARCANE))
+		{
+			return (DRGN_MAGIC_ATTACK);
+		}
+
+		return (DRGN_MELEE_ATTACK);
+	}
+	if (gfc_strlcmp(window->texts, "Heal") == 0)
+	{
+		return (DRGN_HEAL);
+	}
+	if (gfc_strlcmp(window->texts, "Item") == 0 && (unit->inventory->itemList[unit->inventory->equipped].type == DRGN_POTION || unit->inventory->itemList[unit->inventory->equipped].type == DRGN_STAT_BOOSTER))
+	{
+		slog("consuming item");
+		return (DRGN_ITEM);
+	}
+	if (gfc_strlcmp(window->texts, "Trade") == 0)
+	{
+		return (DRGN_TRADE);
+	}
+	if (gfc_strlcmp(window->texts, "Rescue") == 0)
+	{
+		return (DRGN_RESCUE);
+	}
+	if (gfc_strlcmp(window->texts, "Transfer") == 0)
+	{
+		return (DRGN_TRANSFER);
+	}
+	if (gfc_strlcmp(window->texts, "Drop") == 0)
+	{
+		return (DRGN_DROP);
+	}
+
+	return (DRGN_NO_ACTION);
 }
