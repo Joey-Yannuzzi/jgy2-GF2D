@@ -36,7 +36,7 @@ void drgn_fontFree();
 * @param color the color of the text
 * @param pos the position of the text in world space
 */
-void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2D pos, Vector2D vertical);
+void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2D pos, Vector2D* vertical);
 
 DRGN_FontCache* drgn_fontGetCached(const char* text, DRGN_FontStyles style, Color color);
 

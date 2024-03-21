@@ -34,12 +34,19 @@
 
     {
       "name": "mountain",
-      "displayName" : "Mountain",
+      "displayName": "Mountain",
       "tile": 5,
       "moveValue": 4,
-      "ignoreClass": [ "Soldier" ], //should ignore all except brigands
+      "ignoreClass": [ "soldier", "captain", "cavalier", "arcanist" ], //should ignore all except brigands
       "avoidBonus": 50,
-      "defBonus" : 2
+      "defBonus": 2
+    },
+    {
+      "name": "flag",
+      "displayName": "Flag",
+      "tile": 6,
+      "moveValue": 1,
+      "avoidBonus" : 50
     }
   ]
 }

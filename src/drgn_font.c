@@ -86,7 +86,7 @@ void drgn_fontInit()
 	atexit(drgn_fontFree);
 }
 
-void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2D pos, Vector2D vertical)
+void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2D pos, Vector2D* vertical)
 {
 	TTF_Font* font;
 	SDL_Surface* result;
@@ -148,8 +148,17 @@ void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2
 
 	destination.x = pos.x;
 	destination.y = pos.y;
-	destination.w = vertical.x; //result->w;
-	destination.h = vertical.y; //result->h;
+
+	if (vertical)
+	{
+		destination.w = vertical->x;
+		destination.h = vertical->y;
+	}
+	else
+	{
+		destination.w = result->w;
+		destination.h = result->h;
+	}
 	SDL_RenderCopy(gf2d_graphics_get_renderer(), texture, NULL, &destination);
 	SDL_FreeSurface(result);
 	drgn_fontAddCached(text, style, color, texture, vector2d(destination.w, destination.h));
