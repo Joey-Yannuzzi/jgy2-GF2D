@@ -967,6 +967,7 @@ void drgn_unitWait(DRGN_Entity* self)
 void drgn_unitSeize(DRGN_Entity* self)
 {
 	drgn_unitWait(self);
+	self->win = 1;
 	//Win the game as well
 }
 

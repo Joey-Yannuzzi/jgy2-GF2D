@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 #include "drgn_camera.h"
 #include "drgn_entity.h"
+#include "drgn_font.h"
 
 typedef struct
 {
@@ -179,6 +180,11 @@ void drgn_entityDraw(DRGN_Entity* self, enum DRGN_Affiliation affiliation)
 	{
 		slog("No entity to draw");
 		return;
+	}
+
+	if (self->win)
+	{
+		drgn_fontDraw("You Win!", DRGN_LARGE_FONT, GFC_COLOR_CYAN, vector2d(self->pos.x, self->pos.y), NULL);
 	}
 
 	if (self->inactive)

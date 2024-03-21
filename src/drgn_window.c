@@ -114,6 +114,7 @@ void drgn_windowDraw(DRGN_Entity* self)
 {
 	DRGN_Window* window;
 	Vector2D pos;
+	Vector2D vert;
 
 	if (!self || !self->data)
 	{
@@ -122,7 +123,8 @@ void drgn_windowDraw(DRGN_Entity* self)
 
 	vector2d_add(pos, self->pos, self->offsetVal);
 	window = (DRGN_Window*)self->data;
-	drgn_fontDraw(window->texts, DRGN_SMALL_FONT, GFC_COLOR_BLACK, pos, vector2d(self->sprite->frame_w, self->sprite->frame_h));
+	vert = vector2d(self->sprite->frame_w, self->sprite->frame_h);
+	drgn_fontDraw(window->texts, DRGN_SMALL_FONT, GFC_COLOR_BLACK, pos, &vert);
 }
 
 DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
