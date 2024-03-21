@@ -143,4 +143,6 @@ void drgn_unitActionAttack(DRGN_Entity* self, DRGN_Entity* other);
 
 void drgn_unitActionMagicAttack(DRGN_Entity* self, DRGN_Entity* other, Uint8 counter);
 
+void drgn_unitActionHeal(DRGN_Entity* self, DRGN_Entity* other);
+
 #endif

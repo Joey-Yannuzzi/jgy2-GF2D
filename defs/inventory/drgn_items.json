@@ -156,7 +156,15 @@
       "cost": -1,
       "type": 9,
       "uses": -1,
-      "description" : "A spell book used to cast arcane magic with."
+      "description": "A spell book used to cast arcane magic with."
+    },
+    {
+      "name": "healStaff",
+      "displayName": "Staff of Healing",
+      "cost": 500,
+      "type": 10,
+      "uses": 20,
+      "description" : "A staff that contains the healing power of the gods."
     }
   ]
 }

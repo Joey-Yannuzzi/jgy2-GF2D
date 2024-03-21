@@ -17,7 +17,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	const char* displayName;
 	const char* sprite;
 	const char* class;
-	const char* names[] = { "spellBook", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
+	const char* names[] = { "spellBook", "healStaff", "mediumPotion", "largePotion", "smallPotion" };
 
 	self = drgn_entityNew();
 
@@ -852,7 +852,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		break;
 
 	case DRGN_HEAL:
-		//drgn_unitHeal(self);
+		drgn_unitHeal(self);
 		break;
 
 	case DRGN_ITEM:
@@ -1099,6 +1099,63 @@ void drgn_unitRangedAttack(DRGN_Entity* self)
 	self->curr->curr = self;
 }
 
+void drgn_unitHeal(DRGN_Entity* self)
+{
+	DRGN_Entity* right;
+	DRGN_Entity* left;
+	DRGN_Entity* up;
+	DRGN_Entity* down;
+	DRGN_Unit* unit;
+	DRGN_Player* player;
+
+	if (!self || !self->data || !self->curr || !self->curr->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+	drgn_unitMoveFree(self);
+	drgn_entityFree(unit->menuCursor);
+	unit->menuCursor = NULL;
+	drgn_unitMenuFree(unit);
+
+	right = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self);
+	left = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self);
+	down = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self);
+	up = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self);
+	player = (DRGN_Player*)self->curr->data;
+
+	if (right)
+	{
+		self->curr->pos = right->pos;
+		player->targets[player->totalTargets] = right;
+		player->totalTargets++;
+	}
+	if (left)
+	{
+		self->curr->pos = left->pos;
+		player->targets[player->totalTargets] = left;
+		player->totalTargets++;
+	}
+	if (up)
+	{
+		self->curr->pos = up->pos;
+		player->targets[player->totalTargets] = up;
+		player->totalTargets++;
+	}
+	if (down)
+	{
+		self->curr->pos = down->pos;
+		player->targets[player->totalTargets] = down;
+		player->totalTargets++;
+	}
+
+	player->targeting = 1;
+	self->curr->inactive = 0;
+	player->pressed = 0;
+	self->curr->curr = self;
+}
+
 void drgn_unitMenuFree(DRGN_Unit* self)
 {
 	if (!self || !self->menuWindow)
@@ -1191,6 +1248,17 @@ void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
 
 		//check if counter attack is possible here (ranged may not get countered some times)
 		drgn_unitActionMagicAttack(self, other, 0);
+		break;
+
+	case DRGN_HEAL:
+
+		if (!other)
+		{
+			return;
+		}
+		drgn_unitActionHeal(self, other);
+		break;
+
 	default:
 		break;
 	}
@@ -1558,6 +1626,42 @@ void drgn_unitActionMagicAttack(DRGN_Entity* self, DRGN_Entity* other, Uint8 cou
 				return;
 			}
 		}
+	}
+
+	drgn_unitWait(self);
+}
+
+void drgn_unitActionHeal(DRGN_Entity* self, DRGN_Entity* other)
+{
+	DRGN_Unit* selfUnit;
+	DRGN_Unit* otherUnit;
+	int healing;
+
+	if (!self || !self->data || !other || !other->data)
+	{
+		return;
+	}
+
+	selfUnit = (DRGN_Unit*)self->data;
+	otherUnit = (DRGN_Unit*)other->data;
+
+	if (!drgn_inventoryCheckItemTypeInInventory(selfUnit->inventory, DRGN_DIVINE))
+	{
+		return;
+	}
+
+	if (otherUnit->currentHP >= otherUnit->stats[1])
+	{
+		return;
+	}
+
+	healing = selfUnit->stats[3] + selfUnit->stats[8];
+	otherUnit->currentHP += healing;
+	slog("healed for %i health", healing);
+
+	if (otherUnit->currentHP > otherUnit->stats[1])
+	{
+		otherUnit->currentHP = otherUnit->stats[1];
 	}
 
 	drgn_unitWait(self);
