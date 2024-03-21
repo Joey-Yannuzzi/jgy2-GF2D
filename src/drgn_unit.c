@@ -240,7 +240,14 @@ void drgn_unitThink(DRGN_Entity* self)
 	DRGN_Unit* unit;
 	DRGN_Entity* check;
 
-	if (!self)
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+
+	if (unit->rescued)
 	{
 		return;
 	}
@@ -267,6 +274,11 @@ void drgn_unitUpdate(DRGN_Entity* self)
 	}
 
 	unit = (DRGN_Unit*)self->data;
+
+	if (unit->rescued)
+	{
+		return;
+	}
 
 	if (!unit->active)
 	{
@@ -865,7 +877,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		break;
 
 	case DRGN_RESCUE:
-		//drgn_unitRescue(self);
+		drgn_unitRescue(self);
 		break;
 
 	case DRGN_TRANSFER:
@@ -1243,6 +1255,63 @@ void drgn_unitTrade(DRGN_Entity* self)
 	self->curr->curr = self;
 }
 
+void drgn_unitRescue(DRGN_Entity* self)
+{
+	DRGN_Entity* right;
+	DRGN_Entity* left;
+	DRGN_Entity* up;
+	DRGN_Entity* down;
+	DRGN_Unit* unit;
+	DRGN_Player* player;
+
+	if (!self || !self->data || !self->curr || !self->curr->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+	drgn_unitMoveFree(self);
+	drgn_entityFree(unit->menuCursor);
+	unit->menuCursor = NULL;
+	drgn_unitMenuFree(unit);
+
+	right = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x + 64, self->pos.y), self);
+	left = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x - 64, self->pos.y), self);
+	down = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y + 64), self);
+	up = drgn_entityGetSelectionByPosition(DRGN_BLUE, vector2d(self->pos.x, self->pos.y - 64), self);
+	player = (DRGN_Player*)self->curr->data;
+
+	if (right)
+	{
+		self->curr->pos = right->pos;
+		player->targets[player->totalTargets] = right;
+		player->totalTargets++;
+	}
+	if (left)
+	{
+		self->curr->pos = left->pos;
+		player->targets[player->totalTargets] = left;
+		player->totalTargets++;
+	}
+	if (up)
+	{
+		self->curr->pos = up->pos;
+		player->targets[player->totalTargets] = up;
+		player->totalTargets++;
+	}
+	if (down)
+	{
+		self->curr->pos = down->pos;
+		player->targets[player->totalTargets] = down;
+		player->totalTargets++;
+	}
+
+	player->targeting = 1;
+	self->curr->inactive = 0;
+	player->pressed = 0;
+	self->curr->curr = self;
+}
+
 void drgn_unitMenuFree(DRGN_Unit* self)
 {
 	if (!self || !self->menuWindow)
@@ -1356,6 +1425,14 @@ void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
 		drgn_unitActionTrade(self, other);
 		break;
 
+	case DRGN_RESCUE:
+
+		if (!other)
+		{
+			return;
+		}
+
+		drgn_unitActionRescue(self, other);
 	default:
 		break;
 	}
@@ -1782,5 +1859,25 @@ void drgn_unitActionTrade(DRGN_Entity* self, DRGN_Entity* other)
 	otherItem = otherUnit->inventory->itemList[otherUnit->inventory->equipped];
 	selfUnit->inventory->itemList[selfUnit->inventory->equipped] = otherItem;
 	otherUnit->inventory->itemList[otherUnit->inventory->equipped] = selfItem;
+	drgn_unitWait(self);
+}
+
+void drgn_unitActionRescue(DRGN_Entity* self, DRGN_Entity* other)
+{
+	DRGN_Unit* selfUnit;
+	DRGN_Unit* otherUnit;
+
+	if (!self || !self->data || !other)
+	{
+		return;
+	}
+
+	selfUnit = (DRGN_Unit*)self->data;
+	otherUnit = (DRGN_Unit*)other->data;
+	selfUnit->rescuedUnit = other;
+	other->pos.x = -1;
+	other->pos.y = 1;
+	otherUnit->rescued = 1;
+	other->inactive = 1;
 	drgn_unitWait(self);
 }

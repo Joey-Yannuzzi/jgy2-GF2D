@@ -66,6 +66,7 @@ typedef struct
 	int menuMax; //number of generated menu elements
 	DRGN_Entity* rescuedUnit; //points to the unit currently being rescued; NULL if no rescue in progress
 	DRGN_Entity* menuCursor; //the cursor when selecting a command
+	Uint8 rescued; //checks to see if this unit is recsued currently
 }
 DRGN_Unit;
 
@@ -146,5 +147,7 @@ void drgn_unitActionMagicAttack(DRGN_Entity* self, DRGN_Entity* other, Uint8 cou
 void drgn_unitActionHeal(DRGN_Entity* self, DRGN_Entity* other);
 
 void drgn_unitActionTrade(DRGN_Entity* self, DRGN_Entity* other);
+
+void drgn_unitActionRescue(DRGN_Entity* self, DRGN_Entity* other);
 
 #endif
