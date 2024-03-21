@@ -376,52 +376,6 @@ DRGN_World* drgn_worldLoad(const char* file)
 		}
 	}
 
-	/*vertical = sj_object_get_value(worldJson, "terrainMap");
-
-	if (!vertical)
-	{
-		slog("Error obtaining vertical array in json object");
-		sj_free(json);
-		return NULL;
-	}
-
-	height = sj_array_get_count(vertical);
-	horizontal = sj_array_get_nth(vertical, 0);
-
-	if (!horizontal)
-	{
-		slog("Error obtaining horizontal array in json object");
-		sj_free(json);
-		return NULL;
-	}
-
-	width = sj_array_get_count(horizontal);
-
-	for (int bogus = 0; bogus < height; bogus++)
-	{
-		horizontal = sj_array_get_nth(vertical, bogus);
-
-		if (!horizontal)
-		{
-			continue;
-		}
-
-		for (int bogus2 = 0; bogus2 < width; bogus2++)
-		{
-			item = sj_array_get_nth(horizontal, bogus2);
-
-			if (!item)
-			{
-				continue;
-			}
-
-			tile = 0;
-			sj_get_integer_value(item, &tile);
-			drgn_terrainNew(tile, vector2d(bogus2* frameWidth, bogus* frameHeight));
-			
-		}
-	}*/
-
 	drgn_worldTileLayerRender(world);
 	sj_free(json);
 	slog("World created from file %s", file);

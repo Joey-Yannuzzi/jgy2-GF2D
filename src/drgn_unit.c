@@ -17,6 +17,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	const char* displayName;
 	const char* sprite;
 	const char* class;
+	const char* names[] = { "spellBook", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
 
 	self = drgn_entityNew();
 
@@ -203,7 +204,15 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 
 	unit->class = class;
 
-	unit->inventory = drgn_inventoryNew(inventory, 5);
+	if (self->affiliation == DRGN_GREEN)
+	{
+		unit->inventory = drgn_inventoryNew(names, 5);
+		slog("arcanist inventory filled");
+	}
+	else
+	{
+		unit->inventory = drgn_inventoryNew(inventory, 5);
+	}
 
 	if (!unit->inventory)
 	{
@@ -601,6 +610,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 		if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_ARCANE))
 		{
+			slog("magic attack");
 			right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 128, self->pos.y), self);
 			left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 128, self->pos.y), self);
 			down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 128), self);
@@ -608,6 +618,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		}
 		else
 		{
+			slog("melee attack");
 			right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 64, self->pos.y), self);
 			left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 64, self->pos.y), self);
 			down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 64), self);
@@ -837,7 +848,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		break;
 
 	case DRGN_MAGIC_ATTACK:
-		//drgn_unitRangedAttack(self);
+		drgn_unitRangedAttack(self);
 		break;
 
 	case DRGN_HEAL:
@@ -1031,6 +1042,63 @@ void drgn_unitMeleeAttack(DRGN_Entity* self)
 	self->curr->curr = self;
 }
 
+void drgn_unitRangedAttack(DRGN_Entity* self)
+{
+	DRGN_Entity* right;
+	DRGN_Entity* left;
+	DRGN_Entity* up;
+	DRGN_Entity* down;
+	DRGN_Unit* unit;
+	DRGN_Player* player;
+
+	if (!self || !self->data || !self->curr || !self->curr->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+	drgn_unitMoveFree(self);
+	drgn_entityFree(unit->menuCursor);
+	unit->menuCursor = NULL;
+	drgn_unitMenuFree(unit);
+
+	right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 128, self->pos.y), self);
+	left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 128, self->pos.y), self);
+	down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 128), self);
+	up = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y - 128), self);
+	player = (DRGN_Player*)self->curr->data;
+
+	if (right)
+	{
+		self->curr->pos = right->pos;
+		player->targets[player->totalTargets] = right;
+		player->totalTargets++;
+	}
+	if (left)
+	{
+		self->curr->pos = left->pos;
+		player->targets[player->totalTargets] = left;
+		player->totalTargets++;
+	}
+	if (up)
+	{
+		self->curr->pos = up->pos;
+		player->targets[player->totalTargets] = up;
+		player->totalTargets++;
+	}
+	if (down)
+	{
+		self->curr->pos = down->pos;
+		player->targets[player->totalTargets] = down;
+		player->totalTargets++;
+	}
+
+	player->targeting = 1;
+	self->curr->inactive = 0;
+	player->pressed = 0;
+	self->curr->curr = self;
+}
+
 void drgn_unitMenuFree(DRGN_Unit* self)
 {
 	if (!self || !self->menuWindow)
@@ -1115,6 +1183,14 @@ void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
 		drgn_unitActionAttack(self, other);
 		break;
 
+	case DRGN_MAGIC_ATTACK:
+		if (!other)
+		{
+			return;
+		}
+
+		//check if counter attack is possible here (ranged may not get countered some times)
+		drgn_unitActionMagicAttack(self, other, 0);
 	default:
 		break;
 	}
@@ -1274,6 +1350,213 @@ void drgn_unitActionAttack(DRGN_Entity* self, DRGN_Entity* other)
 			drgn_entityFree(self);
 			slog("Enemy killed a player");
 			return;
+		}
+	}
+
+	drgn_unitWait(self);
+}
+
+void drgn_unitActionMagicAttack(DRGN_Entity* self, DRGN_Entity* other, Uint8 counter)
+{
+	DRGN_Unit* selfUnit;
+	DRGN_Unit* otherUnit;
+	DRGN_InventoryItem* selfItem;
+	DRGN_InventoryItem* otherItem;
+	int damage;
+
+	if (!self || !self->data || !other || !other->data)
+	{
+		return;
+	}
+
+	selfUnit = (DRGN_Unit*)self->data;
+	otherUnit = (DRGN_Unit*)other->data;
+	selfItem = drgn_inventoryCheckItemTypeInInventory(selfUnit->inventory, DRGN_ARCANE);
+	otherItem = drgn_inventoryCheckItemTypeInInventory(otherUnit->inventory, DRGN_ARCANE);
+
+	if (selfItem && !otherItem)
+	{
+		damage = selfUnit->stats[3] + 5 - otherUnit->stats[8];
+
+		if (damage < 0)
+		{
+			damage = 0;
+		}
+
+		otherUnit->currentHP -= damage;
+		slog("Player dealt %i damage", damage);
+
+		if (otherUnit->currentHP < 1)
+		{
+			drgn_entityFree(other);
+			slog("Player killed an enemy");
+			selfUnit->exp += 30;
+
+			if (selfUnit->exp >= 100)
+			{
+				slog("Player leveled up!");
+				//run level up function here
+			}
+			drgn_unitWait(self);
+			return;
+		}
+	}
+	else if (!selfItem && otherItem)
+	{
+		damage = otherUnit->stats[3] + 5 - selfUnit->stats[8];
+
+		if (damage < 0)
+		{
+			damage = 0;
+		}
+
+		selfUnit->currentHP -= damage;
+		slog("enemy dealt %i damage", damage);
+
+		if (selfUnit->currentHP < 1)
+		{
+			drgn_unitWait(self);
+			drgn_entityFree(self);
+			slog("Enemy killed a player");
+			return;
+		}
+	}
+	else if (selfItem && otherItem)
+	{
+		if (selfUnit->stats[5] > otherUnit->stats[5])
+		{
+			damage = selfUnit->stats[3] + 5 - otherUnit->stats[8];
+
+			if (damage < 0)
+			{
+				damage = 0;
+			}
+
+			otherUnit->currentHP -= damage;
+			slog("Player dealt %i damage", damage);
+
+			if (otherUnit->currentHP < 1)
+			{
+				drgn_entityFree(other);
+				slog("Player killed an enemy");
+				selfUnit->exp += 30;
+
+				if (selfUnit->exp >= 100)
+				{
+					slog("Player leveled up!");
+					//run level up function here
+				}
+				drgn_unitWait(self);
+				return;
+			}
+
+			damage = otherUnit->stats[3] + 5 - selfUnit->stats[8];
+
+			if (damage < 0)
+			{
+				damage = 0;
+			}
+
+			selfUnit->currentHP -= damage;
+			slog("enemy dealt %i damage", damage);
+
+			if (selfUnit->currentHP < 1)
+			{
+				drgn_unitWait(self);
+				drgn_entityFree(self);
+				slog("Enemy killed a player");
+				return;
+			}
+		}
+		else if (selfUnit->stats[5] < otherUnit->stats[5])
+		{
+			damage = otherUnit->stats[3] + 5 - selfUnit->stats[8];
+
+			if (damage < 0)
+			{
+				damage = 0;
+			}
+
+			selfUnit->currentHP -= damage;
+			slog("enemy dealt %i damage", damage);
+
+			if (selfUnit->currentHP < 1)
+			{
+				drgn_unitWait(self);
+				drgn_entityFree(self);
+				slog("Enemy killed a player");
+				return;
+			}
+
+			damage = selfUnit->stats[3] + 5 - otherUnit->stats[8];
+
+			if (damage < 0)
+			{
+				damage = 0;
+			}
+
+			otherUnit->currentHP -= damage;
+			slog("Player dealt %i damage", damage);
+
+			if (otherUnit->currentHP < 1)
+			{
+				drgn_entityFree(other);
+				slog("Player killed an enemy");
+				selfUnit->exp += 30;
+
+				if (selfUnit->exp >= 100)
+				{
+					slog("Player leveled up!");
+					//run level up function here
+				}
+				drgn_unitWait(self);
+				return;
+			}
+		}
+		else
+		{
+			damage = otherUnit->stats[3] + 5 - selfUnit->stats[8];
+
+			if (damage < 0)
+			{
+				damage = 0;
+			}
+
+			selfUnit->currentHP -= damage;
+			slog("enemy dealt %i damage", damage);
+
+			damage = selfUnit->stats[3] + 5 - otherUnit->stats[8];
+
+			if (damage < 0)
+			{
+				damage = 0;
+			}
+
+			otherUnit->currentHP -= damage;
+			slog("Player dealt %i damage", damage);
+
+			if (otherUnit->currentHP < 1)
+			{
+				drgn_entityFree(other);
+				slog("Player killed an enemy");
+				selfUnit->exp += 30;
+
+				if (selfUnit->exp >= 100)
+				{
+					slog("Player leveled up!");
+					//run level up function here
+				}
+				drgn_unitWait(self);
+				return;
+			}
+
+			if (selfUnit->currentHP < 1)
+			{
+				drgn_unitWait(self);
+				drgn_entityFree(self);
+				slog("Enemy killed a player");
+				return;
+			}
 		}
 	}
 

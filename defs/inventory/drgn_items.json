@@ -149,6 +149,14 @@
       "increase": 4,
       "uses": 1,
       "description": "A belt worn by body builders to help with extreme exercises.  Increases build by 4."
+    },
+    {
+      "name": "spellBook",
+      "displayName": "Spell Book",
+      "cost": -1,
+      "type": 9,
+      "uses": -1,
+      "description" : "A spell book used to cast arcane magic with."
     }
   ]
 }
