@@ -1,6 +1,8 @@
 #ifndef __DRGN_WINDELS_H__
 #define __DRGN_WINDELS_H__
 
+#include "gfc_types.h"
+#include "gf2d_sprite.h"
 #include "drgn_font.h"
 
 /*
