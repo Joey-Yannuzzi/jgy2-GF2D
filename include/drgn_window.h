@@ -37,6 +37,7 @@ DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self);
 
 typedef struct
 {
+	Uint8 _inuse; //checks if space is being used by window currently
 	Vector2D pos; //position of the window relative to world space or screen space
 	Vector2D scale; //the scale of the window; set to 1 if no scaling should be applied
 	Uint8 offsetPos; //flag for whether camera  offset should affect position; 0 if no offset should be applied

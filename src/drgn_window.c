@@ -1,7 +1,8 @@
 #include "simple_logger.h"
+#include "gfc_types.h"
 #include "drgn_window.h"
-#include "drgn_font.h"
 
+/*
 DRGN_Entity* drgn_windowNew(char* texts, const char* sprite, Uint32 width, Uint32 height, Vector2D pos, DRGN_Entity* curr)
 {
 	DRGN_Entity* self;
@@ -188,4 +189,35 @@ DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
 	}
 
 	return (DRGN_NO_ACTION);
+}*/
+
+typedef struct
+{
+	DRGN_Window* windows; //list of all windows currently in use
+	Uint32 max; //max number of elements in the list
+}
+DRGN_WindowManager;
+
+static DRGN_WindowManager _windows = { 0 }; //local global window manager
+
+DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements)
+{
+	for (int bogus = 0; bogus < _windows.max; bogus++)
+	{
+		if (_windows.windows[bogus]._inuse)
+		{
+			continue;
+		}
+
+		memset(&_windows.windows[bogus], 0, sizeof(DRGN_Window));
+		_windows.windows[bogus]._inuse = 1;
+		_windows.windows[bogus].pos = pos;
+		_windows.windows[bogus].scale = scale;
+		_windows.windows[bogus].offsetPos = offsetPos;
+		_windows.windows[bogus].elements = elements;
+		return (&_windows.windows[bogus]);
+	}
+
+	slog("Could not find free memory space for window");
+	return NULL;
 }
