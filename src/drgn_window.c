@@ -191,6 +191,9 @@ DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
 	return (DRGN_NO_ACTION);
 }*/
 
+/*
+* @purpose a container for window management
+*/
 typedef struct
 {
 	DRGN_Window* windows; //list of all windows currently in use
@@ -200,7 +203,88 @@ DRGN_WindowManager;
 
 static DRGN_WindowManager _windows = { 0 }; //local global window manager
 
-DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements)
+void drgn_windowManagerNew(Uint32 max)
+{
+	if (_windows.windows)
+	{
+		slog("Window manager already exists");
+		return;
+	}
+
+	if (!max)
+	{
+		slog("Cannot allocate 0 windows");
+		return;
+	}
+
+	_windows.windows = gfc_allocate_array(sizeof(DRGN_Window), max);
+
+	if (!_windows.windows)
+	{
+		slog("Failed to allocate window space");
+		return;
+	}
+
+	_windows.max = max;
+	slog("Window manager created");
+	
+	atexit(drgn_windowManagerFree);
+}
+
+void drgn_windowManagerFree()
+{
+	drgn_windowFreeAll();
+
+	if (!_windows.windows)
+	{
+		slog("No window list to free");
+		return;
+	}
+
+	free(_windows.windows);
+	memset(&_windows, 0, sizeof(DRGN_WindowManager));
+}
+
+void drgn_windowFreeAll()
+{
+	for (int bogus = 0; bogus < _windows.max; bogus++)
+	{
+		if (!_windows.windows[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_windowFree(&_windows.windows[bogus]);
+	}
+}
+
+void drgn_windowUpdateAll()
+{
+	for (int bogus = 0; bogus < _windows.max; bogus++)
+	{
+		if (!_windows.windows[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_windowUpdate(&_windows.windows[bogus]);
+	}
+}
+
+void drgn_windowDrawAll()
+{
+	for (int bogus = 0; bogus < _windows.max; bogus++)
+	{
+		if (!_windows.windows[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_windowDraw(&_windows.windows[bogus]);
+	}
+}
+
+DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements, Uint32 elementsNum)
 {
 	for (int bogus = 0; bogus < _windows.max; bogus++)
 	{
@@ -215,9 +299,68 @@ DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_
 		_windows.windows[bogus].scale = scale;
 		_windows.windows[bogus].offsetPos = offsetPos;
 		_windows.windows[bogus].elements = elements;
+		_windows.windows[bogus].elementsNum = elementsNum;
 		return (&_windows.windows[bogus]);
 	}
 
 	slog("Could not find free memory space for window");
 	return NULL;
+}
+
+void drgn_windowFree(DRGN_Window* self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	self->_inuse = 0;
+
+	for (int bogus = 0; bogus < self->elementsNum; bogus++)
+	{
+		if (!self->elements[bogus])
+		{
+			continue;
+		}
+
+		drgn_windelFree(self->elements[bogus]);
+	}
+
+	free(self);
+}
+
+void drgn_windowUpdate(DRGN_Window* self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	for (int bogus = 0; bogus < self->elementsNum; bogus++)
+	{
+		if (!self->elements[bogus])
+		{
+			continue;
+		}
+
+		drgn_windelUpdate(self->elements[bogus]);
+	}
+}
+
+void drgn_windowDraw(DRGN_Window* self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	for (int bogus = 0; bogus < self->elementsNum; bogus++)
+	{
+		if (!self->elements[bogus])
+		{
+			continue;
+		}
+
+		drgn_windelDraw(self->elements[bogus]);
+	}
 }

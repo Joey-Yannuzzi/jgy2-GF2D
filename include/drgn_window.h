@@ -42,6 +42,7 @@ typedef struct
 	Vector2D scale; //the scale of the window; set to 1 if no scaling should be applied
 	Uint8 offsetPos; //flag for whether camera  offset should affect position; 0 if no offset should be applied
 	DRGN_Windel** elements; //window elements that make up the window; must be freed
+	Uint32 elementsNum; //number of elements in this window
 }
 DRGN_Window;
 
@@ -51,9 +52,10 @@ DRGN_Window;
 * @param scale the scale of the window
 * @param offsetPos whether or not the window should be offset by the camera
 * @param elements an array containing pointers to all the window elements for the window
+* @param elementsNum the number of elements in the elements array
 * @return the window created
 */
-DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements);
+DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements, Uint32 elementsNum);
 
 /*
 * @brief free a window
