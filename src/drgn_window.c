@@ -203,6 +203,34 @@ DRGN_WindowManager;
 
 static DRGN_WindowManager _windows = { 0 }; //local global window manager
 
+void drgn_windowFreeAll()
+{
+	for (int bogus = 0; bogus < _windows.max; bogus++)
+	{
+		if (!_windows.windows[bogus]._inuse)
+		{
+			continue;
+		}
+
+		drgn_windowFree(&_windows.windows[bogus]);
+	}
+}
+
+void drgn_windowManagerFree()
+{
+	drgn_windowFreeAll();
+
+	if (!_windows.windows)
+	{
+		slog("No window list to free");
+		return;
+	}
+
+	free(_windows.windows);
+	memset(&_windows, 0, sizeof(DRGN_WindowManager));
+	slog("Freed window manager successfully");
+}
+
 void drgn_windowManagerNew(Uint32 max)
 {
 	if (_windows.windows)
@@ -229,33 +257,6 @@ void drgn_windowManagerNew(Uint32 max)
 	slog("Window manager created");
 	
 	atexit(drgn_windowManagerFree);
-}
-
-void drgn_windowManagerFree()
-{
-	drgn_windowFreeAll();
-
-	if (!_windows.windows)
-	{
-		slog("No window list to free");
-		return;
-	}
-
-	free(_windows.windows);
-	memset(&_windows, 0, sizeof(DRGN_WindowManager));
-}
-
-void drgn_windowFreeAll()
-{
-	for (int bogus = 0; bogus < _windows.max; bogus++)
-	{
-		if (!_windows.windows[bogus]._inuse)
-		{
-			continue;
-		}
-
-		drgn_windowFree(&_windows.windows[bogus]);
-	}
 }
 
 void drgn_windowUpdateAll()

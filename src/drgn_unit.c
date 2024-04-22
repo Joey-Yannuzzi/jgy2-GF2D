@@ -603,7 +603,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (gfc_strlcmp(terrain->name, "Flag") == 0)
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("Seize", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+				//unit->menuWindow[bogus] = drgn_windowNew("Seize", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
 				unit->menuWindow[bogus]->offset = 1;
 				bogus++;
 			}
@@ -616,7 +616,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 		if (right || left || down || up)
 		{
-			unit->menuWindow[bogus] = drgn_windowNew("Talk", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+			//unit->menuWindow[bogus] = drgn_windowNew("Talk", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
 			unit->menuWindow[bogus]->offset = 1;
 			bogus++;
 		}
@@ -663,8 +663,8 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unitRight || unitLeft || unitUp || unitDown)
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("Attack", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				unit->menuWindow[bogus]->offset = 1;
+				//unit->menuWindow[bogus] = drgn_windowNew("Attack", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+				//unit->menuWindow[bogus]->offset = 1;
 				bogus++;
 			}
 		}
@@ -699,15 +699,15 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_DIVINE) &&((unitRight && unitRight->currentHP < unitRight->stats[1]) || (unitLeft && unitLeft->currentHP < unitLeft->stats[1]) || (unitUp && unitUp->currentHP < unitUp->stats[1]) || (unitDown && unitDown->currentHP < unitDown->stats[1])))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("Heal", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				unit->menuWindow[bogus]->offset = 1;
+				//unit->menuWindow[bogus] = drgn_windowNew("Heal", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+				//unit->menuWindow[bogus]->offset = 1;
 				bogus++;
 			}
 		}
 		if (unit->inventory->curr > 0)
 		{
-			unit->menuWindow[bogus] = drgn_windowNew("Item", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-			unit->menuWindow[bogus]->offset = 1;
+			//unit->menuWindow[bogus] = drgn_windowNew("Item", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+			//unit->menuWindow[bogus]->offset = 1;
 			bogus++;
 		}
 
@@ -741,8 +741,8 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unit->inventory->curr > 0 || ((unitRight && unitRight->inventory->curr > 0) || (unitLeft && unitLeft->inventory->curr > 0) || (unitUp && unitUp->inventory->curr > 0) || (unitDown && unitDown->inventory->curr > 0)))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("Trade", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				unit->menuWindow[bogus]->offset = 1;
+				//unit->menuWindow[bogus] = drgn_windowNew("Trade", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+				//unit->menuWindow[bogus]->offset = 1;
 				bogus++;
 			}
 		}
@@ -777,8 +777,8 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (!unit->rescuedUnit && ((unitRight && unit->stats[10] > unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] > unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] > unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] > unitDown->stats[10] && !unitDown->rescuedUnit)))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("Rescue", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				unit->menuWindow[bogus]->offset = 1;
+				//unit->menuWindow[bogus] = drgn_windowNew("Rescue", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+				//unit->menuWindow[bogus]->offset = 1;
 				bogus++;
 			}
 		}
@@ -813,8 +813,8 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unit->rescuedUnit && ((unitRight && unit->stats[10] <= unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] <= unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] <= unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] <= unitDown->stats[10] && !unitDown->rescuedUnit)))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("Transfer", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				unit->menuWindow[bogus]->offset = 1;
+				//unit->menuWindow[bogus] = drgn_windowNew("Transfer", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+				//unit->menuWindow[bogus]->offset = 1;
 				bogus++;
 			}
 		}
@@ -832,16 +832,16 @@ void drgn_unitMenu(DRGN_Entity* self)
 			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self) ||
 			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self)))
 		{
-			unit->menuWindow[bogus] = drgn_windowNew("Drop", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-			unit->menuWindow[bogus]->offset = 1;
+			//unit->menuWindow[bogus] = drgn_windowNew("Drop", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+			//unit->menuWindow[bogus]->offset = 1;
 			bogus++;
 		}
 
-		unit->menuWindow[bogus] = drgn_windowNew("Wait", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-		unit->menuWindow[bogus]->offset = 1;
-		unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos);
+		//unit->menuWindow[bogus] = drgn_windowNew("Wait", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
+		//unit->menuWindow[bogus]->offset = 1;
+		//unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos);
 		bogus++;
-		unit->menuMax = bogus;
+		//unit->menuMax = bogus;
 		break;
 
 	case DRGN_WAIT:
@@ -1355,7 +1355,7 @@ void drgn_unitSelectedMenuItem(DRGN_Entity* self)
 	{
 		if (unit->menuWindow[bogus] && unit->menuWindow[bogus]->selected)
 		{
-			unit->currentAction = drgn_windowMenuItemFromText(unit->menuWindow[bogus]);
+			//unit->currentAction = drgn_windowMenuItemFromText(unit->menuWindow[bogus]);
 			slog("got action");
 			return;
 		}

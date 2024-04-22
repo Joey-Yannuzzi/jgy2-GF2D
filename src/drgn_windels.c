@@ -5,7 +5,7 @@ DRGN_Windel* drgn_windelNew(const char* name, Vector2D pos, Vector2D* scale, Col
 {
 	DRGN_Windel* windel;
 
-	memset(windel, 0, sizeof(DRGN_Windel));
+	windel = gfc_allocate_array(sizeof(DRGN_Windel), 1);
 
 	if (!name)
 	{

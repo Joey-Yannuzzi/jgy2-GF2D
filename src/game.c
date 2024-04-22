@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
     drgn_unitFileInit("defs/drgn_unit.json");
     drgn_terrainFileInit("defs/drgn_terrain.json");
     drgn_fontInit();
-
+    drgn_windowManagerNew(1024);
     SDL_ShowCursor(SDL_DISABLE);
 
     drgn_cameraSetSize(vector2d(1200, 720));
@@ -74,6 +74,7 @@ int main(int argc, char * argv[])
     player = drgn_playerNew();
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
 
+    slog("Begining game");
     /*main game loop*/
     while(!done)
     {
@@ -89,6 +90,7 @@ int main(int argc, char * argv[])
         
         drgn_entitySystemThink();
         drgn_entitySystemUpdate();
+        drgn_windowUpdateAll();
 
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
@@ -100,6 +102,8 @@ int main(int argc, char * argv[])
 
             //drgn_fontDraw("Hello\nWorld", DRGN_LARGE_FONT, GFC_COLOR_BLACK, player->pos);
             //UI elements last
+
+            drgn_windowDrawAll();
             gf2d_sprite_draw(
                 mouse,
                 vector2d(mx,my),

@@ -31,7 +31,7 @@ DRGN_Entity* drgn_playerNew()
 	//slog("%i", (*(DRGN_Player*)self->data).test);
 	player = gfc_allocate_array(sizeof(DRGN_Player), 1);
 	self->data = player;
-	player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576), NULL);
+	//player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576), NULL);
 	player->unitWindow = NULL;
 	player->targets = gfc_allocate_array(sizeof(DRGN_Entity*), 12);
 	return (self);
@@ -277,6 +277,8 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->pressed = 0;
 	}
 
+	return;
+
 	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow && !player->unitWindowSource && !self->selected)
 	{
 		//slog("begining to draw");
@@ -305,7 +307,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			y = self->pos.y - 64;
 		}
 
-		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
+		//player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
 		player->unitWindow->offset = 1;
 		//window->texts = curr->name;
 		slog("created unit window");
@@ -338,7 +340,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			y = self->pos.y - 64;
 		}
 
-		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
+		//player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
 		player->unitWindow->offset = 1;
 		//window->texts = curr->name;
 		slog("created unit window");
@@ -371,7 +373,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			y = self->pos.y - 64;
 		}
 
-		player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
+		//player->unitWindow = drgn_windowNew(curr->name, "images/windows/unitWindow.png", 192, 64, vector2d(x, y), NULL);
 		player->unitWindow->offset = 1;
 		//window->texts = curr->name;
 		slog("created unit window");
@@ -412,7 +414,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	if (!terrain)
 	{
 		//slog("Player not on any known terrain");
-		window->texts = "Grass\nAvoid: 0\nDefense: 0";
+		//window->texts = "Grass\nAvoid: 0\nDefense: 0";
 		return;
 	}
 
@@ -425,8 +427,8 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	}
 
 	size = strlen(terrainData->name) + strlen("\nAvoid: ")  + sizeof(terrainData->avoidBonus) + sizeof(terrainData->defBonus) + 1;
-	window->texts = gfc_allocate_array(sizeof(char), size);
-	sprintf(window->texts, "%s\nAvoid: %i\nDefense: %i", terrainData->name, terrainData->avoidBonus, terrainData->defBonus);
+	//window->texts = gfc_allocate_array(sizeof(char), size);
+	//sprintf(window->texts, "%s\nAvoid: %i\nDefense: %i", terrainData->name, terrainData->avoidBonus, terrainData->defBonus);
 }
 
 void drgn_playerFree(DRGN_Entity* self)

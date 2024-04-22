@@ -75,4 +75,10 @@ void drgn_windowUpdate(DRGN_Window* self);
 */
 void drgn_windowDraw(DRGN_Window* self);
 
+void drgn_windowDrawAll();
+
+void drgn_windowUpdateAll();
+
+void drgn_windowManagerNew(Uint32 max);
+
 #endif
