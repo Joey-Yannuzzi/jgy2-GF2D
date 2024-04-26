@@ -51,6 +51,7 @@ void drgn_entitySystemClose()
 	}
 	free(_entManager.entList);
 	memset(&_entManager, 0, sizeof(DRGN_EntityManager));
+	slog("Freed entity manager");
 }
 
 void drgn_entityCleanAll(DRGN_Entity* ignore)

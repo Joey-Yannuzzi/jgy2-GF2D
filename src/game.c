@@ -27,6 +27,7 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     DRGN_Entity* player;
     DRGN_World* world;
+    DRGN_Window* window;
     //DRGN_Entity* window;
     //Color color = gfc_color8(255, 0, 0, 100);
     //Vector2D vect = vector2d(1, 1);
@@ -49,6 +50,7 @@ int main(int argc, char * argv[])
     drgn_inventoryFileInit("defs/inventory/drgn_items.json");
     drgn_unitFileInit("defs/drgn_unit.json");
     drgn_terrainFileInit("defs/drgn_terrain.json");
+    drgn_windowFileInit("defs/drgn_windows.json");
     drgn_fontInit();
     drgn_windowManagerNew(1024);
     SDL_ShowCursor(SDL_DISABLE);
@@ -72,6 +74,7 @@ int main(int argc, char * argv[])
 
     //window = drgn_windowNew("hello world", "images/windows/testWindow.png", 128, 64, vector2d(64, 64));
     player = drgn_playerNew();
+    window = drgn_windowNew("terrainDisplay");
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
 
     slog("Begining game");
@@ -130,6 +133,8 @@ int main(int argc, char * argv[])
     slog("cleaned world successfully");
     drgn_inventoryClose();
     slog("cleaned inventory successfully");
+    drgn_windowFreeAll();
+    slog("freed windows successfully");
 
     slog("---==== END ====---");
     return 0;

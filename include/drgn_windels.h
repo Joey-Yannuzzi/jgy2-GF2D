@@ -1,6 +1,7 @@
 #ifndef __DRGN_WINDELS_H__
 #define __DRGN_WINDELS_H__
 
+#include "simple_json.h"
 #include "gfc_types.h"
 #include "gf2d_sprite.h"
 #include "drgn_font.h"
@@ -25,13 +26,10 @@ DRGN_Windel;
 
 /*
 * @brief create a new window element
-* @param name the name of the element
-* @param pos the position of the element local to the parent window
-* @param scale OPTIONAL the scale of the element; NULL for no extra scaling
-* @param color OPTIONAL the color the element should be set to; NULL for no additional color
+* @param object the json object to pull data from
 * @return a pointer to the created window element
 */
-DRGN_Windel* drgn_windelNew(const char* name, Vector2D pos, Vector2D* scale, Color* color);
+DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos);
 
 /*
 * @brief free a window element and its data
@@ -63,15 +61,10 @@ DRGN_WindelText;
 
 /*
 * @brief create a new text windel
-* @param name the name of the element
-* @param pos the position of the element
-* @param scale OPTIONAL the scale of the element; NULL for no additional scaling
-* @param color OPTIONAL the color of the element; NULL for no color change
-* @param text the text the element should render
-* @param style the font size of the element
+* @param object the json object to pull data from
 * @return the created window element
 */
-DRGN_Windel* drgn_windelTextNew(const char* name, Vector2D pos, Vector2D* scale, Color* color, char* text, DRGN_FontStyles style);
+DRGN_Windel* drgn_windelTextNew(SJson* object, Vector2D parentPos);
 
 /*
 * @brief frees a text window element
@@ -111,7 +104,7 @@ DRGN_WindelSprite;
 * @param sprite the sprite to be rendered
 * @return the created window element
 */
-DRGN_Windel* drgn_windelSpriteNew(const char* name, Vector2D pos, Vector2D* scale, Color* color, Sprite* sprite);
+DRGN_Windel* drgn_windelSpriteNew(SJson* object, Vector2D parentPos);
 
 /*
 * @brief frees a sprite window element

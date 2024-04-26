@@ -151,8 +151,8 @@ void drgn_fontDraw(const char* text, DRGN_FontStyles style, Color color, Vector2
 
 	if (vertical)
 	{
-		destination.w = vertical->x;
-		destination.h = vertical->y;
+		destination.w = vertical->x * result->w;
+		destination.h = vertical->y * result->h;
 	}
 	else
 	{

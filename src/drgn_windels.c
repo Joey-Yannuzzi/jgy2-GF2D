@@ -1,39 +1,51 @@
 #include "simple_logger.h"
 #include "drgn_windels.h"
 
-DRGN_Windel* drgn_windelNew(const char* name, Vector2D pos, Vector2D* scale, Color* color)
+DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos)
 {
 	DRGN_Windel* windel;
+	int check;
 
 	windel = gfc_allocate_array(sizeof(DRGN_Windel), 1);
 
-	if (!name)
+	if (!object)
 	{
-		slog("no name given for the windel");
+		slog("no no json object given for the windel");
 		return NULL;
 	}
 
-	windel->name = name;
-	windel->pos = pos;
-	
-	if (scale)
+	windel->name = sj_object_get_value_as_string(object, "name");
+	check = sj_object_get_value_as_float(object, "posX", &windel->pos.x);
+
+	if (!check)
 	{
-		windel->scale.x = scale->x;
-		windel->scale.y = scale->y;
-	}
-	else
-	{
-		vector2d_copy(windel->scale, vector2d(1, 1));
+		windel->pos.x = 0;
 	}
 
-	if (color)
+	check = sj_object_get_value_as_float(object, "posY", &windel->pos.y);
+
+	if (!check)
 	{
-		windel->color = *color;
+		windel->pos.y = 0;
 	}
-	else
+
+	vector2d_add(windel->pos, windel->pos, parentPos);
+
+	check = sj_object_get_value_as_float(object, "scaleX", &windel->scale.x);
+
+	if (!check)
 	{
-		windel->color = GFC_COLOR_BLACK;
+		windel->scale.x = 1;
 	}
+
+	check = sj_object_get_value_as_float(object, "scaleY", &windel->scale.y);
+
+	if (!check)
+	{
+		windel->scale.y = 1;
+	}
+
+	//do color later
 
 	return (windel);
 }
@@ -79,12 +91,19 @@ void drgn_windelDraw(DRGN_Windel* windel)
 	}
 }
 
-DRGN_Windel* drgn_windelTextNew(const char* name, Vector2D pos, Vector2D* scale, Color* color, char* text, DRGN_FontStyles style)
+DRGN_Windel* drgn_windelTextNew(SJson* object, Vector2D parentPos)
 {
 	DRGN_Windel* windel;
 	DRGN_WindelText* textBox;
+	const char* text;
 
-	windel = drgn_windelNew(name, pos, scale, color);
+	if (!object)
+	{
+		slog("no json object given");
+		return NULL;
+	}
+
+	windel = drgn_windelNew(object, parentPos);
 
 	if (!windel)
 	{
@@ -105,16 +124,18 @@ DRGN_Windel* drgn_windelTextNew(const char* name, Vector2D pos, Vector2D* scale,
 		return NULL;
 	}
 
+	text = sj_object_get_value_as_string(object, "text");
+
 	if (!text)
 	{
-		slog("could not get text for windel");
+		slog("no text given");
 		drgn_windelFree(windel);
 		return NULL;
 	}
 
 	textBox->text = gfc_allocate_array(sizeof(char), strlen(text) + 1);
 	strcpy(textBox->text, text);
-	textBox->style = style;
+	sj_object_get_value_as_int(object, "size", &textBox->style);
 	windel->data = textBox;
 
 	return (windel);
@@ -152,15 +173,17 @@ void drgn_windelTextDraw(DRGN_Windel* windel)
 	}
 
 	text = (DRGN_WindelText*)windel->data;
-	drgn_fontDraw(text->text, text->style, windel->color, windel->pos, NULL);
+	//slog("scale: %f, %f", windel->scale.x, windel->scale.y);
+	drgn_fontDraw(text->text, text->style, windel->color, windel->pos, &windel->scale);
 }
 
-DRGN_Windel* drgn_windelSpriteNew(const char* name, Vector2D pos, Vector2D* scale, Color* color, Sprite* sprite)
+DRGN_Windel* drgn_windelSpriteNew(SJson* object, Vector2D parentPos)
 {
 	DRGN_Windel* windel;
 	DRGN_WindelSprite* image;
+	const char* sprite;
 
-	windel = drgn_windelNew(name, pos, scale, color);
+	windel = drgn_windelNew(object, parentPos);
 
 	if (!windel)
 	{
@@ -180,6 +203,8 @@ DRGN_Windel* drgn_windelSpriteNew(const char* name, Vector2D pos, Vector2D* scal
 		return NULL;
 	}
 
+	sprite = sj_object_get_value_as_string(object, "sprite");
+
 	if (!sprite)
 	{
 		slog("No sprite to populate the windel");
@@ -187,13 +212,8 @@ DRGN_Windel* drgn_windelSpriteNew(const char* name, Vector2D pos, Vector2D* scal
 		return NULL;
 	}
 
-	image->sprite = sprite;
-
-	if (color)
-	{
-		image->useColor = 1;
-	}
-
+	image->sprite = gf2d_sprite_load_image(sprite);
+	sj_object_get_value_as_uint8(object, "useColor", &image->useColor);
 	windel->data = image;
 
 	return (windel);

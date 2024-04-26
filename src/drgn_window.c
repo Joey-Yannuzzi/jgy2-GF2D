@@ -191,6 +191,92 @@ DRGN_Action drgn_windowMenuItemFromText(DRGN_Entity* self)
 	return (DRGN_NO_ACTION);
 }*/
 
+static SJson* _windowJson = NULL;
+static SJson* _windowObjects = NULL;
+
+void drgn_windowFileClose()
+{
+	if (_windowJson)
+	{
+		sj_free(_windowJson);
+	}
+
+	_windowJson = NULL;
+	_windowObjects = NULL;
+}
+
+void drgn_windowFileInit(const char* name)
+{
+	if (!name)
+	{
+		slog("no filename given");
+		return;
+	}
+
+	_windowJson = sj_load(name);
+
+	if (!_windowJson)
+	{
+		slog("window json file not found for file %s", name);
+		return;
+	}
+
+	_windowObjects = sj_object_get_value(_windowJson, "windows");
+
+	if (!_windowObjects)
+	{
+		slog("could not find window objects for file %s", name);
+		sj_free(_windowJson);
+		_windowJson = NULL;
+		return;
+	}
+
+	atexit(drgn_windowFileClose);
+}
+
+SJson* drgn_windowGetDefByName(const char* name)
+{
+	SJson* iter;
+	int count;
+	const char* iterName;
+
+	if (!name)
+	{
+		slog("no name given");
+		return NULL;
+	}
+
+	if (!_windowObjects)
+	{
+		slog("no window objects to search through, try initiating the file");
+		return NULL;
+	}
+
+	count = sj_array_get_count(_windowObjects);
+
+	for (int bogus = 0; bogus < count; bogus++)
+	{
+		iter = sj_array_get_nth(_windowObjects, bogus);
+
+		if (!iter)
+		{
+			continue;
+		}
+
+		iterName = sj_object_get_value_as_string(iter, "name");
+
+		if (!iterName)
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(name, iterName) == 0)
+		{
+			return (iter);
+		}
+	}
+}
+
 /*
 * @purpose a container for window management
 */
@@ -212,6 +298,7 @@ void drgn_windowFreeAll()
 			continue;
 		}
 
+		slog("freeing window %i", bogus);
 		drgn_windowFree(&_windows.windows[bogus]);
 	}
 }
@@ -268,6 +355,7 @@ void drgn_windowUpdateAll()
 			continue;
 		}
 
+		//slog("window number %i with inuse flag %i", bogus, _windows.windows[bogus]._inuse);
 		drgn_windowUpdate(&_windows.windows[bogus]);
 	}
 }
@@ -285,8 +373,97 @@ void drgn_windowDrawAll()
 	}
 }
 
-DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements, Uint32 elementsNum)
+DRGN_Window* drgn_windowNew(const char* name)
 {
+	SJson* window;
+	SJson* windels;
+	SJson* element;
+	Vector2D pos;
+	Vector2D scale;
+	DRGN_Windel** elements;
+	int check, count;
+	const char* windelType;
+
+	if (!name)
+	{
+		slog("no window name given");
+		return NULL;
+	}
+	window = drgn_windowGetDefByName(name);
+
+	if (!window)
+	{
+		slog("could not find window of name %s", name);
+		sj_free(window);
+		return NULL;
+	}
+
+	check = sj_object_get_value_as_float(window, "posX", &pos.x);
+
+	if (!check)
+	{
+		pos.x = 0;
+	}
+
+	check = sj_object_get_value_as_float(window, "posY", &pos.y);
+
+	if (!check)
+	{
+		pos.y = 0;
+	}
+
+	check = sj_object_get_value_as_float(window, "scaleX", &scale.x);
+
+	if (!check)
+	{
+		scale.x = 1;
+	}
+
+	check = sj_object_get_value_as_float(window, "scaleY", &scale.y);
+
+	if (!check)
+	{
+		scale.y = 1;
+	}
+
+	windels = sj_object_get_value(window, "windels");
+	count = sj_array_get_count(windels);
+	elements = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+
+	for (int bogus = 0; bogus < count; bogus++)
+	{
+		element = sj_array_get_nth(windels, bogus);
+
+		if (!element)
+		{
+			continue;
+		}
+
+		windelType = sj_object_get_value_as_string(element, "type");
+
+		if (gfc_strlcmp(windelType, "text") == 0)
+		{
+			elements[bogus] = drgn_windelTextNew(element, pos);
+			slog("text created");
+		}
+		else if (gfc_strlcmp(windelType, "sprite") == 0)
+		{
+			elements[bogus] = drgn_windelSpriteNew(element, pos);
+			slog("sprite created");
+		}
+		else if (gfc_strlcmp(windelType, "button") == 0)
+		{
+			//elements[bogus] = drgn_windelButtonNew(element);
+			slog("button created");
+		}
+		else
+		{
+			slog("invalid windel type or no windel type provided");
+			sj_free(window);
+			return NULL;
+		}
+	}
+
 	for (int bogus = 0; bogus < _windows.max; bogus++)
 	{
 		if (_windows.windows[bogus]._inuse)
@@ -296,11 +473,12 @@ DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_
 
 		memset(&_windows.windows[bogus], 0, sizeof(DRGN_Window));
 		_windows.windows[bogus]._inuse = 1;
-		_windows.windows[bogus].pos = pos;
-		_windows.windows[bogus].scale = scale;
-		_windows.windows[bogus].offsetPos = offsetPos;
+		vector2d_copy(_windows.windows[bogus].pos, pos);
+		vector2d_copy(_windows.windows[bogus].scale, scale);
+		sj_object_get_value_as_uint8(window, "offset", &_windows.windows[bogus].offsetPos);
 		_windows.windows[bogus].elements = elements;
-		_windows.windows[bogus].elementsNum = elementsNum;
+		_windows.windows[bogus].elementsNum = count;
+		sj_free(window);
 		return (&_windows.windows[bogus]);
 	}
 
@@ -310,12 +488,22 @@ DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_
 
 void drgn_windowFree(DRGN_Window* self)
 {
+
 	if (!self)
 	{
 		return;
 	}
 
+	slog("%i", self->_inuse);
+
 	self->_inuse = 0;
+
+	if (!self->elementsNum || !self->elements)
+	{
+		slog("no windels to free");
+		free(self);
+		return;
+	}
 
 	for (int bogus = 0; bogus < self->elementsNum; bogus++)
 	{
@@ -328,6 +516,7 @@ void drgn_windowFree(DRGN_Window* self)
 	}
 
 	free(self);
+	//slog("freeing window");
 }
 
 void drgn_windowUpdate(DRGN_Window* self)

@@ -47,15 +47,11 @@ typedef struct
 DRGN_Window;
 
 /*
-* @brief create a new window with the specified dimensions
-* @param pos the position of the window
-* @param scale the scale of the window
-* @param offsetPos whether or not the window should be offset by the camera
-* @param elements an array containing pointers to all the window elements for the window
-* @param elementsNum the number of elements in the elements array
+* @brief create a new window from a json object with a specified name
+* @param name the name if the window
 * @return the window created
 */
-DRGN_Window* drgn_windowNew(Vector2D pos, Vector2D scale, Uint8 offsetPos, DRGN_Windel** elements, Uint32 elementsNum);
+DRGN_Window* drgn_windowNew(const char* name);
 
 /*
 * @brief free a window
@@ -79,6 +75,10 @@ void drgn_windowDrawAll();
 
 void drgn_windowUpdateAll();
 
+void drgn_windowFreeAll();
+
 void drgn_windowManagerNew(Uint32 max);
+
+void drgn_windowFileInit(const char* name);
 
 #endif
