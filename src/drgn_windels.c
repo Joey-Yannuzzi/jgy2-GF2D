@@ -52,8 +52,11 @@ DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos)
 
 void drgn_windelFree(DRGN_Windel* windel)
 {
+	slog("freeing elements");
+	
 	if (!windel)
 	{
+		slog("no element to free");
 		return;
 	}
 

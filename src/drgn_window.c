@@ -198,11 +198,14 @@ void drgn_windowFileClose()
 {
 	if (_windowJson)
 	{
+		slog("freeing window file");
 		sj_free(_windowJson);
 	}
 
 	_windowJson = NULL;
 	_windowObjects = NULL;
+
+	slog("freed window file");
 }
 
 void drgn_windowFileInit(const char* name)
@@ -459,7 +462,7 @@ DRGN_Window* drgn_windowNew(const char* name)
 		else
 		{
 			slog("invalid windel type or no windel type provided");
-			sj_free(window);
+			//sj_free(window);
 			return NULL;
 		}
 	}
@@ -478,7 +481,7 @@ DRGN_Window* drgn_windowNew(const char* name)
 		sj_object_get_value_as_uint8(window, "offset", &_windows.windows[bogus].offsetPos);
 		_windows.windows[bogus].elements = elements;
 		_windows.windows[bogus].elementsNum = count;
-		sj_free(window);
+		//sj_free(window);
 		return (&_windows.windows[bogus]);
 	}
 
@@ -489,19 +492,17 @@ DRGN_Window* drgn_windowNew(const char* name)
 void drgn_windowFree(DRGN_Window* self)
 {
 
-	if (!self)
+	if (!self || !self->_inuse)
 	{
 		return;
 	}
-
-	slog("%i", self->_inuse);
 
 	self->_inuse = 0;
 
 	if (!self->elementsNum || !self->elements)
 	{
 		slog("no windels to free");
-		free(self);
+		//free(self);
 		return;
 	}
 
@@ -515,7 +516,7 @@ void drgn_windowFree(DRGN_Window* self)
 		drgn_windelFree(self->elements[bogus]);
 	}
 
-	free(self);
+	free(self->elements);
 	//slog("freeing window");
 }
 

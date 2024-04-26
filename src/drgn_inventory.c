@@ -87,6 +87,8 @@ void drgn_inventoryClose()
 
 	_inventoryJson = NULL;
 	_inventoryItems = NULL;
+
+	slog("freed inventory file successfully");
 }
 
 DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int max)

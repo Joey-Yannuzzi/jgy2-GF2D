@@ -49,6 +49,7 @@ void drgn_fontFree()
 
 	gfc_list_delete(_fontManager.cache);
 	memset(&_fontManager, 0, sizeof(DRGN_FontManager));
+	slog("Freed font manager successfully");
 	TTF_Quit();
 }
 

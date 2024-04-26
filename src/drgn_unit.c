@@ -521,6 +521,8 @@ void drgn_unitFileFree()
 
 	_unitJson = NULL;
 	_unitIds = NULL;
+
+	slog("freed unit file successfully");
 }
 
 SJson* drgn_unitGetDefByName(const char* name)
