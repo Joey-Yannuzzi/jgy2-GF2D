@@ -2,12 +2,13 @@
 #define __DRGN_PLAYER_H__
 
 #include "drgn_entity.h"
+#include "drgn_window.h"
 
 typedef struct
 {
 	//int test;
 	int pressed; //to check if spacebar is pressed this frame
-	DRGN_Entity* terrainWindow; //terrain window to display terrain being hovered over
+	DRGN_Window* terrainWindow; //terrain window to display terrain being hovered over
 	DRGN_Entity* unitWindow; //window that display's unit's name/class
 	DRGN_Entity* unitWindowSource; //entity where the unitWindow is getting information from
 	DRGN_Entity** targets; //pointers to all the targets a unit can interact with; max 12

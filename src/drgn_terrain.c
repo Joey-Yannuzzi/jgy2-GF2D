@@ -170,6 +170,8 @@ void drgn_terrainFileFree()
 
 	_terrainJson = NULL;
 	_terrainList = NULL;
+
+	slog("freed terrain file successfully");
 }
 
 SJson* drgn_terrainGetDefByNumber(int index)

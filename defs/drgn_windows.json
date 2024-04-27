@@ -1,0 +1,42 @@
+{
+  "windows": [
+    {
+      "name": "terrainDisplay",
+      "posX": 1024,
+      "posY": 576,
+      "offset": 0,
+      "windels": [
+        {
+          "type": "sprite",
+          "name": "backgroundSprite",
+          "sprite": "images/windows/terrainWindow.png",
+          "useColor": 0
+        },
+        {
+          "type": "text",
+          "name": "terrainValue",
+          "text": "Grass",
+          "size": 2,
+          "posX": 24,
+          "posY": 11
+        },
+        {
+          "type": "text",
+          "name": "terrainValueAvoid",
+          "text": "Avoid: 0",
+          "posX": 12,
+          "posY": 39,
+          "size": 2
+        },
+        {
+          "type": "text",
+          "name": "terrainValueDefense",
+          "text": "Defense: 0",
+          "posY": 67,
+          "size": 2,
+          "scaleX": 0.9
+        }
+      ]
+    }
+  ]
+}
