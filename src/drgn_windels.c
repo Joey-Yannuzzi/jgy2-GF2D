@@ -180,6 +180,27 @@ void drgn_windelTextDraw(DRGN_Windel* windel)
 	drgn_fontDraw(text->text, text->style, windel->color, windel->pos, &windel->scale);
 }
 
+void drgn_windelTextChangeText(DRGN_Windel* windel, const char* newText)
+{
+	DRGN_WindelText* text;
+
+	if (!windel || !windel->data || !newText)
+	{
+		return;
+	}
+
+	text = (DRGN_WindelText*)windel->data;
+
+	if (!text)
+	{
+		return;
+	}
+
+	text->text = gfc_allocate_array(strlen(newText) + 1, 1);
+	strcpy(text->text, newText);
+	//slog("%s", newText);
+}
+
 DRGN_Windel* drgn_windelSpriteNew(SJson* object, Vector2D parentPos)
 {
 	DRGN_Windel* windel;
@@ -266,12 +287,50 @@ void drgn_windelSpriteDraw(DRGN_Windel* windel)
 	}
 }
 
-DRGN_Windel* drgn_windelButtonNew(const char* name, Vector2D pos, Vector2D* scale, Color* color)
+Uint32 drgn_windelSpriteGetWidth(DRGN_Windel* windel)
+{
+	DRGN_WindelSprite* sprite;
+
+	if (!windel || !windel->data)
+	{
+		return NULL;
+	}
+
+	sprite = (DRGN_WindelSprite*)windel->data;
+
+	if (!sprite)
+	{
+		return NULL;
+	}
+
+	return (sprite->sprite->frame_w);
+}
+
+Uint32 drgn_windelSpriteGetHeight(DRGN_Windel* windel)
+{
+	DRGN_WindelSprite* sprite;
+
+	if (!windel || !windel->data)
+	{
+		return NULL;
+	}
+
+	sprite = (DRGN_WindelSprite*)windel->data;
+
+	if (!sprite)
+	{
+		return NULL;
+	}
+
+	return (sprite->sprite->frame_h);
+}
+
+DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos)
 {
 	DRGN_Windel* windel;
 	DRGN_WindelButton* button;
 
-	windel = drgn_windelNew(name, pos, scale, color);
+	windel = drgn_windelNew(object, parentPos);
 
 	if (!windel)
 	{

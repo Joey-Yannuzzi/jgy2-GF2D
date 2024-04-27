@@ -3,7 +3,7 @@
 #include "drgn_camera.h"
 #include "drgn_terrain.h"
 #include "drgn_unit.h"
-#include "drgn_window.h"
+#include "drgn_windels.h"
 
 DRGN_Entity* drgn_playerNew()
 {
@@ -31,7 +31,7 @@ DRGN_Entity* drgn_playerNew()
 	//slog("%i", (*(DRGN_Player*)self->data).test);
 	player = gfc_allocate_array(sizeof(DRGN_Player), 1);
 	self->data = player;
-	//player->terrainWindow = drgn_windowNew("terrain", "images/windows/terrainWindow.png", 96, 96, vector2d(1024, 576), NULL);
+	player->terrainWindow = drgn_windowNew("terrainDisplay");
 	player->unitWindow = NULL;
 	player->targets = gfc_allocate_array(sizeof(DRGN_Entity*), 12);
 	return (self);
@@ -130,6 +130,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	Rect bounds;
 	DRGN_Unit* curr;
 	DRGN_Window* window;
+	DRGN_Windel* windel;
 	size_t size;
 	char* terrainText;
 	int x, y;
@@ -277,9 +278,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->pressed = 0;
 	}
 
-	return;
-
-	if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow && !player->unitWindowSource && !self->selected)
+	/*if (drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self) && !player->unitWindow && !player->unitWindowSource && !self->selected)
 	{
 		//slog("begining to draw");
 		player->unitWindowSource = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
@@ -388,33 +387,73 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		player->unitWindow = NULL;
 		player->unitWindowSource = NULL;
 		//slog("deleted unit window");
+	}*/
+
+	windel = NULL;
+
+	for (int bogus = 0; bogus < player->terrainWindow->elementsNum; bogus++)
+	{
+		windel = player->terrainWindow->elements[bogus];
+
+		if (!windel)
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(windel->name, "backgroundSprite") == 0)
+		{
+			break;
+		}
 	}
 
 	if (self->pos.x > player->terrainWindow->pos.x)
 	{
-		player->terrainWindow->pos.x = 80;
+		//slog("one");
+		//player->terrainWindow->pos.x = 80;
+		drgn_windowChangePosition(player->terrainWindow, vector2d(80, player->terrainWindow->pos.y));
 	}
-	if (self->pos.x < player->terrainWindow->pos.x + player->terrainWindow->sprite->frame_w)
+	if (self->pos.x < player->terrainWindow->pos.x + drgn_windelSpriteGetWidth(windel))
 	{
-		player->terrainWindow->pos.x = 1024;
+		//slog("two");
+		//player->terrainWindow->pos.x = 1024;
+		drgn_windowChangePosition(player->terrainWindow, vector2d(1024, player->terrainWindow->pos.y));
 	}
 
 	if (self->pos.y > player->terrainWindow->pos.y)
 	{
-		player->terrainWindow->pos.y = 36;
+		//slog("three");
+		//player->terrainWindow->pos.y = 36;
+		drgn_windowChangePosition(player->terrainWindow, vector2d(player->terrainWindow->pos.x, 36));
 	}
-	if (self->pos.y < player->terrainWindow->pos.y + player->terrainWindow->sprite->frame_h)
+	if (self->pos.y < player->terrainWindow->pos.y + drgn_windelSpriteGetHeight(windel))
 	{
-		player->terrainWindow->pos.y = 576;
+		//slog("four");
+		//player->terrainWindow->pos.y = 576;
+		drgn_windowChangePosition(player->terrainWindow, vector2d(player->terrainWindow->pos.x, 576));
 	}
 
 	terrain = drgn_entityGetSelectionByPosition(0, self->pos, self);
-	window = (DRGN_Window*)player->terrainWindow->data;
+	window = (DRGN_Window*)player->terrainWindow;
 	
 	if (!terrain)
 	{
 		//slog("Player not on any known terrain");
-		//window->texts = "Grass\nAvoid: 0\nDefense: 0";
+		
+		for (int bogus = 0; bogus < window->elementsNum; bogus++)
+		{
+			if (gfc_strlcmp(window->elements[bogus]->name, "terrainValue") == 0)
+			{
+				drgn_windelTextChangeText(window->elements[bogus], "grass");
+			}
+			else if (gfc_strlcmp(window->elements[bogus]->name, "terrainValueAvoid") == 0)
+			{
+				drgn_windelTextChangeText(window->elements[bogus], "Avoid: 0");
+			}
+			else if (gfc_strlcmp(window->elements[bogus]->name, "terrainValueDefense") == 0)
+			{
+				drgn_windelTextChangeText(window->elements[bogus], "Defense: 0");
+			}
+		}
 		return;
 	}
 
@@ -426,8 +465,26 @@ void drgn_playerUpdate(DRGN_Entity* self)
 		return;
 	}
 
-	size = strlen(terrainData->name) + strlen("\nAvoid: ")  + sizeof(terrainData->avoidBonus) + sizeof(terrainData->defBonus) + 1;
-	//window->texts = gfc_allocate_array(sizeof(char), size);
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (gfc_strlcmp(window->elements[bogus]->name, "terrainValue") == 0)
+		{
+			drgn_windelTextChangeText(window->elements[bogus], terrainData->name);
+		}
+		else if (gfc_strlcmp(window->elements[bogus]->name, "terrainValueAvoid") == 0)
+		{
+			terrainText = gfc_allocate_array(sizeof("Avoid: ") + sizeof(terrainData->avoidBonus), 1);
+			sprintf(terrainText, "Avoid: %i", terrainData->avoidBonus);
+			drgn_windelTextChangeText(window->elements[bogus],terrainText);
+		}
+		else if (gfc_strlcmp(window->elements[bogus]->name, "terrainValueDefense") == 0)
+		{
+			terrainText = gfc_allocate_array(sizeof("Defense: ") + sizeof(terrainData->defBonus), 1);
+			sprintf(terrainText, "Defense: %i", terrainData->defBonus);
+			drgn_windelTextChangeText(window->elements[bogus], terrainText);
+		}
+	}
+	//size = strlen(terrainData->name) + strlen("Avoid: ")  + sizeof(terrainData->avoidBonus) + sizeof(terrainData->defBonus) + 1;
 	//sprintf(window->texts, "%s\nAvoid: %i\nDefense: %i", terrainData->name, terrainData->avoidBonus, terrainData->defBonus);
 }
 
@@ -443,11 +500,6 @@ void drgn_playerFree(DRGN_Entity* self)
 	}
 
 	player = (DRGN_Player*)self->data;
-
-	if (player->terrainWindow)
-	{
-		drgn_entityFree(player->terrainWindow);
-	}
 
 	if (player->targets)
 	{

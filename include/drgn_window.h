@@ -71,6 +71,8 @@ void drgn_windowUpdate(DRGN_Window* self);
 */
 void drgn_windowDraw(DRGN_Window* self);
 
+void drgn_windowChangePosition(DRGN_Window* self, Vector2D changePos);
+
 void drgn_windowDrawAll();
 
 void drgn_windowUpdateAll();

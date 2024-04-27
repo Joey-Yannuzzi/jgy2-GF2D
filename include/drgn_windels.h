@@ -84,6 +84,8 @@ void drgn_windelTextUpdate(DRGN_Windel* windel);
 */
 void drgn_windelTextDraw(DRGN_Windel* windel);
 
+void drgn_windelTextChangeText(DRGN_Windel* windel, const char* newText);
+
 /*
 * @purpose struct for sprite window elements
 */
@@ -124,6 +126,10 @@ void drgn_windelSpriteUpdate(DRGN_Windel* windel);
 */
 void drgn_windelSpriteDraw(DRGN_Windel* windel);
 
+Uint32 drgn_windelSpriteGetWidth(DRGN_Windel* windel);
+
+Uint32 drgn_windelSpriteGetHeight(DRGN_Windel* windel);
+
 /*
 * @purpose struct for button window elements
 */
@@ -141,7 +147,7 @@ DRGN_WindelButton;
 * @param color OPTIONAL the color the element should be set to; NULL for no additional color
 * @return the created window element
 */
-DRGN_Windel* drgn_windelButtonNew(const char* name, Vector2D pos, Vector2D* scale, Color* color);
+DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos);
 
 /*
 * @brief frees a button window element

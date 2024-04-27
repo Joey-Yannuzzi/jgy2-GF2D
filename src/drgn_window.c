@@ -456,7 +456,7 @@ DRGN_Window* drgn_windowNew(const char* name)
 		}
 		else if (gfc_strlcmp(windelType, "button") == 0)
 		{
-			//elements[bogus] = drgn_windelButtonNew(element);
+			elements[bogus] = drgn_windelButtonNew(element, pos);
 			slog("button created");
 		}
 		else
@@ -553,5 +553,30 @@ void drgn_windowDraw(DRGN_Window* self)
 		}
 
 		drgn_windelDraw(self->elements[bogus]);
+	}
+}
+
+void drgn_windowChangePosition(DRGN_Window* self, Vector2D changePos)
+{
+	DRGN_Windel* windel;
+
+	if (!self || !self->elements || !self->elementsNum)
+	{
+		return;
+	}
+
+	vector2d_sub(changePos, self->pos, changePos);
+	vector2d_sub(self->pos, self->pos, changePos);
+
+	for (int bogus = 0; bogus < self->elementsNum; bogus++)
+	{
+		windel = self->elements[bogus];
+
+		if (!windel)
+		{
+			continue;
+		}
+
+		vector2d_sub(windel->pos, windel->pos, changePos);
 	}
 }

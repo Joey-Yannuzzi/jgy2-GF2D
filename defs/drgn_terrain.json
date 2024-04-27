@@ -37,7 +37,7 @@
       "displayName": "Mountain",
       "tile": 5,
       "moveValue": 4,
-      "ignoreClass": [ "soldier", "captain", "cavalier", "arcanist" ], //should ignore all except brigands
+      "ignoreClass": [ "soldier", "captain", "cavalier", "arcanist" ],
       "avoidBonus": 50,
       "defBonus": 2
     },
