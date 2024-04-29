@@ -37,6 +37,144 @@
           "scaleX": 0.9
         }
       ]
+    },
+    {
+      "name": "statScreen",
+      "offset": 0,
+      "windels": [
+        {
+          "type": "sprite",
+          "name": "backgroundImage",
+          "sprite": "images/backgrounds/statScreen.png",
+          "useColor": 0
+        },
+        {
+          "type": "text",
+          "name": "unitName",
+          "text": "Unit_Name",
+          "posX": 170,
+          "size": 2,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "hp",
+          "text": "Health_Points",
+          "posY": 28,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "str",
+          "text": "Strength",
+          "posY": 52,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "mag",
+          "text": "Magic",
+          "posY": 76,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "skl",
+          "text": "Skill",
+          "posY": 100,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "spd",
+          "text": "Speed",
+          "posY": 124,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "lck",
+          "text": "Luck",
+          "posX": 341,
+          "posY": 28,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "def",
+          "text": "Defense",
+          "posX": 341,
+          "posY": 52,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "res",
+          "text": "Resistance",
+          "posX": 341,
+          "posY": 76,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "mov",
+          "text": "Move",
+          "posX": 341,
+          "posY": 100,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        },
+        {
+          "type": "text",
+          "name": "bld",
+          "text": "Build",
+          "posX": 341,
+          "posY": 124,
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255
+        }
+      ]
     }
   ]
 }

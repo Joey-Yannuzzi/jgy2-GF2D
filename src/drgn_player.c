@@ -57,6 +57,11 @@ void drgn_playerThink(DRGN_Entity* self)
 
 	player = (DRGN_Player*)self->data;
 
+	if (player->statScreenPress && keys[SDL_SCANCODE_E] && event.type == SDL_KEYDOWN)
+	{
+		player->statScreenPress = 0;
+	}
+
 	if (player->targeting)
 	{
 		if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_D]) && event.type == SDL_KEYDOWN)
@@ -105,6 +110,11 @@ void drgn_playerThink(DRGN_Entity* self)
 		//slog("begin selection");
 	}
 
+	if (keys[SDL_SCANCODE_E] && !player->statScreenPress && !player->pressed && event.type == SDL_KEYDOWN && !player->statScreen)
+	{
+		player->statScreenPress = 1;
+	}
+
 	vector2d_normalize(&dir);
 
 	if (dir.x)
@@ -133,6 +143,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	DRGN_Windel* windel;
 	size_t size;
 	char* terrainText;
+	char* text;
 	int x, y;
 
 	if (!self || !self->data)
@@ -149,6 +160,109 @@ void drgn_playerUpdate(DRGN_Entity* self)
 	}
 
 	player = (DRGN_Player*)self->data;
+
+	if (player->statScreenPress && !player->statScreen)
+	{
+		//player->statScreenPress = 0;
+		unit = drgn_entityGetSelectionByPosition(DRGN_BLUE, self->pos, self);
+
+		if (!unit || !unit->data)
+		{
+			player->statScreenPress = 0;
+			return;
+		}
+
+		player->statScreen = drgn_windowNew("statScreen");
+		self->inactive = 1;
+		curr = (DRGN_Unit*)unit->data;
+
+		if (player->statScreen)
+		{
+			drgn_windowChangePosition(player->statScreen, vector2d(unit->pos.x + 64, unit->pos.y));
+
+			for (int bogus = 0; bogus < player->statScreen->elementsNum; bogus++)
+			{
+				if (!player->statScreen->elements[bogus] || !player->statScreen->elements[bogus]->name)
+				{
+					continue;
+				}
+
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "unitName") == 0)
+				{
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], curr->name);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "hp") == 0)
+				{
+					text = gfc_allocate_array(sizeof("HP: ") + sizeof(curr->stats[1]), 1);
+					sprintf(text, "HP: %i", curr->stats[1]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "str") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Strength: ") + sizeof(curr->stats[2]), 1);
+					sprintf(text, "Strenth: %i", curr->stats[2]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "mag") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Magic: ") + sizeof(curr->stats[3]), 1);
+					sprintf(text, "Magic: %i", curr->stats[3]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "skl") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Skill: ") + sizeof(curr->stats[4]), 1);
+					sprintf(text, "Skill: %i", curr->stats[4]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "spd") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Speed: ") + sizeof(curr->stats[5]), 1);
+					sprintf(text, "Speed: %i", curr->stats[5]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "lck") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Luck: ") + sizeof(curr->stats[6]), 1);
+					sprintf(text, "Luck: %i", curr->stats[6]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "def") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Defense: ") + sizeof(curr->stats[7]), 1);
+					sprintf(text, "Defense: %i", curr->stats[7]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "res") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Resistance: ") + sizeof(curr->stats[8]), 1);
+					sprintf(text, "Resistance: %i", curr->stats[8]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "mov") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Move: ") + sizeof(curr->stats[9]), 1);
+					sprintf(text, "Move: %i", curr->stats[9]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+				if (gfc_strlcmp(player->statScreen->elements[bogus]->name, "bld") == 0)
+				{
+					text = gfc_allocate_array(sizeof("Build: ") + sizeof(curr->stats[10]), 1);
+					sprintf(text, "Build: %i", curr->stats[10]);
+					drgn_windelTextChangeText(player->statScreen->elements[bogus], text);
+				}
+			}
+		}
+
+		return;
+	}
+
+	if (!player->statScreenPress && player->statScreen)
+	{
+		drgn_windowFree(player->statScreen);
+		player->statScreen = NULL;
+		self->inactive = 0;
+	}
 
 	if (player->targeting)
 	{

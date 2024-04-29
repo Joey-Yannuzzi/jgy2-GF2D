@@ -75,6 +75,7 @@ int main(int argc, char * argv[])
     //window = drgn_windowNew("hello world", "images/windows/testWindow.png", 128, 64, vector2d(64, 64));
     player = drgn_playerNew();
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
+    //window = drgn_windowNew("statScreen");
 
     slog("Begining game");
     /*main game loop*/

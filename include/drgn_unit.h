@@ -1,6 +1,7 @@
 #ifndef __DRGN_UNIT_H__
 #define __DRGN_UNIT_H__
 
+#include "drgn_window.h"
 #include "drgn_entity.h"
 #include "drgn_inventory.h"
 #include "drgn_move.h"
@@ -67,6 +68,7 @@ typedef struct
 	DRGN_Entity* rescuedUnit; //points to the unit currently being rescued; NULL if no rescue in progress
 	DRGN_Entity* menuCursor; //the cursor when selecting a command
 	Uint8 rescued; //checks to see if this unit is recsued currently
+	//DRGN_Window* statScreen;
 }
 DRGN_Unit;
 
