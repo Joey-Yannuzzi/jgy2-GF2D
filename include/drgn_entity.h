@@ -3,6 +3,7 @@
 
 #include "gfc_types.h"
 #include "gf2d_sprite.h"
+
 /*
 * @purpose default entity skeleton; all entities should inherit from this
 */

@@ -5,6 +5,7 @@ DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos)
 {
 	DRGN_Windel* windel;
 	int check;
+	float red, green, blue, alpha;
 
 	windel = gfc_allocate_array(sizeof(DRGN_Windel), 1);
 
@@ -45,7 +46,35 @@ DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos)
 		windel->scale.y = 1;
 	}
 
-	//do color later
+	check = sj_object_get_value_as_float(object, "colorR", &red);
+
+	if (!check)
+	{
+		return (windel);
+	}
+
+	check = sj_object_get_value_as_float(object, "colorG", &green);
+
+	if (!check)
+	{
+		return (windel);
+	}
+
+	check = sj_object_get_value_as_float(object, "colorB", &blue);
+
+	if (!check)
+	{
+		return (windel);
+	}
+
+	check = sj_object_get_value_as_float(object, "colorA", &alpha);
+
+	if (!check)
+	{
+		return (windel);
+	}
+
+	windel->color = gfc_color8(red, green, blue, alpha);
 
 	return (windel);
 }

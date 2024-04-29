@@ -2,7 +2,6 @@
 #include "drgn_unit.h"
 #include "drgn_terrain.h"
 #include "drgn_world.h"
-#include "drgn_window.h"
 #include "drgn_cursor.h"
 #include "drgn_player.h"
 
@@ -268,6 +267,8 @@ void drgn_unitThink(DRGN_Entity* self)
 void drgn_unitUpdate(DRGN_Entity* self)
 {
 	DRGN_Unit* unit;
+	char* text;
+
 	if (!self || !self->data)
 	{
 		return;
