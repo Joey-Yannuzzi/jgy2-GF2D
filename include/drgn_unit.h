@@ -63,11 +63,12 @@ typedef struct
 	int active; //check for if unit already acted this turn
 	const char* class; //name of the class of unit
 	DRGN_Action currentAction; //current action the unit is taking
-	DRGN_Entity** menuWindow; //menu window pointer
+	DRGN_Window** menuWindow; //menu window pointer
 	int menuMax; //number of generated menu elements
 	DRGN_Entity* rescuedUnit; //points to the unit currently being rescued; NULL if no rescue in progress
 	DRGN_Entity* menuCursor; //the cursor when selecting a command
 	Uint8 rescued; //checks to see if this unit is recsued currently
+	int menuOffset;
 	//DRGN_Window* statScreen;
 }
 DRGN_Unit;

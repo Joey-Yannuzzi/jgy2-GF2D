@@ -130,12 +130,30 @@ Uint32 drgn_windelSpriteGetWidth(DRGN_Windel* windel);
 
 Uint32 drgn_windelSpriteGetHeight(DRGN_Windel* windel);
 
+
+typedef enum DRGN_CommandAction
+{
+	DRGN_BUTTON_NONE,
+	DRGN_BUTTON_SEIZE,
+	DRGN_BUTTON_TALK,
+	DRGN_BUTTON_ATTACK,
+	DRGN_BUTTON_HEAL,
+	DRGN_BUTTON_ITEM,
+	DRGN_BUTTON_TRADE,
+	DRGN_BUTTON_RESCUE,
+	DRGN_BUTTON_TRANSFER,
+	DRGN_BUTTON_DROP,
+	DRGN_BUTTON_WAIT
+}
+DRGN_ButtonAction;
+
 /*
 * @purpose struct for button window elements
 */
 typedef struct
 {
 	Uint8 pushed; //checks if button has been pushed this frame; set to 1 if button was pushed
+	DRGN_ButtonAction action; //action the button should perform
 }
 DRGN_WindelButton;
 
@@ -147,7 +165,7 @@ DRGN_WindelButton;
 * @param color OPTIONAL the color the element should be set to; NULL for no additional color
 * @return the created window element
 */
-DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos);
+DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action);
 
 /*
 * @brief frees a button window element

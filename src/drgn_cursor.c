@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 #include "drgn_cursor.h"
+#include "drgn_window.h"
 
 DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds)
 {
@@ -84,22 +85,30 @@ void drgn_cursorThink(DRGN_Entity* self)
 void drgn_cursorUpdate(DRGN_Entity* self)
 {
 	DRGN_Cursor* cursor;
-	DRGN_Entity* temp;
+	DRGN_Windel* temp;
+	DRGN_WindelButton* button;
 
 	if (!self || !self->data)
 	{
 		return;
 	}
 
+	//slog("Cursor: x: %f, y: %f", self->pos.x, self->pos.y);
+
 	cursor = (DRGN_Cursor*)self->data;
 
 	if (cursor->pressed)
 	{
-		temp = drgn_entityGetSelectionByPosition(DRGN_UI, vector2d(self->pos.x + 31, self->pos.y), self);
+		temp = drgn_windowGetPositionByName(vector2d(self->pos.x + 31, self->pos.y), "commandButton");
 
-		if (temp && !temp->selected)
+		if (temp && temp->data)
 		{
-			temp->selected = 1;
+			button = (DRGN_WindelButton*)temp->data;
+
+			if (button)
+			{
+				button->pushed = 1;
+			}
 		}
 
 		cursor->pressed = 0;

@@ -354,7 +354,7 @@ Uint32 drgn_windelSpriteGetHeight(DRGN_Windel* windel)
 	return (sprite->sprite->frame_h);
 }
 
-DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos)
+DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action)
 {
 	DRGN_Windel* windel;
 	DRGN_WindelButton* button;
@@ -381,6 +381,7 @@ DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos)
 	}
 
 	button->pushed = 0;
+	button->action = action;
 	windel->data = button;
 
 	return (windel);
@@ -409,11 +410,14 @@ void drgn_windelButtonUpdate(DRGN_Windel* windel)
 	}
 
 	button = (DRGN_WindelButton*)windel->data;
+	//slog("Button: x: %f, y: %f", windel->pos.x, windel->pos.y);
 
 	if (button->pushed)
 	{
 		//Do push action here
+		
 		button->pushed = 0;
+		slog("pushed");
 	}
 }
 

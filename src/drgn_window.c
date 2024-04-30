@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 #include "gfc_types.h"
 #include "drgn_window.h"
+#include "drgn_camera.h"
 
 /*
 DRGN_Entity* drgn_windowNew(char* texts, const char* sprite, Uint32 width, Uint32 height, Vector2D pos, DRGN_Entity* curr)
@@ -376,7 +377,7 @@ void drgn_windowDrawAll()
 	}
 }
 
-DRGN_Window* drgn_windowNew(const char* name)
+DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action)
 {
 	SJson* window;
 	SJson* windels;
@@ -456,7 +457,7 @@ DRGN_Window* drgn_windowNew(const char* name)
 		}
 		else if (gfc_strlcmp(windelType, "button") == 0)
 		{
-			elements[bogus] = drgn_windelButtonNew(element, pos);
+			elements[bogus] = drgn_windelButtonNew(element, pos, action);
 			slog("button created");
 		}
 		else
@@ -540,9 +541,20 @@ void drgn_windowUpdate(DRGN_Window* self)
 
 void drgn_windowDraw(DRGN_Window* self)
 {
+	Vector2D offset;
+	Vector2D pos;
+
 	if (!self)
 	{
 		return;
+	}
+
+	if (self->offsetPos)
+	{
+		offset = drgn_cameraGetOffset();
+		vector2d_add(pos, self->pos, offset);
+		drgn_windowChangePosition(self, pos);
+		self->offsetPos = 0;
 	}
 
 	for (int bogus = 0; bogus < self->elementsNum; bogus++)
@@ -579,4 +591,40 @@ void drgn_windowChangePosition(DRGN_Window* self, Vector2D changePos)
 
 		vector2d_sub(windel->pos, windel->pos, changePos);
 	}
+}
+
+DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name)
+{
+	if (!name)
+	{
+		return NULL;
+	}
+
+	for (int bogus = 0; bogus < _windows.max; bogus++)
+	{
+		if (!_windows.windows[bogus]._inuse)
+		{
+			continue;
+		}
+
+		if (!_windows.windows[bogus].elementsNum || !_windows.windows[bogus].elements)
+		{
+			continue;
+		}
+
+		for (int bogus2 = 0; bogus2 < _windows.windows[bogus].elementsNum; bogus2++)
+		{
+			if (!_windows.windows[bogus].elements[bogus2])
+			{
+				continue;
+			}
+
+			if (gfc_strlcmp(_windows.windows[bogus].elements[bogus2]->name, name) == 0)
+			{
+				return (_windows.windows[bogus].elements[bogus2]);
+			}
+		}
+	}
+
+	return NULL;
 }
