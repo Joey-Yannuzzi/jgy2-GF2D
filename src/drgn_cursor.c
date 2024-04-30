@@ -2,7 +2,7 @@
 #include "drgn_cursor.h"
 #include "drgn_window.h"
 
-DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds)
+DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds, DRGN_Entity* parent)
 {
 	DRGN_Entity* self;
 	DRGN_Cursor* cursor;
@@ -26,6 +26,7 @@ DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBo
 	cursor = gfc_allocate_array(sizeof(DRGN_Cursor), 1);
 	vector2d_copy(cursor->lowerBounds, lowerBounds);
 	vector2d_copy(cursor->upperBounds, upperBounds);
+	cursor->parent = parent;
 	self->data = cursor;
 	return (self);
 }
@@ -87,6 +88,7 @@ void drgn_cursorUpdate(DRGN_Entity* self)
 	DRGN_Cursor* cursor;
 	DRGN_Windel* temp;
 	DRGN_WindelButton* button;
+	DRGN_Entity* ent;
 
 	if (!self || !self->data)
 	{

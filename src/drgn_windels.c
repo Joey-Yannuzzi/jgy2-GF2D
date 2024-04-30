@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 #include "drgn_windels.h"
+#include "drgn_unit.h"
 
 DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos)
 {
@@ -354,7 +355,7 @@ Uint32 drgn_windelSpriteGetHeight(DRGN_Windel* windel)
 	return (sprite->sprite->frame_h);
 }
 
-DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action)
+DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action, DRGN_Entity* parent)
 {
 	DRGN_Windel* windel;
 	DRGN_WindelButton* button;
@@ -382,6 +383,7 @@ DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_Button
 
 	button->pushed = 0;
 	button->action = action;
+	button->parent = parent;
 	windel->data = button;
 
 	return (windel);
@@ -418,6 +420,8 @@ void drgn_windelButtonUpdate(DRGN_Windel* windel)
 		
 		button->pushed = 0;
 		slog("pushed");
+		drgn_windelButtonCompleteAction(button);
+		return;
 	}
 }
 
@@ -427,4 +431,69 @@ void drgn_windelButtonDraw(DRGN_Windel* windel)
 	{
 		return;
 	}
+}
+
+void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
+{
+	DRGN_Unit* unit;
+
+	if (!button || !button->parent)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)button->parent->data;
+
+	if (!unit)
+	{
+		return;
+	}
+
+	switch (button->action)
+	{
+		case DRGN_BUTTON_NONE:
+			return;
+		case DRGN_BUTTON_SEIZE:
+			unit->currentAction = DRGN_SEIZE;
+			break;
+		case DRGN_BUTTON_TALK:
+			unit->currentAction = DRGN_TALK;
+			break;
+		case DRGN_BUTTON_MELEE_ATTACK:
+			unit->currentAction = DRGN_MELEE_ATTACK;
+			break;
+		case DRGN_BUTTON_RANGED_ATTACK:
+			unit->currentAction = DRGN_RANGED_ATTACK;
+			break;
+		case DRGN_BUTTON_MAGIC_ATTACK:
+			unit->currentAction = DRGN_MAGIC_ATTACK;
+			break;
+		case DRGN_BUTTON_HEAL:
+			unit->currentAction = DRGN_HEAL;
+			break;
+		case DRGN_BUTTON_ITEM:
+			unit->currentAction = DRGN_ITEM;
+			break;
+		case DRGN_BUTTON_TRADE:
+			unit->currentAction = DRGN_TRADE;
+			break;
+		case DRGN_BUTTON_RESCUE:
+			unit->currentAction = DRGN_RESCUE;
+			break;
+		case DRGN_BUTTON_TRANSFER:
+			unit->currentAction = DRGN_TRANSFER;
+			break;
+		case DRGN_BUTTON_DROP:
+			unit->currentAction = DRGN_DROP;
+			break;
+		case DRGN_BUTTON_WAIT:
+			unit->currentAction = DRGN_WAIT;
+			break;
+		default:
+			return;
+	}
+
+	slog("%i action", unit->currentAction);
+	drgn_unitMenu(button->parent);
+
 }

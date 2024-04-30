@@ -377,7 +377,7 @@ void drgn_windowDrawAll()
 	}
 }
 
-DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action)
+DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent)
 {
 	SJson* window;
 	SJson* windels;
@@ -457,7 +457,7 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action)
 		}
 		else if (gfc_strlcmp(windelType, "button") == 0)
 		{
-			elements[bogus] = drgn_windelButtonNew(element, pos, action);
+			elements[bogus] = drgn_windelButtonNew(element, pos, action, parent);
 			slog("button created");
 		}
 		else

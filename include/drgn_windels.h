@@ -2,9 +2,10 @@
 #define __DRGN_WINDELS_H__
 
 #include "simple_json.h"
-#include "gfc_types.h"
-#include "gf2d_sprite.h"
+//#include "gfc_types.h"
+//#include "gf2d_sprite.h"
 #include "drgn_font.h"
+#include "drgn_entity.h"
 
 /*
 * @purpose windel creation, management, and destruction
@@ -136,7 +137,9 @@ typedef enum DRGN_CommandAction
 	DRGN_BUTTON_NONE,
 	DRGN_BUTTON_SEIZE,
 	DRGN_BUTTON_TALK,
-	DRGN_BUTTON_ATTACK,
+	DRGN_BUTTON_MELEE_ATTACK,
+	DRGN_BUTTON_RANGED_ATTACK,
+	DRGN_BUTTON_MAGIC_ATTACK,
 	DRGN_BUTTON_HEAL,
 	DRGN_BUTTON_ITEM,
 	DRGN_BUTTON_TRADE,
@@ -154,6 +157,7 @@ typedef struct
 {
 	Uint8 pushed; //checks if button has been pushed this frame; set to 1 if button was pushed
 	DRGN_ButtonAction action; //action the button should perform
+	DRGN_Entity* parent; //parent entity of the button, if it exists
 }
 DRGN_WindelButton;
 
@@ -165,7 +169,7 @@ DRGN_WindelButton;
 * @param color OPTIONAL the color the element should be set to; NULL for no additional color
 * @return the created window element
 */
-DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action);
+DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action, DRGN_Entity* parent);
 
 /*
 * @brief frees a button window element
@@ -184,4 +188,7 @@ void drgn_windelButtonUpdate(DRGN_Windel* windel);
 * @param the window element to be drawn
 */
 void drgn_windelButtonDraw(DRGN_Windel* windel);
+
+void drgn_windelButtonCompleteAction(DRGN_WindelButton* button);
+
 #endif
