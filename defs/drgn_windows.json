@@ -175,6 +175,28 @@
           "colorA": 255
         }
       ]
+    },
+    {
+      "name": "commandWindow",
+      "offset": 1,
+      "windels": [
+        {
+          "type": "sprite",
+          "name": "backgroundSprite",
+          "sprite": "images/windows/menuWindow.png",
+          "useColor": 0
+        },
+        {
+          "type": "text",
+          "name": "commandText",
+          "text": "Wait",
+          "size": 2
+        },
+        {
+          "type": "button",
+          "name": "commandButton"
+        }
+      ]
     }
   ]
 }

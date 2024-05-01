@@ -4,7 +4,6 @@
 #include "gfc_list.h"
 #include "drgn_entity.h"
 #include "drgn_font.h"
-#include "drgn_unit.h"
 #include "drgn_windels.h"
 
 /*
@@ -51,7 +50,7 @@ DRGN_Window;
 * @param name the name if the window
 * @return the window created
 */
-DRGN_Window* drgn_windowNew(const char* name);
+DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent);
 
 /*
 * @brief free a window
@@ -82,5 +81,7 @@ void drgn_windowFreeAll();
 void drgn_windowManagerNew(Uint32 max);
 
 void drgn_windowFileInit(const char* name);
+
+DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name);
 
 #endif

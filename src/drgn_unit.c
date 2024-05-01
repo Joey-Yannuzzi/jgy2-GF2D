@@ -223,7 +223,7 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 	unit->moveTotal = ((unit->stats[9] * 2) + 1) * ((unit->stats[9] * 2) + 1);
 	unit->moveMap = gfc_allocate_array(sizeof(Uint8), unit->moveTotal);
 	unit->active = 1;
-	unit->menuWindow = gfc_allocate_array(sizeof(DRGN_Entity*), 8);
+	unit->menuWindow = gfc_allocate_array(sizeof(DRGN_Window*), 8);
 	unit->currentHP = unit->stats[1];
 	unit->currentHP--;
 	unit->inventory->equipped = 0;
@@ -586,6 +586,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 	DRGN_Unit* unitDown;
 	DRGN_Entity* temp;
 	DRGN_Terrain* terrain;
+	DRGN_ButtonAction action;
 
 	if (!self || !self->data)
 	{
@@ -606,8 +607,9 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (gfc_strlcmp(terrain->name, "Flag") == 0)
 			{
-				//unit->menuWindow[bogus] = drgn_windowNew("Seize", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				unit->menuWindow[bogus]->offset = 1;
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_SEIZE, self);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Seize");
 				bogus++;
 			}
 		}
@@ -619,14 +621,16 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 		if (right || left || down || up)
 		{
-			//unit->menuWindow[bogus] = drgn_windowNew("Talk", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-			unit->menuWindow[bogus]->offset = 1;
+			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TALK, self);
+			drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+			drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Talk");
 			bogus++;
 		}
 
 		if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_ARCANE))
 		{
 			slog("magic attack");
+			action = DRGN_BUTTON_MAGIC_ATTACK;
 			right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 128, self->pos.y), self);
 			left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 128, self->pos.y), self);
 			down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 128), self);
@@ -635,6 +639,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		else
 		{
 			slog("melee attack");
+			action = DRGN_BUTTON_MELEE_ATTACK;
 			right = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x + 64, self->pos.y), self);
 			left = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x - 64, self->pos.y), self);
 			down = drgn_entityGetSelectionByPosition(DRGN_RED, vector2d(self->pos.x, self->pos.y + 64), self);
@@ -666,8 +671,9 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unitRight || unitLeft || unitUp || unitDown)
 			{
-				//unit->menuWindow[bogus] = drgn_windowNew("Attack", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				//unit->menuWindow[bogus]->offset = 1;
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", action, self);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Attack");
 				bogus++;
 			}
 		}
@@ -702,15 +708,17 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_DIVINE) &&((unitRight && unitRight->currentHP < unitRight->stats[1]) || (unitLeft && unitLeft->currentHP < unitLeft->stats[1]) || (unitUp && unitUp->currentHP < unitUp->stats[1]) || (unitDown && unitDown->currentHP < unitDown->stats[1])))
 			{
-				//unit->menuWindow[bogus] = drgn_windowNew("Heal", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				//unit->menuWindow[bogus]->offset = 1;
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_HEAL, self);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Heal");
 				bogus++;
 			}
 		}
 		if (unit->inventory->curr > 0)
 		{
-			//unit->menuWindow[bogus] = drgn_windowNew("Item", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-			//unit->menuWindow[bogus]->offset = 1;
+			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_ITEM, self);
+			drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+			drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Item");
 			bogus++;
 		}
 
@@ -744,8 +752,9 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unit->inventory->curr > 0 || ((unitRight && unitRight->inventory->curr > 0) || (unitLeft && unitLeft->inventory->curr > 0) || (unitUp && unitUp->inventory->curr > 0) || (unitDown && unitDown->inventory->curr > 0)))
 			{
-				//unit->menuWindow[bogus] = drgn_windowNew("Trade", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				//unit->menuWindow[bogus]->offset = 1;
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TRADE, self);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Trade");
 				bogus++;
 			}
 		}
@@ -780,8 +789,9 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (!unit->rescuedUnit && ((unitRight && unit->stats[10] > unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] > unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] > unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] > unitDown->stats[10] && !unitDown->rescuedUnit)))
 			{
-				//unit->menuWindow[bogus] = drgn_windowNew("Rescue", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				//unit->menuWindow[bogus]->offset = 1;
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_RESCUE, self);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Rescue");
 				bogus++;
 			}
 		}
@@ -816,8 +826,9 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unit->rescuedUnit && ((unitRight && unit->stats[10] <= unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] <= unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] <= unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] <= unitDown->stats[10] && !unitDown->rescuedUnit)))
 			{
-				//unit->menuWindow[bogus] = drgn_windowNew("Transfer", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-				//unit->menuWindow[bogus]->offset = 1;
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TRANSFER, self);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Transfer");
 				bogus++;
 			}
 		}
@@ -835,16 +846,18 @@ void drgn_unitMenu(DRGN_Entity* self)
 			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self) ||
 			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self)))
 		{
-			//unit->menuWindow[bogus] = drgn_windowNew("Drop", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-			//unit->menuWindow[bogus]->offset = 1;
+			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_DROP, self);
+			drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+			drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Drop");
 			bogus++;
 		}
 
-		//unit->menuWindow[bogus] = drgn_windowNew("Wait", "images/windows/menuWindow.png", 64, 32, vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)), self);
-		//unit->menuWindow[bogus]->offset = 1;
-		//unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos);
+		unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_WAIT, self);
+		drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+		drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Wait");
+		unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos, self, bogus);
 		bogus++;
-		//unit->menuMax = bogus;
+		unit->menuMax = bogus;
 		break;
 
 	case DRGN_WAIT:
@@ -1330,7 +1343,7 @@ void drgn_unitMenuFree(DRGN_Unit* self)
 			continue;
 		}
 
-		drgn_entityFree(self->menuWindow[bogus]);
+		drgn_windowFree(self->menuWindow[bogus]);
 		self->menuWindow[bogus] = NULL;
 	}
 
@@ -1356,12 +1369,12 @@ void drgn_unitSelectedMenuItem(DRGN_Entity* self)
 
 	for (int bogus = 0; bogus < unit->menuMax; bogus++)
 	{
-		if (unit->menuWindow[bogus] && unit->menuWindow[bogus]->selected)
+		/*if (unit->menuWindow[bogus] && unit->menuWindow[bogus]->selected)
 		{
 			//unit->currentAction = drgn_windowMenuItemFromText(unit->menuWindow[bogus]);
 			slog("got action");
 			return;
-		}
+		}*/
 	}
 }
 

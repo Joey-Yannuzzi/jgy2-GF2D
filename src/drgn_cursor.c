@@ -1,7 +1,9 @@
 #include "simple_logger.h"
 #include "drgn_cursor.h"
+#include "drgn_window.h"
+#include "drgn_unit.h"
 
-DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds)
+DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds, DRGN_Entity* parent, int max)
 {
 	DRGN_Entity* self;
 	DRGN_Cursor* cursor;
@@ -25,6 +27,10 @@ DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBo
 	cursor = gfc_allocate_array(sizeof(DRGN_Cursor), 1);
 	vector2d_copy(cursor->lowerBounds, lowerBounds);
 	vector2d_copy(cursor->upperBounds, upperBounds);
+	cursor->parent = parent;
+	//cursor->windows = windows;
+	cursor->curr = 0;
+	cursor->max = max;
 	self->data = cursor;
 	return (self);
 }
@@ -56,10 +62,12 @@ void drgn_cursorThink(DRGN_Entity* self)
 	if (keys[SDL_SCANCODE_W])
 	{
 		dir.y = -1;
+		cursor->curr--;
 	}
 	else if (keys[SDL_SCANCODE_S])
 	{
 		dir.y = 1;
+		cursor->curr++;
 	}
 
 	if (keys[SDL_SCANCODE_E] && !cursor->pressed)
@@ -84,22 +92,43 @@ void drgn_cursorThink(DRGN_Entity* self)
 void drgn_cursorUpdate(DRGN_Entity* self)
 {
 	DRGN_Cursor* cursor;
-	DRGN_Entity* temp;
+	DRGN_Windel* temp;
+	DRGN_WindelButton* button;
+	DRGN_Entity* ent;
+	DRGN_Unit* unit;
 
 	if (!self || !self->data)
 	{
 		return;
 	}
 
+	//slog("Cursor: x: %f, y: %f", self->pos.x, self->pos.y);
+
 	cursor = (DRGN_Cursor*)self->data;
+
+	if (cursor->curr < 0)
+	{
+		cursor->curr = cursor->max + cursor->curr;
+	}
+	if (cursor->curr >= cursor->max)
+	{
+		cursor->curr = cursor->curr - cursor->max;
+	}
 
 	if (cursor->pressed)
 	{
-		temp = drgn_entityGetSelectionByPosition(DRGN_UI, vector2d(self->pos.x + 31, self->pos.y), self);
+		//temp = drgn_windowGetPositionByName(vector2d(self->pos.x + 31, self->pos.y), "commandButton");
+		unit = (DRGN_Unit*)cursor->parent->data;
+		temp = unit->menuWindow[cursor->curr]->elements[2];
 
-		if (temp && !temp->selected)
+		if (temp && temp->data)
 		{
-			temp->selected = 1;
+			button = (DRGN_WindelButton*)temp->data;
+
+			if (button)
+			{
+				button->pushed = 1;
+			}
 		}
 
 		cursor->pressed = 0;
