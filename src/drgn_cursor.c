@@ -1,8 +1,9 @@
 #include "simple_logger.h"
 #include "drgn_cursor.h"
 #include "drgn_window.h"
+#include "drgn_unit.h"
 
-DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds, DRGN_Entity* parent)
+DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBounds, DRGN_Entity* parent, int max)
 {
 	DRGN_Entity* self;
 	DRGN_Cursor* cursor;
@@ -27,6 +28,9 @@ DRGN_Entity* drgn_cursorNew(Vector2D pos, Vector2D upperBounds, Vector2D lowerBo
 	vector2d_copy(cursor->lowerBounds, lowerBounds);
 	vector2d_copy(cursor->upperBounds, upperBounds);
 	cursor->parent = parent;
+	//cursor->windows = windows;
+	cursor->curr = 0;
+	cursor->max = max;
 	self->data = cursor;
 	return (self);
 }
@@ -58,10 +62,12 @@ void drgn_cursorThink(DRGN_Entity* self)
 	if (keys[SDL_SCANCODE_W])
 	{
 		dir.y = -1;
+		cursor->curr--;
 	}
 	else if (keys[SDL_SCANCODE_S])
 	{
 		dir.y = 1;
+		cursor->curr++;
 	}
 
 	if (keys[SDL_SCANCODE_E] && !cursor->pressed)
@@ -89,6 +95,7 @@ void drgn_cursorUpdate(DRGN_Entity* self)
 	DRGN_Windel* temp;
 	DRGN_WindelButton* button;
 	DRGN_Entity* ent;
+	DRGN_Unit* unit;
 
 	if (!self || !self->data)
 	{
@@ -99,9 +106,20 @@ void drgn_cursorUpdate(DRGN_Entity* self)
 
 	cursor = (DRGN_Cursor*)self->data;
 
+	if (cursor->curr < 0)
+	{
+		cursor->curr = cursor->max + cursor->curr;
+	}
+	if (cursor->curr >= cursor->max)
+	{
+		cursor->curr = cursor->curr - cursor->max;
+	}
+
 	if (cursor->pressed)
 	{
-		temp = drgn_windowGetPositionByName(vector2d(self->pos.x + 31, self->pos.y), "commandButton");
+		//temp = drgn_windowGetPositionByName(vector2d(self->pos.x + 31, self->pos.y), "commandButton");
+		unit = (DRGN_Unit*)cursor->parent->data;
+		temp = unit->menuWindow[cursor->curr]->elements[2];
 
 		if (temp && temp->data)
 		{

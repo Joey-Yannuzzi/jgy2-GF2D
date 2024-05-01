@@ -855,7 +855,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_WAIT, self);
 		drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 		drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Wait");
-		unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos, self);
+		unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos, self, bogus);
 		bogus++;
 		unit->menuMax = bogus;
 		break;

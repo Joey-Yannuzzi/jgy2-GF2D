@@ -621,7 +621,12 @@ DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name)
 
 			if (gfc_strlcmp(_windows.windows[bogus].elements[bogus2]->name, name) == 0)
 			{
-				return (_windows.windows[bogus].elements[bogus2]);
+				slog("Cursor y: %f, window y: %f", pos.y, _windows.windows[bogus].pos.y);
+
+				if (pos.y == _windows.windows[bogus].pos.y)
+				{
+					return (_windows.windows[bogus].elements[bogus2]);
+				}
 			}
 		}
 	}
