@@ -94,4 +94,6 @@ DRGN_Entity* drgn_entityGetUnitsByAffiliation(enum DRGN_Affiliation affiliation)
 
 DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation, Vector2D pos, DRGN_Entity* self);
 
+void drgn_entitySetAllInactive();
+
 #endif

@@ -28,6 +28,7 @@ int main(int argc, char * argv[])
     DRGN_Entity* player;
     DRGN_World* world;
     DRGN_Window* window;
+    SDL_Event event;
     //DRGN_Entity* window;
     //Color color = gfc_color8(255, 0, 0, 100);
     //Vector2D vect = vector2d(1, 1);
@@ -76,6 +77,7 @@ int main(int argc, char * argv[])
     player = drgn_playerNew();
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
     //window = drgn_windowNew("commandWindow");
+    window = NULL;
 
     slog("Begining game");
     /*main game loop*/
@@ -86,6 +88,7 @@ int main(int argc, char * argv[])
         //slog("Unit named %s on field", ((DRGN_Unit*)unit->data)->name);
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+        //SDL_PollEvent(&event);
         /*update things here*/
         SDL_GetMouseState(&mx,&my);
         mf+=0.1;
@@ -121,7 +124,17 @@ int main(int argc, char * argv[])
         //slog("Player pos: %f, %f", player->pos.x, player->pos.y);
         //slog("Unit pos: %f, %f", unit->pos.x, unit->pos.y);
         
-        if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
+        if (keys[SDL_SCANCODE_1] && !window)
+        {
+            window = drgn_windowNew("pauseMenu", DRGN_BUTTON_NONE, NULL);
+            drgn_entitySetAllInactive();
+        }
+        
+        // exit condition
+        if (keys[SDL_SCANCODE_ESCAPE])
+        {
+            done = 1;
+        }
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
 

@@ -351,3 +351,16 @@ DRGN_Entity* drgn_entityGetSelectionByPosition(enum DRGN_Affiliation affiliation
 
 	return NULL;
 }
+
+void drgn_entitySetAllInactive()
+{
+	for (int bogus = 0; bogus < _entManager.entMax; bogus++)
+	{
+		if (!_entManager.entList[bogus]._inuse)
+		{
+			continue;
+		}
+
+		_entManager.entList[bogus].inactive = 1;
+	}
+}
