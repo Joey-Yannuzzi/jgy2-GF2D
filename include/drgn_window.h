@@ -84,4 +84,8 @@ void drgn_windowFileInit(const char* name);
 
 DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name);
 
+void drgn_windowAssignActionByName(DRGN_Window* window, const char* name, DRGN_ButtonAction action);
+
+Uint8 drgn_windowGetBoundsByName(DRGN_Window*, Vector2D pos, const char* name);
+
 #endif

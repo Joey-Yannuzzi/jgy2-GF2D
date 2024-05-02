@@ -216,7 +216,9 @@
           "type": "button",
           "name": "resumeButton",
           "posX": 568,
-          "posY": 240
+          "posY": 240,
+          "width": 64,
+          "height": 32
         },
         {
           "type": "sprite",
@@ -237,7 +239,9 @@
           "type": "button",
           "name": "quitButton",
           "posX": 568,
-          "posY": 480
+          "posY": 480,
+          "width": 64,
+          "height": 32
         },
         {
           "type": "sprite",

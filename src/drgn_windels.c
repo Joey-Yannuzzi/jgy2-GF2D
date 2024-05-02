@@ -359,6 +359,7 @@ DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_Button
 {
 	DRGN_Windel* windel;
 	DRGN_WindelButton* button;
+	float w, h;
 
 	windel = drgn_windelNew(object, parentPos);
 
@@ -384,6 +385,10 @@ DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_Button
 	button->pushed = 0;
 	button->action = action;
 	button->parent = parent;
+
+	sj_object_get_value_as_float(object, "width", &w);
+	sj_object_get_value_as_float(object, "height", &h);
+	button->bounds = gfc_rect(windel->pos.x, windel->pos.y, w, h);
 	windel->data = button;
 
 	return (windel);
@@ -496,4 +501,31 @@ void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
 	slog("%i action", unit->currentAction);
 	drgn_unitMenu(button->parent);
 
+}
+
+void drgn_windelButtonAssignAction(DRGN_Windel* windel, DRGN_ButtonAction action)
+{
+	DRGN_WindelButton* button;
+
+	if (!windel || !windel->data)
+	{
+		return;
+	}
+
+	button = (DRGN_WindelButton*)windel->data;
+	button->action = action;
+}
+
+Uint8 drgn_windelButtonCheckBounds(DRGN_Windel* windel, Vector2D pos)
+{
+	DRGN_WindelButton* button;
+
+	if (!windel || !windel->data)
+	{
+		return;
+	}
+
+	button = (DRGN_WindelButton*)windel->data;
+
+	return (gfc_point_in_rect(pos, button->bounds));
 }

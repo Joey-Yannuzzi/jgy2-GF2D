@@ -19,6 +19,7 @@ int main(int argc, char * argv[])
     /*variable declarations*/
     int done = 0;
     const Uint8 * keys;
+    Uint32* mouseInput;
     //Sprite *sprite;
     
     int mx,my;
@@ -90,7 +91,7 @@ int main(int argc, char * argv[])
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         //SDL_PollEvent(&event);
         /*update things here*/
-        SDL_GetMouseState(&mx,&my);
+        mouseInput = SDL_GetMouseState(&mx,&my);
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
         
@@ -127,8 +128,15 @@ int main(int argc, char * argv[])
         if (keys[SDL_SCANCODE_1] && !window)
         {
             window = drgn_windowNew("pauseMenu", DRGN_BUTTON_NONE, NULL);
+            drgn_windowAssignActionByName(window, "resumeButton", DRGN_BUTTON_RESUME);
+            drgn_windowAssignActionByName(window, "quitButton", DRGN_BUTTON_QUIT);
             drgn_entitySetAllInactive();
         }
+
+        /*if (mouseInput[SDL_MOUSEBUTTONDOWN])
+        {
+            slog("click!");
+        }*/
         
         // exit condition
         if (keys[SDL_SCANCODE_ESCAPE])

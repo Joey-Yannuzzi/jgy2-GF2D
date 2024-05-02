@@ -4,6 +4,7 @@
 #include "simple_json.h"
 //#include "gfc_types.h"
 //#include "gf2d_sprite.h"
+#include "gfc_shape.h"
 #include "drgn_font.h"
 #include "drgn_entity.h"
 
@@ -146,7 +147,9 @@ typedef enum DRGN_CommandAction
 	DRGN_BUTTON_RESCUE,
 	DRGN_BUTTON_TRANSFER,
 	DRGN_BUTTON_DROP,
-	DRGN_BUTTON_WAIT
+	DRGN_BUTTON_WAIT,
+	DRGN_BUTTON_RESUME,
+	DRGN_BUTTON_QUIT
 }
 DRGN_ButtonAction;
 
@@ -158,6 +161,7 @@ typedef struct
 	Uint8 pushed; //checks if button has been pushed this frame; set to 1 if button was pushed
 	DRGN_ButtonAction action; //action the button should perform
 	DRGN_Entity* parent; //parent entity of the button, if it exists
+	Rect bounds; //bounds of the collision rect
 }
 DRGN_WindelButton;
 
@@ -190,5 +194,9 @@ void drgn_windelButtonUpdate(DRGN_Windel* windel);
 void drgn_windelButtonDraw(DRGN_Windel* windel);
 
 void drgn_windelButtonCompleteAction(DRGN_WindelButton* button);
+
+void drgn_windelButtonAssignAction(DRGN_Windel* windel, DRGN_ButtonAction action);
+
+Uint8 drgn_windelButtonCheckBounds(DRGN_Windel* windel, Vector2D pos);
 
 #endif
