@@ -13,6 +13,7 @@
 #include "drgn_inventory.h"
 #include "drgn_terrain.h"
 #include "drgn_window.h"
+#include "drgn_cursor.h"
 
 int main(int argc, char * argv[])
 {
@@ -30,6 +31,12 @@ int main(int argc, char * argv[])
     DRGN_World* world;
     DRGN_Window* window;
     SDL_Event event;
+    DRGN_Entity* pauseCursor = NULL;
+    DRGN_Windel* resume = NULL;
+    DRGN_Windel* quit = NULL;
+    DRGN_WindelButton* button;
+    DRGN_Entity* unitHolder;
+    DRGN_Unit* unit;
     //DRGN_Entity* window;
     //Color color = gfc_color8(255, 0, 0, 100);
     //Vector2D vect = vector2d(1, 1);
@@ -125,12 +132,19 @@ int main(int argc, char * argv[])
         //slog("Player pos: %f, %f", player->pos.x, player->pos.y);
         //slog("Unit pos: %f, %f", unit->pos.x, unit->pos.y);
         
-        if (keys[SDL_SCANCODE_1] && !window)
+        if (keys[SDL_SCANCODE_ESCAPE] && !window)
         {
             window = drgn_windowNew("pauseMenu", DRGN_BUTTON_NONE, NULL);
             drgn_windowAssignActionByName(window, "resumeButton", DRGN_BUTTON_RESUME);
             drgn_windowAssignActionByName(window, "quitButton", DRGN_BUTTON_QUIT);
+            unitHolder = drgn_unitNew("soldier", NULL, DRGN_BLUE, vector2d(0, 0));
+            unitHolder->pauseWindels = gfc_allocate_array(sizeof(DRGN_Windel*), 2);
             drgn_entitySetAllInactive();
+            resume = drgn_windowGetWindelByName(window, "resumeButton");
+            quit = drgn_windowGetWindelByName(window, "quitButton");
+            unitHolder->pauseWindels[0] = resume;
+            unitHolder->pauseWindels[1] = quit;
+            pauseCursor = drgn_cursorNew(vector2d(resume->pos.x - 31, resume->pos.y), resume->pos, quit->pos, unitHolder, 1);
         }
 
         /*if (mouseInput[SDL_MOUSEBUTTONDOWN])
@@ -139,11 +153,36 @@ int main(int argc, char * argv[])
         }*/
         
         // exit condition
-        if (keys[SDL_SCANCODE_ESCAPE])
-        {
-            done = 1;
-        }
+        //if (keys[SDL_SCANCODE_ESCAPE])
+        //{
+            //done = 1;
+        //}
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
+
+        if (resume)
+        {
+            button = (DRGN_WindelButton*)resume->data;
+
+            if (button->pushed)
+            {
+                drgn_windowFree(window);
+                window = NULL;
+                resume = NULL;
+                quit = NULL;
+                drgn_entityFree(pauseCursor);
+                pauseCursor = NULL;
+            }
+        }
+
+        if (quit)
+        {
+            button = (DRGN_WindelButton*)quit->data;
+
+            if (button->pushed)
+            {
+                done = 1;
+            }
+        }
     }
 
     //drgn_entityFree(player);

@@ -494,6 +494,10 @@ void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
 		case DRGN_BUTTON_WAIT:
 			unit->currentAction = DRGN_WAIT;
 			break;
+		case DRGN_BUTTON_RESUME:
+			break;
+		case DRGN_BUTTON_QUIT:
+			break;
 		default:
 			return;
 	}

@@ -3,6 +3,7 @@
 
 #include "gfc_types.h"
 #include "gf2d_sprite.h"
+#include "drgn_window.h"
 
 /*
 * @purpose default entity skeleton; all entities should inherit from this
@@ -36,6 +37,7 @@ typedef struct DRGN_Entity_S
 	Vector2D offsetVal; //value of the offset; only used for UI
 	Uint8 inactive; //set this off when entity is no longer active, but does not want to be destroyed yet
 	Uint8 win; //checks if this unit has completed the objective
+	DRGN_Windel** pauseWindels; //windels for the pause menu; only for use in pause menu
 	void* data; //for any additional data default entity may not have; NULL if no such data exists
 
 	void (*think) (struct DRGN_Entity_S* self); //call function to make decisions

@@ -6,7 +6,7 @@
 //#include "gf2d_sprite.h"
 #include "gfc_shape.h"
 #include "drgn_font.h"
-#include "drgn_entity.h"
+//#include "drgn_entity.h"
 
 /*
 * @purpose windel creation, management, and destruction

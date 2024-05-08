@@ -2,8 +2,8 @@
 #define __DRGN_WINDOW_H__
 
 #include "gfc_list.h"
-#include "drgn_entity.h"
-#include "drgn_font.h"
+//#include "drgn_entity.h"
+//#include "drgn_font.h"
 #include "drgn_windels.h"
 
 /*
@@ -87,5 +87,7 @@ DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name);
 void drgn_windowAssignActionByName(DRGN_Window* window, const char* name, DRGN_ButtonAction action);
 
 Uint8 drgn_windowGetBoundsByName(DRGN_Window*, Vector2D pos, const char* name);
+
+DRGN_Windel* drgn_windowGetWindelByName(DRGN_Window* window, const char* name);
 
 #endif
