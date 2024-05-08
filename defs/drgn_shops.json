@@ -1,0 +1,9 @@
+{
+  "shops": [
+    {
+      "type": "item",
+      "name": "testShop",
+      "items": [ "smallPotion", "mediumPotion", "largePotion" ]
+    }
+  ]
+}

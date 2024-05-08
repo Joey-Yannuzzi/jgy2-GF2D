@@ -377,16 +377,18 @@ void drgn_windowDrawAll()
 	}
 }
 
-DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent)
+DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent, int textNum, int buttonNum)
 {
 	SJson* window;
 	SJson* windels;
 	SJson* element;
-	Vector2D pos;
+	Vector2D pos, temp;
 	Vector2D scale;
 	DRGN_Windel** elements;
 	int check, count;
 	const char* windelType;
+	int multiTexts = 0;
+	int multiButtons = 0;
 
 	if (!name)
 	{
@@ -432,11 +434,12 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Ent
 
 	windels = sj_object_get_value(window, "windels");
 	count = sj_array_get_count(windels);
+	count = count + textNum + multiButtons;
 	elements = gfc_allocate_array(sizeof(DRGN_Windel*), count);
 
 	for (int bogus = 0; bogus < count; bogus++)
 	{
-		element = sj_array_get_nth(windels, bogus);
+		element = sj_array_get_nth(windels, bogus - (multiTexts + multiButtons));
 
 		if (!element)
 		{
@@ -459,6 +462,44 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Ent
 		{
 			elements[bogus] = drgn_windelButtonNew(element, pos, action, parent);
 			slog("button created");
+		}
+		else if (gfc_strlcmp(windelType, "multiText") == 0)
+		{
+			slog("begining multiText");
+
+			if (!textNum)
+			{
+				slog("no text number");
+				continue;
+			}
+			vector2d_copy(temp, pos);
+
+			for (int bogus2 = 0; bogus2 < textNum; bogus2++)
+			{
+				slog("iterating");
+				vector2d_add(temp, temp, vector2d(pos.x, pos.y + 24));
+				elements[bogus + bogus2] = drgn_windelTextNew(element, vector2d(pos.x, pos.y + (bogus2* 24)));
+				multiTexts++;
+			}
+
+			bogus = bogus + multiTexts;
+			slog("created multi text");
+		}
+		else if (gfc_strlcmp(windelType, "multiButton") == 0)
+		{
+			if (!buttonNum)
+			{
+				continue;
+			}
+
+			for (int bogus2 = 0; bogus2 < buttonNum; bogus2++)
+			{
+				elements[bogus + bogus2] = drgn_windelButtonNew(element, vector2d(pos.x, pos.y + (bogus2 * 24)), 0, NULL);
+				multiButtons++;
+			}
+
+			bogus = bogus + multiButtons;
+			slog("created multi button");
 		}
 		else
 		{
@@ -632,4 +673,54 @@ DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name)
 	}
 
 	return NULL;
+}
+
+void drgn_windowAddWindel(DRGN_Window* window, DRGN_Windel* windel)
+{
+	DRGN_Windel** windels;
+	int count;
+
+	if (!window || !window->elements || !windel)
+	{
+		return;
+	}
+
+	count = window->elementsNum + 1;
+	windels = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+
+	if (!windels)
+	{
+		slog("failed to make new windel array");
+		return;
+	}
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus])
+		{
+			continue;
+		}
+
+		windels[bogus] = window->elements[bogus];
+	}
+
+	windels[window->elementsNum] = windel;
+	window->elementsNum = count;
+	window->elements = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+
+	if (!window->elements)
+	{
+		slog("failed to add windel");
+		return;
+	}
+
+	for (int bogus = 0; bogus < count; bogus++)
+	{
+		if (!windels[bogus])
+		{
+			continue;
+		}
+
+		window->elements[bogus] = windels[bogus];
+	}
 }

@@ -13,6 +13,7 @@
 #include "drgn_inventory.h"
 #include "drgn_terrain.h"
 #include "drgn_window.h"
+#include "drgn_shop.h"
 
 int main(int argc, char * argv[])
 {
@@ -53,6 +54,7 @@ int main(int argc, char * argv[])
     drgn_windowFileInit("defs/drgn_windows.json");
     drgn_fontInit();
     drgn_windowManagerNew(1024);
+    drgn_shopFileInit("defs/drgn_shops.json");
     SDL_ShowCursor(SDL_DISABLE);
 
     drgn_cameraSetSize(vector2d(1200, 720));
@@ -75,7 +77,8 @@ int main(int argc, char * argv[])
     //window = drgn_windowNew("hello world", "images/windows/testWindow.png", 128, 64, vector2d(64, 64));
     player = drgn_playerNew();
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
-    //window = drgn_windowNew("commandWindow");
+    //window = drgn_windowNew("shopWindow", 0, NULL);
+    //drgn_shopCreate("testShop");
 
     slog("Begining game");
     /*main game loop*/
