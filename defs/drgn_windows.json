@@ -197,6 +197,65 @@
           "name": "commandButton"
         }
       ]
+    },
+    {
+      "name": "shopWindow",
+      "offset": 1,
+      "windels": [
+        {
+          "type": "sprite",
+          "name": "backgroundSprite",
+          "sprite": "images/windows/shop.png",
+          "useColor": 0
+        },
+        {
+          "type": "text",
+          "name": "buyText",
+          "text": "Buy",
+          "size": 2,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255,
+          "posX": 32,
+          "posY": 96
+        },
+        {
+          "type": "multiText",
+          "name": "buyItems",
+          "text": "Buyable_Items",
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255,
+          "posY": 128
+        },
+        {
+          "type": "text",
+          "name": "sellText",
+          "text": "Sell",
+          "size": 2,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255,
+          "posX": 173,
+          "posY": 96
+        },
+        {
+          "type": "text",
+          "name": "sellItems",
+          "text": "Sellable_Items",
+          "size": 1,
+          "colorR": 255,
+          "colorG": 255,
+          "colorB": 255,
+          "colorA": 255,
+          "posX": 173,
+          "posY": 128
+        }
+      ]
     }
   ]
 }

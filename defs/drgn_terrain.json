@@ -46,7 +46,21 @@
       "displayName": "Flag",
       "tile": 6,
       "moveValue": 1,
-      "avoidBonus" : 50
+      "avoidBonus": 50
+    },
+    {
+      "name": "shop",
+      "displayName": "Item Shop",
+      "tile": 7,
+      "moveValue": 1,
+      "avoidBonus": 10
+    },
+    {
+      "name": "armory",
+      "displayName": "Armory",
+      "tile": 8,
+      "moveValue": 1,
+      "defBonus": 1
     }
   ]
 }

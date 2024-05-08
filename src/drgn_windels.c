@@ -171,6 +171,7 @@ DRGN_Windel* drgn_windelTextNew(SJson* object, Vector2D parentPos)
 	sj_object_get_value_as_int(object, "size", &textBox->style);
 	windel->data = textBox;
 
+	slog("created text with text %s", textBox->text);
 	return (windel);
 }
 

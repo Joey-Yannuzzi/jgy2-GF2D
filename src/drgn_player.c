@@ -31,7 +31,7 @@ DRGN_Entity* drgn_playerNew()
 	//slog("%i", (*(DRGN_Player*)self->data).test);
 	player = gfc_allocate_array(sizeof(DRGN_Player), 1);
 	self->data = player;
-	player->terrainWindow = drgn_windowNew("terrainDisplay", DRGN_BUTTON_NONE, NULL);
+	player->terrainWindow = drgn_windowNew("terrainDisplay", DRGN_BUTTON_NONE, NULL, 0);
 	player->unitWindow = NULL;
 	player->targets = gfc_allocate_array(sizeof(DRGN_Entity*), 12);
 	return (self);
@@ -172,7 +172,7 @@ void drgn_playerUpdate(DRGN_Entity* self)
 			return;
 		}
 
-		player->statScreen = drgn_windowNew("statScreen", DRGN_BUTTON_NONE, NULL);
+		player->statScreen = drgn_windowNew("statScreen", DRGN_BUTTON_NONE, NULL, 0);
 		self->inactive = 1;
 		curr = (DRGN_Unit*)unit->data;
 

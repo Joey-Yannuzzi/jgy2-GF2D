@@ -50,7 +50,7 @@ DRGN_Window;
 * @param name the name if the window
 * @return the window created
 */
-DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent);
+DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent, int textNum);
 
 /*
 * @brief free a window
