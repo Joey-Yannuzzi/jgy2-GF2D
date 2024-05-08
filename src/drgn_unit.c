@@ -608,14 +608,14 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (gfc_strlcmp(terrain->name, "Flag") == 0)
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_SEIZE, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_SEIZE, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Seize");
 				bogus++;
 			}
 			else if (gfc_strlcmp(terrain->name, "Item Shop") == 0)
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_ITEM_SHOP, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_ITEM_SHOP, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Item Shop");
 				bogus++;
@@ -629,7 +629,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 		if (right || left || down || up)
 		{
-			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TALK, self, 0);
+			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TALK, self, 0, 0);
 			drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 			drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Talk");
 			bogus++;
@@ -679,7 +679,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unitRight || unitLeft || unitUp || unitDown)
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", action, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", action, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Attack");
 				bogus++;
@@ -716,7 +716,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (drgn_inventoryCheckItemTypeInInventory(unit->inventory, DRGN_DIVINE) &&((unitRight && unitRight->currentHP < unitRight->stats[1]) || (unitLeft && unitLeft->currentHP < unitLeft->stats[1]) || (unitUp && unitUp->currentHP < unitUp->stats[1]) || (unitDown && unitDown->currentHP < unitDown->stats[1])))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_HEAL, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_HEAL, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Heal");
 				bogus++;
@@ -724,7 +724,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 		}
 		if (unit->inventory->curr > 0)
 		{
-			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_ITEM, self, 0);
+			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_ITEM, self, 0, 0);
 			drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 			drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Item");
 			bogus++;
@@ -760,7 +760,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unit->inventory->curr > 0 || ((unitRight && unitRight->inventory->curr > 0) || (unitLeft && unitLeft->inventory->curr > 0) || (unitUp && unitUp->inventory->curr > 0) || (unitDown && unitDown->inventory->curr > 0)))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TRADE, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TRADE, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Trade");
 				bogus++;
@@ -797,7 +797,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (!unit->rescuedUnit && ((unitRight && unit->stats[10] > unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] > unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] > unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] > unitDown->stats[10] && !unitDown->rescuedUnit)))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_RESCUE, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_RESCUE, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Rescue");
 				bogus++;
@@ -834,7 +834,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 
 			if (unit->rescuedUnit && ((unitRight && unit->stats[10] <= unitRight->stats[10] && !unitRight->rescuedUnit) || (unitLeft && unit->stats[10] <= unitLeft->stats[10] && !unitLeft->rescuedUnit) || (unitUp && unit->stats[10] <= unitUp->stats[10] && !unitUp->rescuedUnit) || (unitDown && unit->stats[10] <= unitDown->stats[10] && !unitDown->rescuedUnit)))
 			{
-				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TRANSFER, self, 0);
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_TRANSFER, self, 0, 0);
 				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Transfer");
 				bogus++;
@@ -854,13 +854,13 @@ void drgn_unitMenu(DRGN_Entity* self)
 			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y + 64), self) ||
 			!drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x, self->pos.y - 64), self)))
 		{
-			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_DROP, self, 0);
+			unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_DROP, self, 0, 0);
 			drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 			drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Drop");
 			bogus++;
 		}
 
-		unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_WAIT, self, 0);
+		unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_WAIT, self, 0, 0);
 		drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
 		drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Wait");
 		unit->menuCursor = drgn_cursorNew(vector2d(self->pos.x + 65, self->pos.y), unit->menuWindow[0]->pos, unit->menuWindow[bogus]->pos, self, bogus);

@@ -377,7 +377,7 @@ void drgn_windowDrawAll()
 	}
 }
 
-DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent, int textNum)
+DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent, int textNum, int buttonNum)
 {
 	SJson* window;
 	SJson* windels;
@@ -388,6 +388,7 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Ent
 	int check, count;
 	const char* windelType;
 	int multiTexts = 0;
+	int multiButtons = 0;
 
 	if (!name)
 	{
@@ -433,12 +434,12 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Ent
 
 	windels = sj_object_get_value(window, "windels");
 	count = sj_array_get_count(windels);
-	count = count + textNum;
+	count = count + textNum + multiButtons;
 	elements = gfc_allocate_array(sizeof(DRGN_Windel*), count);
 
 	for (int bogus = 0; bogus < count; bogus++)
 	{
-		element = sj_array_get_nth(windels, bogus - multiTexts);
+		element = sj_array_get_nth(windels, bogus - (multiTexts + multiButtons));
 
 		if (!element)
 		{
@@ -483,6 +484,22 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Ent
 
 			bogus = bogus + multiTexts;
 			slog("created multi text");
+		}
+		else if (gfc_strlcmp(windelType, "multiButton") == 0)
+		{
+			if (!buttonNum)
+			{
+				continue;
+			}
+
+			for (int bogus2 = 0; bogus2 < buttonNum; bogus2++)
+			{
+				elements[bogus + bogus2] = drgn_windelButtonNew(element, vector2d(pos.x, pos.y + (bogus2 * 24)), 0, NULL);
+				multiButtons++;
+			}
+
+			bogus = bogus + multiButtons;
+			slog("created multi button");
 		}
 		else
 		{

@@ -190,7 +190,7 @@
           "type": "text",
           "name": "commandText",
           "text": "Wait",
-          "size": 2
+          "size": 1
         },
         {
           "type": "button",
@@ -221,6 +221,12 @@
           "posY": 96
         },
         {
+          "type": "button",
+          "name": "buyButton",
+          "posX": 32,
+          "posY": 96
+        },
+        {
           "type": "multiText",
           "name": "buyItems",
           "text": "Buyable_Items",
@@ -232,6 +238,11 @@
           "posY": 128
         },
         {
+          "type": "multiButton",
+          "name": "buyItemButton",
+          "posY": 128
+        },
+        {
           "type": "text",
           "name": "sellText",
           "text": "Sell",
@@ -240,6 +251,12 @@
           "colorG": 255,
           "colorB": 255,
           "colorA": 255,
+          "posX": 173,
+          "posY": 96
+        },
+        {
+          "type": "button",
+          "name": "sellButton",
           "posX": 173,
           "posY": 96
         }

@@ -12,9 +12,11 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 	SJson* shop;
 	SJson* items;
 	SJson* item;
+	SJson* inventoryItem;
 	int count, check;
 	const char** itemNames;
 	DRGN_Unit* unit;
+	const char* inventoryName;
 
 	shop = drgn_shopGetDefByName(name);
 
@@ -48,7 +50,7 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 		slog("%s", itemNames[bogus]);
 	}
 
-	window = drgn_windowNew("shopWindow", 0, NULL, count);
+	window = drgn_windowNew("shopWindow", 0, NULL, count, count);
 	check = 0;
 
 	for (int bogus = 0; bogus < window->elementsNum; bogus++)
@@ -60,7 +62,15 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 
 		if (gfc_strlcmp(window->elements[bogus]->name, "buyItems") == 0)
 		{
-			drgn_windelTextChangeText(window->elements[bogus],itemNames[check++]);
+			inventoryItem = drgn_inventoryGetDefByName(itemNames[check++]);
+			inventoryName = sj_object_get_value_as_string(inventoryItem, "displayName");
+
+			if (!inventoryName)
+			{
+				continue;
+			}
+
+			drgn_windelTextChangeText(window->elements[bogus], inventoryName);
 		}
 	}
 
