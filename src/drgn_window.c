@@ -633,3 +633,63 @@ DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name)
 
 	return NULL;
 }
+
+void drgn_windowAssignActionByName(DRGN_Window* window, const char* name, DRGN_ButtonAction action)
+{
+	if (!window)
+	{
+		return;
+	}
+
+	if (!name)
+	{
+		slog("no name given");
+		return;
+	}
+
+	if (!window->elementsNum || !window->elements)
+	{
+		return;
+	}
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus])
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(window->elements[bogus]->name, name) == 0)
+		{
+			drgn_windelButtonAssignAction(window->elements[bogus], action);
+		}
+	}
+}
+
+DRGN_Windel* drgn_windowGetWindelByName(DRGN_Window* window, const char* name)
+{
+	if (!window || !name)
+	{
+		return;
+	}
+
+	if (!window->elementsNum || !window->elements)
+	{
+		return;
+	}
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus])
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(window->elements[bogus]->name, name) == 0)
+		{
+			return (window->elements[bogus]);
+		}
+	}
+
+	return NULL;
+}

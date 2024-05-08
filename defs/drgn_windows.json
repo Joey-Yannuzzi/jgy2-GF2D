@@ -197,6 +197,68 @@
           "name": "commandButton"
         }
       ]
+    },
+    {
+      "name": "pauseMenu",
+      "offset": 0,
+      "windels": [
+        {
+          "type": "sprite",
+          "name": "backgroundShadow",
+          "sprite": "images/windows/shadow.png",
+          "useColor": 1,
+          "colorR": 0,
+          "colorG": 0,
+          "colorB": 0,
+          "colorA": 100
+        },
+        {
+          "type": "button",
+          "name": "resumeButton",
+          "posX": 568,
+          "posY": 240,
+          "width": 64,
+          "height": 32
+        },
+        {
+          "type": "sprite",
+          "name": "resumeSprite",
+          "sprite": "images/windows/menuWindow.png",
+          "posX": 568,
+          "posY": 240
+        },
+        {
+          "type": "text",
+          "name": "resumeText",
+          "text": "RESUME",
+          "size": 2,
+          "posX": 536,
+          "posY": 240
+        },
+        {
+          "type": "button",
+          "name": "quitButton",
+          "posX": 568,
+          "posY": 480,
+          "width": 64,
+          "height": 32
+        },
+        {
+          "type": "sprite",
+          "name": "quitSprite",
+          "sprite": "images/windows/menuWindow.png",
+          "posX": 568,
+          "posY": 480
+        },
+        {
+          "type": "text",
+          "name": "quitText",
+          "text": "QUIT",
+          "size": 2,
+          "posX": 552,
+          "posY": 480
+        }
+      ]
     }
   ]
 }

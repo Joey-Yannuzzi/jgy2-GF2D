@@ -1,7 +1,7 @@
 #ifndef __DRGN_UNIT_H__
 #define __DRGN_UNIT_H__
 
-#include "drgn_window.h"
+//#include "drgn_window.h"
 #include "drgn_entity.h"
 #include "drgn_inventory.h"
 #include "drgn_move.h"

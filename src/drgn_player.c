@@ -3,7 +3,7 @@
 #include "drgn_camera.h"
 #include "drgn_terrain.h"
 #include "drgn_unit.h"
-#include "drgn_windels.h"
+//#include "drgn_windels.h"
 
 DRGN_Entity* drgn_playerNew()
 {
