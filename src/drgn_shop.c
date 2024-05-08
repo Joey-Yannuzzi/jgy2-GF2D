@@ -1,25 +1,27 @@
 #include "simple_logger.h"
-#include "drgn_window.h"
+#include "drgn_unit.h"
 #include "drgn_shop.h"
 
 SJson* _shopFile = NULL;
 SJson* _shops = NULL;
 
-void drgn_shopCreate(const char* name)
+DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 {
 	DRGN_Window* window;
+	DRGN_Windel* text;
 	SJson* shop;
 	SJson* items;
 	SJson* item;
-	int count;
+	int count, check;
 	const char** itemNames;
+	DRGN_Unit* unit;
 
 	shop = drgn_shopGetDefByName(name);
 
 	if (!shop)
 	{
 		slog("failed to find shop with name %s", name);
-		return;
+		return NULL;
 	}
 
 	items = sj_object_get_value(shop, "items");
@@ -27,7 +29,7 @@ void drgn_shopCreate(const char* name)
 	if (!items)
 	{
 		slog("failed to find shop items");
-		return;
+		return NULL;
 	}
 
 	count = sj_array_get_count(items);
@@ -47,7 +49,51 @@ void drgn_shopCreate(const char* name)
 	}
 
 	window = drgn_windowNew("shopWindow", 0, NULL, count);
+	check = 0;
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus] || check > count)
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(window->elements[bogus]->name, "buyItems") == 0)
+		{
+			drgn_windelTextChangeText(window->elements[bogus],itemNames[check++]);
+		}
+	}
+
+	if (!shopper || !shopper->data)
+	{
+		slog("no unit is shopping currently");
+		free(itemNames);
+		return NULL;
+	}
+
+	unit = (DRGN_Unit*)shopper->data;
+
+	if (unit->inventory->curr)
+	{
+		for (int bogus = 0; bogus < unit->inventory->curr; bogus++)
+		{
+			if (!&unit->inventory->itemList[bogus])
+			{
+				continue;
+			}
+
+			text = drgn_windelTextAdd(unit->inventory->itemList[bogus].name, vector2d(173, 128 + (bogus * 24)), window->pos, vector2d(1, 1), GFC_COLOR_WHITE, unit->inventory->itemList[bogus].name, DRGN_MEDIUM_FONT);
+
+			if (!text)
+			{
+				continue;
+			}
+
+			drgn_windowAddWindel(window, text);
+		}
+	}
 	free(itemNames);
+	return (window);
 }
 
 void drgn_shopFileInit(const char* file)

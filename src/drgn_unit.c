@@ -1,4 +1,5 @@
 #include "simple_logger.h"
+#include "drgn_shop.h"
 #include "drgn_unit.h"
 #include "drgn_terrain.h"
 #include "drgn_world.h"
@@ -612,6 +613,13 @@ void drgn_unitMenu(DRGN_Entity* self)
 				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Seize");
 				bogus++;
 			}
+			else if (gfc_strlcmp(terrain->name, "Item Shop") == 0)
+			{
+				unit->menuWindow[bogus] = drgn_windowNew("commandWindow", DRGN_BUTTON_ITEM_SHOP, self, 0);
+				drgn_windowChangePosition(unit->menuWindow[bogus], vector2d(self->pos.x + 96, self->pos.y + (bogus * 32)));
+				drgn_windelTextChangeText(unit->menuWindow[bogus]->elements[1], "Item Shop");
+				bogus++;
+			}
 		}
 
 		right = drgn_entityGetSelectionByPosition(DRGN_GREEN, vector2d(self->pos.x + 64, self->pos.y), self);
@@ -903,7 +911,11 @@ void drgn_unitMenu(DRGN_Entity* self)
 	case DRGN_DROP:
 		//drgn_unitDrop(self);
 		break;
-
+	case DRGN_ITEM_SHOP:
+		drgn_unitItemShop(self);
+		break;
+	case DRGN_ARMORY:
+		break;
 	default:
 		break;
 	}
@@ -1897,4 +1909,26 @@ void drgn_unitActionRescue(DRGN_Entity* self, DRGN_Entity* other)
 	otherUnit->rescued = 1;
 	other->inactive = 1;
 	drgn_unitWait(self);
+}
+
+void drgn_unitItemShop(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+
+	if (!unit->shop)
+	{
+		unit->shop = drgn_shopCreate("testShop", self);
+		drgn_windowChangePosition(unit->shop, vector2d(self->pos.x + 96, self->pos.y));
+		drgn_unitMoveFree(self);
+		drgn_entityFree(unit->menuCursor);
+		unit->menuCursor = NULL;
+		drgn_unitMenuFree(unit);
+	}
 }

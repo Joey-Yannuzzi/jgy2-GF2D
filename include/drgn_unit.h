@@ -38,7 +38,9 @@ typedef enum DRGN_Action
 	DRGN_RESCUE,
 	DRGN_DROP,
 	DRGN_TRANSFER,
-	DRGN_SEIZE
+	DRGN_SEIZE,
+	DRGN_ITEM_SHOP,
+	DRGN_ARMORY
 }
 DRGN_Action;
 
@@ -69,6 +71,7 @@ typedef struct
 	DRGN_Entity* menuCursor; //the cursor when selecting a command
 	Uint8 rescued; //checks to see if this unit is recsued currently
 	int menuOffset;
+	DRGN_Window* shop;
 	//DRGN_Window* statScreen;
 }
 DRGN_Unit;
@@ -152,5 +155,7 @@ void drgn_unitActionHeal(DRGN_Entity* self, DRGN_Entity* other);
 void drgn_unitActionTrade(DRGN_Entity* self, DRGN_Entity* other);
 
 void drgn_unitActionRescue(DRGN_Entity* self, DRGN_Entity* other);
+
+void drgn_unitItemShop(DRGN_Entity* self);
 
 #endif

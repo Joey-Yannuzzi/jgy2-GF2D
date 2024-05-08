@@ -175,6 +175,48 @@ DRGN_Windel* drgn_windelTextNew(SJson* object, Vector2D parentPos)
 	return (windel);
 }
 
+DRGN_Windel* drgn_windelTextAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color color, const char* text, DRGN_FontStyles style)
+{
+	DRGN_Windel* windel;
+	DRGN_WindelText* textBox;
+
+	if (!name || !text)
+	{
+		slog("no name or text given");
+		return;
+	}
+
+	windel = gfc_allocate_array(sizeof(DRGN_Windel), 1);
+
+	if (!windel)
+	{
+		slog("no windel could be created");
+		return;
+	}
+
+	windel->free = drgn_windelTextFree;
+	windel->update = drgn_windelTextUpdate;
+	windel->draw = drgn_windelTextDraw;
+	windel->name = name;
+	vector2d_add(windel->pos, pos, parentPos);
+	vector2d_copy(windel->scale, scale);
+	windel->color = color;
+	textBox = gfc_allocate_array(sizeof(DRGN_WindelText), 1);
+
+	if (!textBox)
+	{
+		slog("text box could not be created");
+		drgn_windelFree(windel);
+		return;
+	}
+
+	textBox->text = gfc_allocate_array(sizeof(char), strlen(text) + 1);
+	strcpy(textBox->text, text);
+	textBox->style = style;
+	windel->data = textBox;
+	return (windel);
+}
+
 void drgn_windelTextFree(DRGN_Windel* windel)
 {
 	DRGN_WindelText* text;
@@ -489,6 +531,12 @@ void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
 			break;
 		case DRGN_BUTTON_WAIT:
 			unit->currentAction = DRGN_WAIT;
+			break;
+		case DRGN_BUTTON_ITEM_SHOP:
+			unit->currentAction = DRGN_ITEM_SHOP;
+			break;
+		case DRGN_BUTTON_ARMORY:
+			unit->currentAction = DRGN_ARMORY;
 			break;
 		default:
 			return;

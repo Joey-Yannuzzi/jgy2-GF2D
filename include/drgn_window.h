@@ -52,6 +52,8 @@ DRGN_Window;
 */
 DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Entity* parent, int textNum);
 
+void drgn_windowAddWindel(DRGN_Window* window, DRGN_Windel* windel);
+
 /*
 * @brief free a window
 * @param self the window to be freed

@@ -242,18 +242,6 @@
           "colorA": 255,
           "posX": 173,
           "posY": 96
-        },
-        {
-          "type": "text",
-          "name": "sellItems",
-          "text": "Sellable_Items",
-          "size": 1,
-          "colorR": 255,
-          "colorG": 255,
-          "colorB": 255,
-          "colorA": 255,
-          "posX": 173,
-          "posY": 128
         }
       ]
     }

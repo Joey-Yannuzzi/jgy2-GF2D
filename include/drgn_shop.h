@@ -1,6 +1,7 @@
 #ifndef __DRGN_SHOP_H__
 #define __DRGN_SHOP_H__
 
+#include "drgn_window.h"
 /*
 *  @prupose create and manage in game shops and armories
 */
@@ -9,7 +10,7 @@
 * @brief creates a new shop
 * @param name the name of the shop
 */
-void drgn_shopCreate(const char* name);
+DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper);
 
 /*
 * @brief loads the shop file and json object and all its shop objects

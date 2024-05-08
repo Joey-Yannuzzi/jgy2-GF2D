@@ -78,7 +78,7 @@ int main(int argc, char * argv[])
     player = drgn_playerNew();
     //sprite = gf2d_sprite_load_all("images/tiles/move.png", 64, 64, 1, 0);
     //window = drgn_windowNew("shopWindow", 0, NULL);
-    drgn_shopCreate("testShop");
+    //drgn_shopCreate("testShop");
 
     slog("Begining game");
     /*main game loop*/
