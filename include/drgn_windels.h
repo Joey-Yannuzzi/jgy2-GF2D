@@ -17,6 +17,7 @@ typedef struct DRGN_Windel_S
 	Vector2D pos; //position of the element relative to the window
 	Vector2D scale; //scale of the element relative to the window; set to 1 for no additional scaling
 	Color color; //color of the text
+	Uint8 selectable; //is this windel able to be selected
 	void* data; //element specific data
 
 	void (*free) (struct DRGN_Windel_S* windel); //call function for freeing windel

@@ -427,6 +427,7 @@ DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_Button
 	button->pushed = 0;
 	button->action = action;
 	button->parent = parent;
+	windel->selectable = 1;
 	windel->data = button;
 
 	return (windel);
@@ -544,5 +545,4 @@ void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
 
 	slog("%i action", unit->currentAction);
 	drgn_unitMenu(button->parent);
-
 }

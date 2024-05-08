@@ -1462,9 +1462,26 @@ void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
 		}
 
 		drgn_unitActionRescue(self, other);
+		break;
+	case DRGN_ITEM_SHOP:
+		drgn_unitActionShop(self);
 	default:
 		break;
 	}
+}
+
+void drgn_unitActionShop(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+	drgn_selectorThink(unit->selector);
+	drgn_selectorUpdate(unit->selector);
 }
 
 void drgn_unitActionTalk(DRGN_Entity* self, DRGN_Entity* other)
@@ -1930,5 +1947,6 @@ void drgn_unitItemShop(DRGN_Entity* self)
 		drgn_entityFree(unit->menuCursor);
 		unit->menuCursor = NULL;
 		drgn_unitMenuFree(unit);
+		unit->selector = drgn_selectorNew(unit->shop);
 	}
 }

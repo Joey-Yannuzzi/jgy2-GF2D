@@ -2,6 +2,7 @@
 #define __DRGN_UNIT_H__
 
 #include "drgn_window.h"
+#include "drgn_selector.h"
 #include "drgn_entity.h"
 #include "drgn_inventory.h"
 #include "drgn_move.h"
@@ -72,6 +73,7 @@ typedef struct
 	Uint8 rescued; //checks to see if this unit is recsued currently
 	int menuOffset;
 	DRGN_Window* shop;
+	DRGN_Selector* selector;
 	//DRGN_Window* statScreen;
 }
 DRGN_Unit;
@@ -157,5 +159,7 @@ void drgn_unitActionTrade(DRGN_Entity* self, DRGN_Entity* other);
 void drgn_unitActionRescue(DRGN_Entity* self, DRGN_Entity* other);
 
 void drgn_unitItemShop(DRGN_Entity* self);
+
+void drgn_unitActionShop(DRGN_Entity* self);
 
 #endif

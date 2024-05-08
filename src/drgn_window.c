@@ -724,3 +724,30 @@ void drgn_windowAddWindel(DRGN_Window* window, DRGN_Windel* windel)
 		window->elements[bogus] = windels[bogus];
 	}
 }
+
+DRGN_Windel* drgn_windowGetWindelByPosition(DRGN_Window* window, DRGN_Windel* ignore, Vector2D pos)
+{
+	if (!window || !window->elementsNum || !window->elements)
+	{
+		slog("no window or elements to search through");
+		return NULL;
+	}
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus])
+		{
+			continue;
+		}
+
+		if (window->elements[bogus] == ignore)
+		{
+			continue;
+		}
+
+		if (vector2d_compare(window->elements[bogus]->pos, pos))
+		{
+			return (window->elements[bogus]);
+		}
+	}
+}
