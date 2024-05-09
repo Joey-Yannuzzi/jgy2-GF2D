@@ -305,6 +305,11 @@ void drgn_unitUpdate(DRGN_Entity* self)
 		unit->moveMap = NULL;
 		unit->moveMap = gfc_allocate_array(sizeof(Uint8), unit->moveTotal);
 	}
+
+	if (unit->selector)
+	{
+		drgn_unitActionShop(self);
+	}
 }
 
 void drgn_unitFree(DRGN_Entity* self)
@@ -337,6 +342,13 @@ void drgn_unitFree(DRGN_Entity* self)
 	slog("after if");
 	drgn_inventoryFree(unit->inventory);
 	slog("after inventory");
+
+	if (!unit->selector)
+	{
+		free(unit);
+		return;
+	}
+
 	free(unit);
 }
 
@@ -916,6 +928,12 @@ void drgn_unitMenu(DRGN_Entity* self)
 		break;
 	case DRGN_ARMORY:
 		break;
+	case DRGN_BUY:
+		drgn_unitBuy(self);
+		break;
+	case DRGN_SELL:
+		drgn_unitSell(self);
+		break;
 	default:
 		break;
 	}
@@ -1462,9 +1480,27 @@ void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
 		}
 
 		drgn_unitActionRescue(self, other);
+		break;
+	case DRGN_ITEM_SHOP:
+		//drgn_unitActionShop(self);
+		break;
 	default:
 		break;
 	}
+}
+
+void drgn_unitActionShop(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+	drgn_selectorThink(unit->selector);
+	drgn_selectorUpdate(unit->selector);
 }
 
 void drgn_unitActionTalk(DRGN_Entity* self, DRGN_Entity* other)
@@ -1930,5 +1966,99 @@ void drgn_unitItemShop(DRGN_Entity* self)
 		drgn_entityFree(unit->menuCursor);
 		unit->menuCursor = NULL;
 		drgn_unitMenuFree(unit);
+		unit->selector = drgn_selectorNew(unit->shop);
 	}
+}
+
+void drgn_unitBuy(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+
+	if (!unit->shop || !unit->shop->elementsNum)
+	{
+		return;
+	}
+
+	for (int bogus = 0; bogus < unit->shop->elementsNum; bogus++)
+	{
+		if (!unit->shop->elements[bogus])
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(unit->shop->elements[bogus]->name, "buyButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 0;
+			slog("made unselectable");
+		}
+		else if (gfc_strlcmp(unit->shop->elements[bogus]->name, "sellButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 0;
+			slog("made unselectable");
+		}
+		else if (gfc_strlcmp(unit->shop->elements[bogus]->name, "buyItemButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 1;
+			slog("made selectable");
+		}
+		else if (gfc_strlcmp(unit->shop->elements[bogus]->name, "sellItemButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 0;
+		}
+	}
+
+	drgn_selectorFindNewSelection(unit->selector);
+}
+
+void drgn_unitSell(DRGN_Entity* self)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+
+	if (!unit->shop || !unit->shop->elementsNum)
+	{
+		return;
+	}
+
+	for (int bogus = 0; bogus < unit->shop->elementsNum; bogus++)
+	{
+		if (!unit->shop->elements[bogus])
+		{
+			continue;
+		}
+
+		if (gfc_strlcmp(unit->shop->elements[bogus]->name, "buyButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 0;
+			slog("made unselectable");
+		}
+		else if (gfc_strlcmp(unit->shop->elements[bogus]->name, "sellButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 0;
+			slog("made unselectable");
+		}
+		else if (gfc_strlcmp(unit->shop->elements[bogus]->name, "buyItemButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 0;
+		}
+		else if (gfc_strlcmp(unit->shop->elements[bogus]->name, "sellItemButton") == 0)
+		{
+			unit->shop->elements[bogus]->selectable = 1;
+		}
+	}
+
+	drgn_selectorFindNewSelection(unit->selector);
 }

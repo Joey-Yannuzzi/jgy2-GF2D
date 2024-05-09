@@ -86,4 +86,6 @@ void drgn_windowFileInit(const char* name);
 
 DRGN_Windel* drgn_windowGetPositionByName(Vector2D pos, const char* name);
 
+DRGN_Windel* drgn_windowGetWindelByPosition(DRGN_Window* window, DRGN_Windel* ignore, Vector2D pos);
+
 #endif

@@ -106,6 +106,13 @@ void drgn_cursorUpdate(DRGN_Entity* self)
 
 	cursor = (DRGN_Cursor*)self->data;
 
+	cursor->frameskip++;
+
+	if (cursor->frameskip % 8 > 0)
+	{
+		return;
+	}
+
 	if (cursor->curr < 0)
 	{
 		cursor->curr = cursor->max + cursor->curr;
@@ -132,13 +139,6 @@ void drgn_cursorUpdate(DRGN_Entity* self)
 		}
 
 		cursor->pressed = 0;
-	}
-
-	cursor->frameskip++;
-
-	if (cursor->frameskip % 8 > 0)
-	{
-		return;
 	}
 
 	vector2d_add(self->pos, self->pos, self->velocity);
