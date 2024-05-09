@@ -72,7 +72,7 @@ SJson* drgn_inventoryGetDefByName(const char* name);
 */
 void drgn_inventoryClose();
 
-DRGN_Inventory* drgn_inventoryNew(const char* itemNames, int max);
+DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int curr, int max);
 
 void drgn_inventoryAddItem(DRGN_Inventory* self, const char* name);
 

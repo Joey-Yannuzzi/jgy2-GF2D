@@ -206,12 +206,12 @@ DRGN_Entity* drgn_unitNew(const char* name, const char* inventory[], enum DRGN_A
 
 	if (gfc_strlcmp(unit->class, "arcanist") == 0)
 	{
-		unit->inventory = drgn_inventoryNew(names, 5);
+		unit->inventory = drgn_inventoryNew(names, 5, 5);
 		slog("arcanist inventory filled");
 	}
 	else
 	{
-		unit->inventory = drgn_inventoryNew(inventory, 5);
+		unit->inventory = drgn_inventoryNew(inventory, 4, 5);
 	}
 
 	if (!unit->inventory)
@@ -342,13 +342,6 @@ void drgn_unitFree(DRGN_Entity* self)
 	slog("after if");
 	drgn_inventoryFree(unit->inventory);
 	slog("after inventory");
-
-	if (!unit->selector)
-	{
-		free(unit);
-		return;
-	}
-
 	free(unit);
 }
 
@@ -480,11 +473,13 @@ void drgn_unitMoveFree(DRGN_Entity* self)
 		return;
 	}
 
+	slog("freeing movement");
+
 	unit = (DRGN_Unit*)self->data;
 
 	for (int bogus = 0; bogus < unit->moveTotal; bogus++)
 	{
-		if (!unit->moveTiles)
+		if (!unit->moveTiles[bogus])
 		{
 			continue;
 		}
@@ -600,6 +595,7 @@ void drgn_unitMenu(DRGN_Entity* self)
 	DRGN_Entity* temp;
 	DRGN_Terrain* terrain;
 	DRGN_ButtonAction action;
+	DRGN_WindelText* text;
 
 	if (!self || !self->data)
 	{
@@ -934,6 +930,14 @@ void drgn_unitMenu(DRGN_Entity* self)
 	case DRGN_SELL:
 		drgn_unitSell(self);
 		break;
+	case DRGN_PURCHASE:
+		if (!unit->selector)
+		{
+			return;
+		}
+
+		text = (DRGN_WindelText*)unit->selector->texts[unit->selector->current]->data;
+		drgn_unitActionBuy(self , text->text);
 	default:
 		break;
 	}
@@ -997,7 +1001,9 @@ void drgn_unitWait(DRGN_Entity* self)
 	self->color = GFC_COLOR_GREY;
 	unit->active = 0;
 	self->selected = 0;
+	slog("failed to free shopping stuff");
 	drgn_unitMoveFree(self);
+	slog("here");
 	drgn_unitMenuFree(unit);
 	drgn_entityFree(unit->menuCursor);
 	unit->menuCursor = NULL;
@@ -1008,6 +1014,19 @@ void drgn_unitWait(DRGN_Entity* self)
 	player->totalTargets = 0;
 	self->curr->curr = NULL;
 	self->curr = NULL;
+
+	if (unit->selector)
+	{
+		drgn_selectorFree(unit->selector);
+		unit->selector = NULL;
+	}
+
+	if (unit->shop)
+	{
+		drgn_windowFree(unit->shop);
+		unit->shop = NULL;
+		slog("freed shop");
+	}
 }
 
 void drgn_unitSeize(DRGN_Entity* self)
@@ -1489,6 +1508,29 @@ void drgn_unitInteractionByEnum(DRGN_Entity* self, DRGN_Entity* other)
 	}
 }
 
+void drgn_unitActionBuy(DRGN_Entity* self, const char* item)
+{
+	DRGN_Unit* unit;
+
+	if (!self || !self->data || !item)
+	{
+		return;
+	}
+
+	unit = (DRGN_Unit*)self->data;
+
+	if (unit->inventory->curr >= unit->inventory->max)
+	{
+		return;
+	}
+
+	slog("buying item");
+	drgn_inventoryItemAdd(unit->inventory, item);
+	slog("bought item");
+	drgn_unitWait(self);
+	slog("waited successfully");
+}
+
 void drgn_unitActionShop(DRGN_Entity* self)
 {
 	DRGN_Unit* unit;
@@ -1499,6 +1541,12 @@ void drgn_unitActionShop(DRGN_Entity* self)
 	}
 
 	unit = (DRGN_Unit*)self->data;
+
+	if (!unit->selector)
+	{
+		return;
+	}
+
 	drgn_selectorThink(unit->selector);
 	drgn_selectorUpdate(unit->selector);
 }
@@ -1964,8 +2012,8 @@ void drgn_unitItemShop(DRGN_Entity* self)
 		drgn_windowChangePosition(unit->shop, vector2d(self->pos.x + 96, self->pos.y));
 		drgn_unitMoveFree(self);
 		drgn_entityFree(unit->menuCursor);
-		unit->menuCursor = NULL;
 		drgn_unitMenuFree(unit);
+		unit->menuCursor = NULL;
 		unit->selector = drgn_selectorNew(unit->shop);
 	}
 }

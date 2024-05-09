@@ -88,6 +88,14 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 
 			drgn_windelTextChangeText(window->elements[bogus], inventoryName);
 		}
+
+		if (gfc_strlcmp(window->elements[bogus]->name, "buyItemButton") == 0)
+		{
+			button = (DRGN_WindelButton*)window->elements[bogus]->data;
+			button->action = DRGN_BUTTON_PURCHASE;
+			button->parent = shopper;
+			slog("making item button");
+		}
 	}
 
 	if (!shopper || !shopper->data)

@@ -84,6 +84,7 @@ int main(int argc, char * argv[])
     /*main game loop*/
     while(!done)
     {
+        //slog("frame");
         drgn_fontCacheListFree();
         //slog("here");
         //slog("Unit named %s on field", ((DRGN_Unit*)unit->data)->name);
@@ -93,7 +94,7 @@ int main(int argc, char * argv[])
         SDL_GetMouseState(&mx,&my);
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
-        
+
         drgn_entitySystemThink();
         drgn_entitySystemUpdate();
         drgn_windowUpdateAll();

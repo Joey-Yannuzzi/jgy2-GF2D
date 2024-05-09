@@ -559,7 +559,7 @@ void drgn_windowFree(DRGN_Window* self)
 	}
 
 	free(self->elements);
-	//slog("freeing window");
+	slog("freeing window");
 }
 
 void drgn_windowUpdate(DRGN_Window* self)

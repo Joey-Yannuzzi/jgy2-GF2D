@@ -195,7 +195,7 @@ DRGN_World* drgn_worldLoad(const char* file)
 	SJson* unit;
 	SJson* unitName;
 	SJson* unitAffiliation;
-	const char* names[] = { "smallPotion", "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
+	const char* names[] = { "lvlIncrease", "mediumPotion", "largePotion", "smallPotion" };
 
 	if (_currentWorld)
 	{
