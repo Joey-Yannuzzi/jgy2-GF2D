@@ -37,6 +37,7 @@ SJson* drgn_inventoryGetDefByName(const char* name)
 	SJson* item;
 	int count;
 	const char* itemName;
+	const char* displayName;
 
 	if (!name)
 	{
@@ -64,6 +65,7 @@ SJson* drgn_inventoryGetDefByName(const char* name)
 		}
 
 		itemName = sj_object_get_value_as_string(item, "name");
+		displayName = sj_object_get_value_as_string(item, "displayName");
 		slog("got name %s", itemName);
 
 		if (!itemName)
@@ -71,7 +73,7 @@ SJson* drgn_inventoryGetDefByName(const char* name)
 			continue;
 		}
 
-		if (gfc_strlcmp(name, itemName) == 0)
+		if (gfc_strlcmp(name, itemName) == 0 || gfc_strlcmp(name, displayName) == 0)
 		{
 			return (item);
 		}
@@ -91,7 +93,7 @@ void drgn_inventoryClose()
 	slog("freed inventory file successfully");
 }
 
-DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int max)
+DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int curr, int max)
 {
 	DRGN_Inventory* self;
 	DRGN_InventoryItem* item;
@@ -124,7 +126,7 @@ DRGN_Inventory* drgn_inventoryNew(const char* itemNames[], int max)
 
 	if (itemNames)
 	{
-		for (int bogus = 0; bogus < max; bogus++)
+		for (int bogus = 0; bogus < curr; bogus++)
 		{
 			if (!itemNames[bogus])
 			{

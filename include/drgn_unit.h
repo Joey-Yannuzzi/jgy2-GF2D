@@ -43,7 +43,8 @@ typedef enum DRGN_Action
 	DRGN_ITEM_SHOP,
 	DRGN_ARMORY,
 	DRGN_BUY,
-	DRGN_SELL
+	DRGN_SELL,
+	DRGN_PURCHASE
 }
 DRGN_Action;
 
@@ -167,5 +168,7 @@ void drgn_unitActionShop(DRGN_Entity* self);
 void drgn_unitBuy(DRGN_Entity* self);
 
 void drgn_unitSell(DRGN_Entity* self);
+
+void drgn_unitActionBuy(DRGN_Entity* self, const char* item);
 
 #endif

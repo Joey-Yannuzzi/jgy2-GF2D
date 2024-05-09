@@ -471,7 +471,6 @@ void drgn_windelButtonFree(DRGN_Windel* windel)
 
 	button = (DRGN_WindelButton*)windel->data;
 	slog("about to free %s", windel->name);
-	//free(button);
 }
 
 void drgn_windelButtonUpdate(DRGN_Windel* windel)
@@ -491,7 +490,7 @@ void drgn_windelButtonUpdate(DRGN_Windel* windel)
 		//Do push action here
 		
 		button->pushed = 0;
-		slog("pushed");
+		//slog("pushed");
 		drgn_windelButtonCompleteAction(button);
 		//slog("%i", button->action);
 		return;
@@ -569,16 +568,19 @@ void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
 			unit->currentAction = DRGN_ARMORY;
 			break;
 		case DRGN_BUTTON_BUY:
-			slog("buying items");
+			//slog("buying items");
 			unit->currentAction = DRGN_BUY;
 			break;
 		case DRGN_BUTTON_SELL:
 			unit->currentAction = DRGN_SELL;
 			break;
+		case DRGN_BUTTON_PURCHASE:
+			unit->currentAction = DRGN_PURCHASE;
+			break;
 		default:
 			return;
 	}
 
-	slog("%i action", unit->currentAction);
+	//slog("%i action", unit->currentAction);
 	drgn_unitMenu(button->parent);
 }
