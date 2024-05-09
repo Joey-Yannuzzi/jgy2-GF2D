@@ -4,6 +4,8 @@
 DRGN_Selector* drgn_selectorNew(DRGN_Window* window)
 {
 	DRGN_Selector* selector;
+	int count = 0;
+	int fail = 0;
 
 	if (!window || !window->elements)
 	{
@@ -21,6 +23,33 @@ DRGN_Selector* drgn_selectorNew(DRGN_Window* window)
 
 	selector->parent = window;
 	selector->current = 0;
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus] || !window->elements[bogus]->selectable)
+		{
+			continue;
+		}
+
+		count++;
+	}
+
+	selector->max = count;
+	selector->buttons = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+	selector->texts = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+
+	for (int bogus = 0; bogus < window->elementsNum; bogus++)
+	{
+		if (!window->elements[bogus] || !window->elements[bogus]->selectable)
+		{
+			fail++;
+			continue;
+		}
+
+		selector->buttons[bogus - fail] = window->elements[bogus];
+		selector->texts[bogus - fail] = drgn_windowGetWindelByPosition(window, window->elements[bogus], window->elements[bogus]->pos);
+	}
+
 	return (selector);
 }
 
@@ -36,13 +65,13 @@ void drgn_selectorThink(DRGN_Selector* selector)
 
 	SDL_PumpEvents();
 	keys = SDL_GetKeyboardState(NULL);
-	SDL_PollEvent(&event);
+	//SDL_PollEvent(&event);
 
-	if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_A]) && event.type == SDL_KEYDOWN)
+	if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_A])
 	{
 		selector->dir = -1;
 	}
-	else if ((keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_D]) && event.type == SDL_KEYDOWN)
+	else if (keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_D])
 	{
 		selector->dir = 1;
 	}
@@ -50,13 +79,25 @@ void drgn_selectorThink(DRGN_Selector* selector)
 	{
 		selector->dir = 0;
 	}
+
+	if (keys[SDL_SCANCODE_SPACE])
+	{
+		selector->pressed = 1;
+	}
 }
 
 void drgn_selectorUpdate(DRGN_Selector* selector)
 {
-	DRGN_Windel* windel;
+	DRGN_WindelButton* button;
 
 	if (!selector || !selector->parent)
+	{
+		return;
+	}
+
+	selector->frameskip++;
+
+	if (selector->frameskip % 8 > 0)
 	{
 		return;
 	}
@@ -65,24 +106,37 @@ void drgn_selectorUpdate(DRGN_Selector* selector)
 
 	if (selector->current < 0)
 	{
-		selector->current = selector->parent->elements[selector->parent->elementsNum - 1];
+		selector->current = selector->max + selector->current;
 	}
 	
-	if (selector->current >= selector->parent->elementsNum)
+	if (selector->current >= selector->max)
 	{
-		selector->current = selector->parent->elements[0];
+		selector->current = selector->current - selector->max;
 	}
 
-	if (!selector->parent->elements[selector->current]->selectable)
+	for (int bogus = 0; bogus < selector->max; bogus++)
 	{
-		selector->current += selector->dir;
+		if (!selector->texts[bogus])
+		{
+			slog("something is wrong");
+			continue;
+		}
+
+		if (selector->texts[bogus] == selector->texts[selector->current])
+		{
+			selector->texts[bogus]->color = GFC_COLOR_GREY;
+		}
+		else
+		{
+			selector->texts[bogus]->color = GFC_COLOR_WHITE;
+		}
 	}
 
-	windel = drgn_windowGetWindelByPosition(selector->parent, selector->parent->elements[selector->current], selector->parent->elements[selector->current]->pos);
-
-	if (selector->parent->elements[selector->current]->selectable && windel)
+	if (selector->pressed)
 	{
-		windel->color = GFC_COLOR_GREY;
+		button = (DRGN_WindelButton*)selector->buttons[selector->current]->data;
+		button->pushed = 1;
+		selector->pressed = 0;
 	}
 }
 
@@ -91,5 +145,39 @@ void drgn_selectorFree(DRGN_Selector* selector)
 	if (!selector)
 	{
 		return;
+	}
+}
+
+void drgn_selectorFindNewSelection(DRGN_Selector* selector)
+{
+	int count = 0;
+	int fail = 0;
+
+	selector->current = 0;
+
+	for (int bogus = 0; bogus < selector->parent->elementsNum; bogus++)
+	{
+		if (!selector->parent->elements[bogus] || !selector->parent->elements[bogus]->selectable)
+		{
+			continue;
+		}
+
+		count++;
+	}
+
+	selector->max = count;
+	selector->buttons = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+	selector->texts = gfc_allocate_array(sizeof(DRGN_Windel*), count);
+
+	for (int bogus = 0; bogus < selector->parent->elementsNum; bogus++)
+	{
+		if (!selector->parent->elements[bogus] || !selector->parent->elements[bogus]->selectable)
+		{
+			fail++;
+			continue;
+		}
+
+		selector->buttons[bogus - fail] = selector->parent->elements[bogus];
+		selector->texts[bogus - fail] = drgn_windowGetWindelByPosition(selector->parent, selector->parent->elements[bogus], selector->parent->elements[bogus]->pos);
 	}
 }

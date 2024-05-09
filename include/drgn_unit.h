@@ -41,7 +41,9 @@ typedef enum DRGN_Action
 	DRGN_TRANSFER,
 	DRGN_SEIZE,
 	DRGN_ITEM_SHOP,
-	DRGN_ARMORY
+	DRGN_ARMORY,
+	DRGN_BUY,
+	DRGN_SELL
 }
 DRGN_Action;
 
@@ -161,5 +163,9 @@ void drgn_unitActionRescue(DRGN_Entity* self, DRGN_Entity* other);
 void drgn_unitItemShop(DRGN_Entity* self);
 
 void drgn_unitActionShop(DRGN_Entity* self);
+
+void drgn_unitBuy(DRGN_Entity* self);
+
+void drgn_unitSell(DRGN_Entity* self);
 
 #endif

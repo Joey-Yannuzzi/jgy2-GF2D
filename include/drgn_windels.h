@@ -33,6 +33,8 @@ DRGN_Windel;
 */
 DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos);
 
+DRGN_Windel* drgn_windelAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color* color);
+
 /*
 * @brief free a window element and its data
 * @param windel the window element to be freed
@@ -71,7 +73,7 @@ DRGN_Windel* drgn_windelTextNew(SJson* object, Vector2D parentPos);
 /*
 * @brief used to directly create new text windels to an existing window
 */
-DRGN_Windel* drgn_windelTextAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color color, const char* text, DRGN_FontStyles style);
+DRGN_Windel* drgn_windelTextAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color* color, const char* text, DRGN_FontStyles style);
 
 /*
 * @brief frees a text window element
@@ -154,7 +156,9 @@ typedef enum DRGN_CommandAction
 	DRGN_BUTTON_DROP,
 	DRGN_BUTTON_WAIT,
 	DRGN_BUTTON_ITEM_SHOP,
-	DRGN_BUTTON_ARMORY
+	DRGN_BUTTON_ARMORY,
+	DRGN_BUTTON_BUY,
+	DRGN_BUTTON_SELL
 }
 DRGN_ButtonAction;
 
@@ -178,6 +182,8 @@ DRGN_WindelButton;
 * @return the created window element
 */
 DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_ButtonAction action, DRGN_Entity* parent);
+
+DRGN_Windel* drgn_windelButtonAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color* color, DRGN_ButtonAction action, DRGN_Entity* parent);
 
 /*
 * @brief frees a button window element

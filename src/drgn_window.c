@@ -302,7 +302,7 @@ void drgn_windowFreeAll()
 			continue;
 		}
 
-		slog("freeing window %i", bogus);
+		//slog("freeing window %s", _windows.windows[bogus].elements[1]->name);
 		drgn_windowFree(&_windows.windows[bogus]);
 	}
 }
@@ -434,7 +434,7 @@ DRGN_Window* drgn_windowNew(const char* name, DRGN_ButtonAction action, DRGN_Ent
 
 	windels = sj_object_get_value(window, "windels");
 	count = sj_array_get_count(windels);
-	count = count + textNum + multiButtons;
+	count = count + textNum + buttonNum;
 	elements = gfc_allocate_array(sizeof(DRGN_Windel*), count);
 
 	for (int bogus = 0; bogus < count; bogus++)
@@ -702,6 +702,7 @@ void drgn_windowAddWindel(DRGN_Window* window, DRGN_Windel* windel)
 		}
 
 		windels[bogus] = window->elements[bogus];
+		//drgn_windelFree(window->elements[bogus]);
 	}
 
 	windels[window->elementsNum] = windel;
@@ -722,6 +723,7 @@ void drgn_windowAddWindel(DRGN_Window* window, DRGN_Windel* windel)
 		}
 
 		window->elements[bogus] = windels[bogus];
+		//drgn_windelFree(windels[bogus]);
 	}
 }
 
@@ -745,9 +747,15 @@ DRGN_Windel* drgn_windowGetWindelByPosition(DRGN_Window* window, DRGN_Windel* ig
 			continue;
 		}
 
-		if (vector2d_compare(window->elements[bogus]->pos, pos))
+		//slog("%s position: %f, %f | %s position: %f, %f", ignore->name, pos.x, pos.y, window->elements[bogus]->name, window->elements[bogus]->pos.x, window->elements[bogus]->pos.y);
+
+		if (window->elements[bogus]->pos.x == pos.x && window->elements[bogus]->pos.y == pos.y)
 		{
+			slog("%s", window->elements[bogus]->name);
 			return (window->elements[bogus]);
 		}
 	}
+
+	slog("nothing found");
+	return NULL;
 }

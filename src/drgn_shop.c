@@ -9,6 +9,7 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 {
 	DRGN_Window* window;
 	DRGN_Windel* text;
+	DRGN_Windel* sellButton;
 	SJson* shop;
 	SJson* items;
 	SJson* item;
@@ -17,6 +18,8 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 	const char** itemNames;
 	DRGN_Unit* unit;
 	const char* inventoryName;
+	DRGN_WindelButton* button;
+	Color color;
 
 	shop = drgn_shopGetDefByName(name);
 
@@ -50,7 +53,7 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 		slog("%s", itemNames[bogus]);
 	}
 
-	window = drgn_windowNew("shopWindow", 0, NULL, count, count);
+	window = drgn_windowNew("shopWindow", 0, shopper, count, count);
 	check = 0;
 
 	for (int bogus = 0; bogus < window->elementsNum; bogus++)
@@ -58,6 +61,19 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 		if (!window->elements[bogus] || check > count)
 		{
 			continue;
+		}
+
+		button = (DRGN_WindelButton*)window->elements[bogus]->data;
+
+		if (gfc_strlcmp(window->elements[bogus]->name, "buyButton") == 0)
+		{
+			window->elements[bogus]->selectable = 1;
+			button->action = DRGN_BUTTON_BUY;
+		}
+		else if (gfc_strlcmp(window->elements[bogus]->name, "sellButton") == 0)
+		{
+			window->elements[bogus]->selectable = 1;
+			button->action = DRGN_BUTTON_SELL;
 		}
 
 		if (gfc_strlcmp(window->elements[bogus]->name, "buyItems") == 0)
@@ -92,14 +108,22 @@ DRGN_Window* drgn_shopCreate(const char* name, DRGN_Entity* shopper)
 				continue;
 			}
 
-			text = drgn_windelTextAdd(unit->inventory->itemList[bogus].name, vector2d(173, 128 + (bogus * 24)), window->pos, vector2d(1, 1), GFC_COLOR_WHITE, unit->inventory->itemList[bogus].name, DRGN_MEDIUM_FONT);
+			color = GFC_COLOR_WHITE;
+			text = drgn_windelTextAdd(unit->inventory->itemList[bogus].name, vector2d(173, 128 + (bogus * 24)), window->pos, vector2d(1, 1), &color, unit->inventory->itemList[bogus].name, DRGN_MEDIUM_FONT);
+			sellButton = drgn_windelButtonAdd("sellItemButton", vector2d(173, 128 + (bogus * 24)), window->pos, vector2d(1, 1), NULL, 0, shopper);
 
 			if (!text)
 			{
 				continue;
 			}
 
+			if (!sellButton)
+			{
+				continue;
+			}
+
 			drgn_windowAddWindel(window, text);
+			drgn_windowAddWindel(window, sellButton);
 		}
 	}
 	free(itemNames);

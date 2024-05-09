@@ -76,13 +76,42 @@ DRGN_Windel* drgn_windelNew(SJson* object, Vector2D parentPos)
 	}
 
 	windel->color = gfc_color8(red, green, blue, alpha);
+	windel->selectable = 0;
 
 	return (windel);
 }
 
+DRGN_Windel* drgn_windelAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color* color)
+{
+	DRGN_Windel* windel;
+
+	if (!name)
+	{
+		slog("no name or text given");
+		return NULL;
+	}
+
+	windel = gfc_allocate_array(sizeof(DRGN_Windel), 1);
+
+	if (!windel)
+	{
+		slog("no windel could be created");
+		return NULL;
+	}
+
+	windel->name = name;
+	vector2d_add(windel->pos, pos, parentPos);
+	vector2d_copy(windel->scale, scale);
+
+	if (color)
+	{
+		windel->color = *color;
+	}
+}
+
 void drgn_windelFree(DRGN_Windel* windel)
 {
-	slog("freeing elements");
+	slog("freeing element %s", windel->name);
 	
 	if (!windel)
 	{
@@ -175,39 +204,22 @@ DRGN_Windel* drgn_windelTextNew(SJson* object, Vector2D parentPos)
 	return (windel);
 }
 
-DRGN_Windel* drgn_windelTextAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color color, const char* text, DRGN_FontStyles style)
+DRGN_Windel* drgn_windelTextAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color* color, const char* text, DRGN_FontStyles style)
 {
 	DRGN_Windel* windel;
 	DRGN_WindelText* textBox;
 
-	if (!name || !text)
-	{
-		slog("no name or text given");
-		return;
-	}
-
-	windel = gfc_allocate_array(sizeof(DRGN_Windel), 1);
-
-	if (!windel)
-	{
-		slog("no windel could be created");
-		return;
-	}
-
+	windel = drgn_windelAdd(name, pos, parentPos, scale, color);
 	windel->free = drgn_windelTextFree;
 	windel->update = drgn_windelTextUpdate;
 	windel->draw = drgn_windelTextDraw;
-	windel->name = name;
-	vector2d_add(windel->pos, pos, parentPos);
-	vector2d_copy(windel->scale, scale);
-	windel->color = color;
 	textBox = gfc_allocate_array(sizeof(DRGN_WindelText), 1);
 
 	if (!textBox)
 	{
 		slog("text box could not be created");
 		drgn_windelFree(windel);
-		return;
+		return NULL;
 	}
 
 	textBox->text = gfc_allocate_array(sizeof(char), strlen(text) + 1);
@@ -427,9 +439,24 @@ DRGN_Windel* drgn_windelButtonNew(SJson* object, Vector2D parentPos, DRGN_Button
 	button->pushed = 0;
 	button->action = action;
 	button->parent = parent;
-	windel->selectable = 1;
 	windel->data = button;
 
+	return (windel);
+}
+
+DRGN_Windel* drgn_windelButtonAdd(const char* name, Vector2D pos, Vector2D parentPos, Vector2D scale, Color* color, DRGN_ButtonAction action, DRGN_Entity* parent)
+{
+	DRGN_Windel* windel;
+	DRGN_WindelButton* button;
+
+	windel = drgn_windelAdd(name, pos, parentPos, scale, color);
+	windel->free = drgn_windelButtonFree;
+	windel->update = drgn_windelButtonUpdate;
+	windel->draw = drgn_windelButtonDraw;
+	button = gfc_allocate_array(sizeof(DRGN_WindelButton*), 1);
+	button->action = action;
+	button->parent = parent;
+	windel->data = button;
 	return (windel);
 }
 
@@ -443,7 +470,8 @@ void drgn_windelButtonFree(DRGN_Windel* windel)
 	}
 
 	button = (DRGN_WindelButton*)windel->data;
-	free(button);
+	slog("about to free %s", windel->name);
+	//free(button);
 }
 
 void drgn_windelButtonUpdate(DRGN_Windel* windel)
@@ -465,6 +493,7 @@ void drgn_windelButtonUpdate(DRGN_Windel* windel)
 		button->pushed = 0;
 		slog("pushed");
 		drgn_windelButtonCompleteAction(button);
+		//slog("%i", button->action);
 		return;
 	}
 }
@@ -538,6 +567,13 @@ void drgn_windelButtonCompleteAction(DRGN_WindelButton* button)
 			break;
 		case DRGN_BUTTON_ARMORY:
 			unit->currentAction = DRGN_ARMORY;
+			break;
+		case DRGN_BUTTON_BUY:
+			slog("buying items");
+			unit->currentAction = DRGN_BUY;
+			break;
+		case DRGN_BUTTON_SELL:
+			unit->currentAction = DRGN_SELL;
 			break;
 		default:
 			return;
